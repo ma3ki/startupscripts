@@ -105,7 +105,7 @@ sed -i 's/^#ssl = yes/ssl = no/' /etc/dovecot/conf.d/10-ssl.conf
 sed -i 's/^ssl_cert =.*/#ssl_cert =/' /etc/dovecot/conf.d/10-ssl.conf
 sed -i 's/^ssl_key =.*/#ssl_key =/' /etc/dovecot/conf.d/10-ssl.conf
 
-sed -i "s/^#postmaster_address.*/postmaster_address = postmaster@${DOMAIN}/" /etc/dovecot/conf.d/15-lda.conf
+sed -i "s/^#postmaster_address.*/postmaster_address = postmaster@${FIRST_DOMAIN}/" /etc/dovecot/conf.d/15-lda.conf
 sed -i 's/^  #mail_plugins =.*/  mail_plugins = $mail_plugins sieve/' /etc/dovecot/conf.d/15-lda.conf
 sed -i 's/^#lda_mailbox_autocreate = no/lda_mailbox_autocreate = yes/' /etc/dovecot/conf.d/15-lda.conf
 sed -i 's/^  #mail_plugins =.*/  mail_plugins = $mail_plugins sieve/' /etc/dovecot/conf.d/20-lmtp.conf
