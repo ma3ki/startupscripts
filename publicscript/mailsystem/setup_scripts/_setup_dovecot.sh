@@ -4,16 +4,16 @@ set -e
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-cat << _EOF_ > /etc/yum.repos.d/dovecot.repo
+cat <<_EOL_> /etc/yum.repos.d/dovecot.repo
 [dovecot-2.3-latest]
-name=Dovecot 2.3 CentOS $releasever - $basearch
-baseurl=http://repo.dovecot.org/ce-2.3-latest/centos/$releasever/RPMS/$basearch
+name=Dovecot 2.3 CentOS $releasever - \$basearch
+baseurl=http://repo.dovecot.org/ce-2.3-latest/centos/\$releasever/RPMS/\$basearch
 gpgkey=https://repo.dovecot.org/DOVECOT-REPO-GPG
 gpgcheck=1
 enabled=1
-_EOF_
+_EOL_
 
-yum install -y dovecot dovecot-pigeonhole
+yum install -y dovecot dovecot-pigeonhole 
 yum install -y openldap-devel expat-devel bzip2-devel zlib-devel
 
 sed -i 's/^#protocols = .*/protocols = imap pop3 lmtp sieve/' /etc/dovecot/dovecot.conf
