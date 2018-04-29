@@ -35,7 +35,7 @@ yum install -y expect telnet bind-utils jq mailx git dstat sysstat bash-completi
 
 # git repository
 git clone https://github.com/ma3ki/startupscripts.git
-source startupscripts/oritinalscript/inbound-mailsystem/config.source
+source startupscripts/originalscript/inbound-mailsystem/config.source
 cd startupscripts/originalscript/inbound-mailsystem
 
 source ./setup_scripts/_startup_function.lib
