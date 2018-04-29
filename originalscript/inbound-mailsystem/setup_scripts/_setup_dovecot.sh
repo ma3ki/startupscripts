@@ -50,8 +50,8 @@ echo 'deliver_log_format = from=%{from_envelope}, to=%{to_envelope}, size=%p, ms
 #echo 'deliver_log_format = from=%{from_envelope}, size=%p, msgid=%m %$' >> /etc/dovecot/conf.d/10-logging.conf
 
 sed -i 's#^\#mail_location .*#mail_location = sdbox:/var/dovecot/%Ld/%Ln#' /etc/dovecot/conf.d/10-mail.conf
-sed -i 's#^\#mail_attachment_dir #mail_attachment_dir = /var/dovecot/%Ld/%Ln/attachments#' /etc/dovecot/conf.d/10-mail.conf
-sed -i 's#^\#mail_attachment_min_size #mail_attachment_min_size = 1#' /etc/dovecot/conf.d/10-mail.conf
+sed -i 's#^\#mail_attachment_dir .*#mail_attachment_dir = /var/dovecot/%Ld/%Ln/attachments#' /etc/dovecot/conf.d/10-mail.conf
+sed -i 's#^\#mail_attachment_min_size .*#mail_attachment_min_size = 1#' /etc/dovecot/conf.d/10-mail.conf
 sed -i 's/^#first_valid_uid.*/first_valid_uid = 97/' /etc/dovecot/conf.d/10-mail.conf
 cat <<_EOL_>>/etc/dovecot/conf.d/10-mail.conf
 

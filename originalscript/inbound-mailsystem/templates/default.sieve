@@ -1,4 +1,4 @@
-require ["copy", "fileinto", "envelope", "vnd.dovecot.execute", "vnd.dovecot.pipe", "foreverypart", "mime", "variables"];
+require ["copy", "fileinto", "envelope", "vnd.dovecot.pipe", "foreverypart", "mime", "variables"];
 
 if envelope :matches "from" "*" {
  	set "from" "${1}" ;

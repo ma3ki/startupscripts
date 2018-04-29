@@ -35,6 +35,7 @@ sed -i -e 's/^smtp/#smtp/' -e 's/^#submission/submission/' /etc/postfix-inbound/
 cat <<_EOL_>> /etc/postfix-inbound/transport
 *	lmtp:[127.0.0.1]:24
 _EOL_
+postmap /etc/postfix-inbound/transport
 
 for cf in /etc/postfix/main.cf /etc/postfix-inbound/main.cf
 do
