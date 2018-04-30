@@ -141,5 +141,7 @@ cp templates/default.sieve /var/dovecot/default.sieve
 mkdir -p /var/dovecot/bin
 cp -p script/mail*.sh /var/dovecot/bin
 
+echo '* * * * * root find /var/dovecot/queue -name \*q\.[0-9]* | xargs -n 1 sh >/dev/null 2>&1' >> /etc/cron.d/startup-script-cron
+
 systemctl enable dovecot
 systemctl start dovecot

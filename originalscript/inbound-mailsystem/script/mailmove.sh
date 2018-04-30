@@ -9,15 +9,23 @@ MBOX="$4"
 
 TAG=mailmove
 PRI=mail.info
+PID=$$
+QD=/var/dovecot/queue
 
-RESULT=$(doveadm move -u ${FROM} "${MBOX}" user ${TO} mailbox INBOX header message-id "${MID}" since 1mins 2>&1)
+mkdir -p ${QD}
+
+# create queue
+cat <<_EOL_> ${QD}/moveq.${PID}
+doveadm move -u ${FROM} "${MBOX}" user ${TO} mailbox INBOX header message-id "${MID}" since 2mins >/dev/null 2>&1
 
 if [ $? -eq 0 ]
 then
 	logger -t ${TAG} -p ${PRI} "from=<${FROM}>, mbox=${MBOX}, to=<${TO}>, mid=${MID}, state=success"
+	rm -f ${QD}/moveq.${PID}
 else
-	logger -t ${TAG} -p ${PRI} "from=<${FROM}>, mbox=${MBOX}, to=<${TO}>, mid=${MID}, state=failure, errmsg=${RESULT}"
+	logger -t ${TAG} -p ${PRI} "from=<${FROM}>, mbox=${MBOX}, to=<${TO}>, mid=${MID}, state=failure"
 fi
+_EOL_
 
 exit 0
 
