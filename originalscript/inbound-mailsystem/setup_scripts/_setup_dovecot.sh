@@ -135,7 +135,7 @@ plugin {
 _EOL_
 
 sed -i 's/#sieve_pipe_socket_dir/sieve_pipe_socket_dir/' /etc/dovecot/conf.d/90-sieve-extprograms.conf
-sed -i 's#^\#sieve_pipe_bin_dir.*#/sieve_pipe_bin_dir = /var/dovecot/bin#' /etc/dovecot/conf.d/90-sieve-extprograms.conf
+sed -i 's#\#sieve_pipe_bin_dir.*#sieve_pipe_bin_dir = /var/dovecot/bin#' /etc/dovecot/conf.d/90-sieve-extprograms.conf
 
 cp templates/default.sieve /var/dovecot/default.sieve
 mkdir -p /var/dovecot/bin
