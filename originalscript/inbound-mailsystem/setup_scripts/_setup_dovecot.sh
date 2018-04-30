@@ -139,6 +139,7 @@ sed -i 's#^\#sieve_pipe_bin_dir.*#/sieve_pipe_bin_dir = /var/dovecot/bin#' /etc/
 
 cp templates/default.sieve /var/dovecot/default.sieve
 mkdir -p /var/dovecot/bin
+cp -p script/mail*.sh /var/dovecot/bin
 
 systemctl enable dovecot
 systemctl start dovecot

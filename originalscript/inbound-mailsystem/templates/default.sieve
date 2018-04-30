@@ -1,22 +1,29 @@
 require ["copy", "fileinto", "envelope", "vnd.dovecot.pipe", "foreverypart", "mime", "variables"];
 
 if envelope :matches "from" "*" {
- 	set "from" "${1}" ;
+ 	set "efrom" "${1}" ;
 }
 
 if envelope :matches "to" "*" {
- 	set "to" "${1}" ;
+ 	set "eto" "${1}" ;
 }
 
 if header :matches "message-id" "*" {
 	set "mid" "${1}" ;
 }
 
-if header :mime :param "filename" :matches "Content-Type" "*" {
-	#execute :output "result" "attachments.sh" [ "${from}", "${to}", "INBOX", "${mid}" ] ;
-	pipe :copy :try "attachments.sh" [ "${from}", "${to}", "INBOX", "${mid}" ];
-} else {
-	pipe :copy :try "noattachments.sh" [ "${from}", "${to}", "INBOX", "${mid}" ] ;
+# destination mail box
+if true
+{
+	set "dmbox" "DRAFT" ;
 }
 
-fileinto "INBOX";
+if true
+{
+	pipe :copy :try "mailmove.sh" [ "${eto}", "${mid}", "${efrom}", "${dmbox}" ];
+}
+
+if true
+{
+	pipe :copy :try "mailsend.sh" [ "${efrom}", "${eto}" ];
+}
