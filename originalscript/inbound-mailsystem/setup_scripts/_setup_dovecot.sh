@@ -145,3 +145,6 @@ echo '* * * * * root find /var/dovecot/queue -name \*q\.[0-9]* | xargs -n 1 sh >
 
 systemctl enable dovecot
 systemctl start dovecot
+
+sed -i 's/^NoNewPrivileges=/#NoNewPrivileges=/' /usr/lib/systemd/system/dovecot.service
+systemctl daemon-reload
