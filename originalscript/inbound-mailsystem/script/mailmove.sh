@@ -27,7 +27,7 @@ then
 fi
 
 # check duplicate message
-COUNT=$(doveadm search -u ${FROM} mailbox "${MBOX}" header message-id "${MID}" since 2mins | wc -l)
+COUNT=\$(doveadm search -u ${FROM} mailbox "${MBOX}" header message-id "${MID}" since 2mins | wc -l)
 if [ \${COUNT} -eq 0 ]
 then
 	doveadm move -u ${FROM} "${MBOX}" user ${TO} mailbox INBOX header message-id "${MID}" since 2mins >/dev/null 2>&1
@@ -41,8 +41,8 @@ then
 	fi
 else
 	logger -t ${TAG} -p ${PRI} "from=<${FROM}>, mbox=${MBOX}, to=<${TO}>, mid=${MID}, state=skip"
+	rm -f ${QD}/moveq.${PID}
 fi
-
 _EOL_
 
 exit 0
