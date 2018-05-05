@@ -14,18 +14,19 @@ QD=/var/dovecot/queue
 
 mkdir -p ${QD}
 
-# create mailbox
+# create queue
+cat <<_EOL_> ${QD}/moveq.${PID}
+# check mailbox
 doveadm mailbox status -u ${FROM} all "${MBOX}"
 
+# create mailbox
 if [ $? -ne 0 ]
 then
 	doveadm mailbox create -u ${FROM} "${MBOX}"
 	doveadm mailbox subscribe -u ${FROM} "${MBOX}"
 fi
 
-# create queue
-cat <<_EOL_> ${QD}/moveq.${PID}
-# check duplicate
+# check duplicate message
 COUNT=$(doveadm search -u ${FROM} mailbox "${MBOX}" header message-id "${MID}" since 2mins | wc -l)
 if [ ${COUNT} -eq 0 ]
 then
