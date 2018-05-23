@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# @sacloud-name "Restyaboard"
 # @sacloud-once
 # @sacloud-desc-begin
 # このスクリプトは Restyaboard をセットアップします
@@ -32,15 +33,14 @@ trap '_motd fail' ERR
 yum update -y
 yum install -y epel-release
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
-yum install -y php72-php php72-php-{fpm,devel,cli,curl,pgsql,mbstring,ldap,pear,imap,xml,imagick} ImageMagick GeoIP-devel nginx expect
+yum install -y php72-php php72-php-{fpm,devel,cli,curl,pgsql,mbstring,ldap,pear,imap,xml,imagick,pecl-geoip} ImageMagick GeoIP-devel nginx expect
 yum install -y https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
 yum install -y postgresql96-server postgresql96-contrib
 
 # php の設定
 sed -i 's/= apache/= nginx/' /etc/opt/remi/php72/php-fpm.d/www.conf
 sed -i -e 's/^;date.timezone =/date.timezone = Asia\/Tokyo/' \
-	-e 's/^;cgi.fix_pathinfo=1/;cgi.fix_pathinfo=0/' \
-	-e '$ a extension=geoip.so' /etc/opt/remi/php72/php.ini
+	-e 's/^;cgi.fix_pathinfo=1/;cgi.fix_pathinfo=0/' /etc/opt/remi/php72/php.ini
 
 # Postgresqlの設定
 export PGSETUP_INITDB_OPTIONS="--encoding=UTF-8 --no-locale"
@@ -62,7 +62,7 @@ _EOL_
 
 # Restyaboardのインストールとセットアップ
 DOCROOT=/usr/share/nginx/html
-VERSION=0.6.3
+VERSION=0.6.4
 
 cd ${DOCROOT}
 curl -L -O https://github.com/RestyaPlatform/board/releases/download/v${VERSION}/board-v${VERSION}.zip
@@ -86,13 +86,13 @@ chmod -R go+w ${DOCROOT}/board/{media,client/img,tmp/cache}
 chmod -R 755 ${DOCROOT}/board/server/php/shell/*.sh
 
 #### cronの設定
-
+PHPCONF=/opt/remi/php72/enable
 cat << _EOF_ >/etc/cron.d/restyaboard
-*/5 * * * * root ${DOCROOT}/board/server/php/shell/instant_email_notification.sh
-0 * * * * root ${DOCROOT}/board/server/php/shell/periodic_email_notification.sh
-*/30 * * * * root ${DOCROOT}/board/server/php/shell/imap.sh
-*/5 * * * * root ${DOCROOT}/board/server/php/shell/webhook.sh
-*/5 * * * * root ${DOCROOT}/board/server/php/shell/card_due_notification.sh
+*/5 * * * * root source ${PHPCONF} && ${DOCROOT}/board/server/php/shell/instant_email_notification.sh 2>/dev/null
+0 * * * * root source ${PHPCONF} && ${DOCROOT}/board/server/php/shell/periodic_email_notification.sh 2>/dev/null
+*/30 * * * * root source ${PHPCONF} && ${DOCROOT}/board/server/php/shell/imap.sh 2>/dev/null
+*/5 * * * * root source ${PHPCONF} && ${DOCROOT}/board/server/php/shell/webhook.sh 2>/dev/null
+*/5 * * * * root source ${PHPCONF} && ${DOCROOT}/board/server/php/shell/card_due_notification.sh 2>/dev/null
 _EOF_
 
 firewall-cmd --permanent --add-port=80/tcp
