@@ -10,7 +10,7 @@ sed -i 's/^Example/#Example/' /etc/freshclam.conf
 freshclam &
 
 mkdir /var/log/clamd
-chown root:clamilt /var/log/clamd
+chown root:clamscan /var/log/clamd
 chmod 775 /var/log/clamd
 
 cat <<_EOL_>/etc/clamd.d/scan.conf
@@ -26,7 +26,7 @@ FixStaleSocket yes
 MaxConnectionQueueLength 30
 MaxThreads 50
 ReadTimeout 300
-User clamilt
+User clamscan
 AllowSupplementaryGroups yes
 ScanPE yes
 ScanELF yes
@@ -49,7 +49,7 @@ systemctl start clamd@scan
 cat <<_EOL_>/etc/mail/clamav-milter.conf
 MilterSocket inet:${CLAMAV_PORT}@${CLAMAV_SERVER}
 MilterSocketMode 666
-User clamilt
+User clamscan
 AllowSupplementaryGroups yes
 ClamdSocket unix:/var/run/clamav-milter/clamd.sock
 AddHeader Replace

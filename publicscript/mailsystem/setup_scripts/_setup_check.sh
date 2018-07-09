@@ -97,8 +97,8 @@ echo "-- Process Check --"
 check_proc slapd ldap
 check_proc opendkim opendkim
 check_proc dovecot dovecot
-check_proc clamav-milter clamilt
-check_proc clamd clamilt
+check_proc clamav-milter clamscan
+check_proc clamd clamscan
 check_proc yenma yenma
 check_proc master root
 check_proc mysqld mysql
