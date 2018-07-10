@@ -18,10 +18,10 @@ LogFile /var/log/clamd/clamd.log
 LogFileMaxSize 0
 LogTime yes
 LogSyslog yes
-PidFile /var/run/clamav-milter/clamd.pid
+PidFile /var/run/clamd.scan/clamd.pid
 TemporaryDirectory /var/tmp
 DatabaseDirectory /var/lib/clamav
-LocalSocket /var/run/clamav-milter/clamd.sock
+LocalSocket /var/run/clamd.scan/clamd.sock
 FixStaleSocket yes
 MaxConnectionQueueLength 30
 MaxThreads 50
@@ -51,7 +51,7 @@ MilterSocket inet:${CLAMAV_PORT}@${CLAMAV_SERVER}
 MilterSocketMode 666
 User clamscan
 AllowSupplementaryGroups yes
-ClamdSocket unix:/var/run/clamav-milter/clamd.sock
+ClamdSocket unix:/var/run/clamd.scan/clamd.sock
 AddHeader Replace
 LogFile /var/log/clamd/clamav-milter.log
 LogFileMaxSize 0
