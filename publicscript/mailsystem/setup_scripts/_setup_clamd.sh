@@ -17,10 +17,10 @@ LogFile /var/log/clamd/clamd.log
 LogFileMaxSize 0
 LogTime yes
 LogSyslog yes
-PidFile /var/run/clamd.scan/clamd.pid
+PidFile /var/run/clamav-milter/clamd.pid
 TemporaryDirectory /var/tmp
 DatabaseDirectory /var/lib/clamav
-LocalSocket /var/run/clamd.scan/clamd.sock
+LocalSocket /var/run/clamav-milter/clamd.sock
 FixStaleSocket yes
 MaxConnectionQueueLength 30
 MaxThreads 50
@@ -46,8 +46,6 @@ LogFileMaxSize 0
 LogTime yes
 LogSyslog yes
 _EOL_
-
-rm -f /var/log/clamav-milter.log
 
 systemctl enable clamd@scan
 systemctl enable clamav-milter
