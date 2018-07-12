@@ -4,13 +4,12 @@ set -e
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-yum install -y clamav-milter-systemd clamav-server-systemd clamav clamav-update
+yum install -y clamav clamav-server-systemd clamav-milter clamav-milter-systemd clamav-update
 
-sed -i 's/^Example/#Example/' /etc/freshclam.conf
 freshclam &
 
 mkdir /var/log/clamd
-chown root:clamscan /var/log/clamd
+chown root:clamilt /var/log/clamd
 chmod 775 /var/log/clamd
 
 cat <<_EOL_>/etc/clamd.d/scan.conf
@@ -26,8 +25,7 @@ FixStaleSocket yes
 MaxConnectionQueueLength 30
 MaxThreads 50
 ReadTimeout 300
-User clamscan
-AllowSupplementaryGroups yes
+User clamilt
 ScanPE yes
 ScanELF yes
 DetectBrokenExecutables yes
@@ -37,20 +35,10 @@ ScanArchive yes
 ArchiveBlockEncrypted no
 _EOL_
 
-cat <<_EOL_>>/lib/systemd/system/clamd\@.service
-
-[Install]
-WantedBy = multi-user.target
-_EOL_
-
-systemctl enable clamd@scan
-systemctl start clamd@scan
-
 cat <<_EOL_>/etc/mail/clamav-milter.conf
 MilterSocket inet:${CLAMAV_PORT}@${CLAMAV_SERVER}
 MilterSocketMode 666
-User clamscan
-AllowSupplementaryGroups yes
+User clamilt
 ClamdSocket unix:/var/run/clamd.scan/clamd.sock
 AddHeader Replace
 LogFile /var/log/clamd/clamav-milter.log
@@ -61,9 +49,9 @@ _EOL_
 
 rm -f /var/log/clamav-milter.log
 
-sed -i '$d' /etc/sysconfig/freshclam
-
+systemctl enable clamd@scan
 systemctl enable clamav-milter
+systemctl start clamd@scan
 systemctl start clamav-milter
 
 cp -p script/remove_hold_queue.sh /usr/local/bin/remove_hold_queue.sh
