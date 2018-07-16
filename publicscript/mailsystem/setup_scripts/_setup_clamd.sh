@@ -39,7 +39,7 @@ cat <<_EOL_>/etc/mail/clamav-milter.conf
 MilterSocket inet:${CLAMAV_PORT}@${CLAMAV_SERVER}
 MilterSocketMode 666
 User clamilt
-ClamdSocket unix:/var/run/clamd.scan/clamd.sock
+ClamdSocket unix:/var/run/clamav-milter/clamd.sock
 AddHeader Replace
 LogFile /var/log/clamd/clamav-milter.log
 LogFileMaxSize 0
