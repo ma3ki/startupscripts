@@ -44,7 +44,7 @@ postconf -c /etc/postfix-inbound -e smtpd_tls_received_header=yes
 postconf -c /etc/postfix-inbound -e tls_preempt_cipherlist=yes
 
 postconf -c /etc/postfix -e smtp_use_tls=yes
-postconf -c /etc/postfix -e smtp_tls_CAfile = /etc/pki/tls/certs/ca-bundle.crt
+postconf -c /etc/postfix -e smtp_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
 postconf -c /etc/postfix -e smtp_tls_cert_file=/etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem
 postconf -c /etc/postfix -e smtp_tls_key_file=/etc/letsencrypt/live/${FIRST_DOMAIN}/privkey.pem
 postconf -c /etc/postfix -e smtp_tls_session_cache_database=btree:/var/lib/postfix/smtp_tls_session_cache
