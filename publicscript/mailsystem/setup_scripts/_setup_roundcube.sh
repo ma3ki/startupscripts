@@ -38,19 +38,6 @@ cp -p ${HTTPS_DOCROOT}/roundcube/plugins/managesieve/config.inc.php.dist ${HTTPS
 
 sed -i "s#_DOMAIN_#ssl://${FIRST_DOMAIN}#" ${HTTPS_DOCROOT}/roundcube/config/config.inc.php
 
-cd ${HTTPS_DOCROOT}/roundcube/plugins/
-git clone https://github.com/messagerie-melanie2/Roundcube-Plugin-Mobile.git
-git clone https://github.com/messagerie-melanie2/Roundcube-Plugin-JQuery-Mobile.git
-mv Roundcube-Plugin-JQuery-Mobile jquery_mobile
-mv Roundcube-Plugin-Mobile mobile
-
-chown nginx. jquery_mobile mobile
-
-cd ../skins
-git clone https://github.com/messagerie-melanie2/Roundcube-Skin-Melanie2-Larry-Mobile.git
-mv Roundcube-Skin-Melanie2-Larry-Mobile melanie2_larry_mobile
-chown nginx. melanie2_larry_mobile
-
 cd ${HTTPS_DOCROOT}/roundcube/bin
 ./install-jsdeps.sh
 
