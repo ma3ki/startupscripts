@@ -10,6 +10,9 @@ sed -i "s/^;date.timezone.*/date.timezone = 'Asia\/Tokyo'/" /etc/php.ini
 sed -i 's/^post_max_size =.*/post_max_size = 20M/' /etc/php.ini
 sed -i 's/^upload_max_filesize =.*/upload_max_filesize = 20M/' /etc/php.ini
 
+cp templates/config.inc.php.roundcube /tmp/config.inc.php.roundcube
+cp templates/config.inc.php.password /tmp/config.inc.php.password
+
 mkdir -p ${WORKDIR}/build
 cd ${WORKDIR}/build
 git clone https://github.com/roundcube/roundcubemail.git
@@ -27,9 +30,8 @@ mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 
 systemctl restart php-fpm
 
-mkdir ${HTTPS_DOCROOT}/roundcube/{temp,logs}
-cp templates/config.inc.php.roundcube ${HTTPS_DOCROOT}/roundcube/config/config.inc.php
-cp templates/config.inc.php.password ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
+mv /tmp/config.inc.php.roundcube ${HTTPS_DOCROOT}/roundcube/config/config.inc.php
+mv /tmp/config.inc.php.password ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
 chown -R nginx. ${HTTPS_DOCROOT}/roundcubemail-${RV}
 
 cp -p ${HTTPS_DOCROOT}/roundcube/plugins/managesieve/config.inc.php.dist ${HTTPS_DOCROOT}/roundcube/plugins/managesieve/config.inc.php
