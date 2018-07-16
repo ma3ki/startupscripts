@@ -4,7 +4,7 @@ set -e
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-yum install -y php-mcrypt php-mysql php-xml php-pear php-mbstring php-intl php-pecl-imagick php-gd php-pear-Mail-mimeDecode php-kolab-net-ldap3 php-pear-Net-IDNA2 php-pear-Auth-SASL php-pear-Net-SMTP
+yum install -y php-mcrypt php-mysql php-xml php-pear php-mbstring php-intl php-pecl-imagick php-gd php-pear-Mail-mimeDecode php-kolab-net-ldap3 php-pear-Net-IDNA2 php-pear-Auth-SASL php-pear-Net-SMTP php-pear-Net-Sieve
 sed -i 's/^;default_charset/default_charset/' /etc/php.ini
 sed -i "s/^;date.timezone.*/date.timezone = 'Asia\/Tokyo'/" /etc/php.ini
 sed -i 's/^post_max_size =.*/post_max_size = 20M/' /etc/php.ini
