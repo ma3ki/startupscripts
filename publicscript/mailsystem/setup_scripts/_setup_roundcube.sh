@@ -4,7 +4,7 @@ set -e
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-yum install -y php-mcrypt php-mysql
+yum install -y php-mcrypt php-mysql php-xml php-pear php-mbstring php-intl php-pecl-imagick php-gd php-pear-Mail-mimeDecode php-kolab-net-ldap3 php-pear-Net-IDNA2 php-pear-Auth-SASL php-pear-Net-SMTP
 sed -i 's/^;default_charset/default_charset/' /etc/php.ini
 sed -i "s/^;date.timezone.*/date.timezone = 'Asia\/Tokyo'/" /etc/php.ini
 sed -i 's/^post_max_size =.*/post_max_size = 20M/' /etc/php.ini
@@ -50,5 +50,8 @@ cd ../skins
 git clone https://github.com/messagerie-melanie2/Roundcube-Skin-Melanie2-Larry-Mobile.git
 mv Roundcube-Skin-Melanie2-Larry-Mobile melanie2_larry_mobile
 chown nginx. melanie2_larry_mobile
+
+cd ${HTTPS_DOCROOT}/roundcube/bin
+./install-jsdeps.sh
 
 mv ${HTTPS_DOCROOT}/roundcube/installer ${HTTPS_DOCROOT}/roundcube/_installer
