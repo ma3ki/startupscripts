@@ -31,7 +31,15 @@ _motd() {
 	;;
 	esac
 }
-KEY="${SACLOUD_APIKEY_ACCESS_TOKEN}:${SACLOUD_APIKEY_ACCESS_TOKEN_SECRET}"
+TK=${SACLOUD_APIKEY_ACCESS_TOKEN}
+SEC=${SACLOUD_APIKEY_ACCESS_TOKEN_SECRET}
+KEY="${TK}:${SEC}"
+
+cat <<_EOF_>/root/.sakura
+dns_sakuracloud_api_token = "${TK}"
+dns_sakuracloud_api_secret = "${SEC}"
+_EOF_
+chmod 600 /root/.sakura
 
 _motd start
 set -e
@@ -41,10 +49,10 @@ DOMAIN="@@@ZONE@@@"
 MADDR=mastodon@${DOMAIN}
 
 yum install -y http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
-curl -sL https://rpm.nodesource.com/setup_6.x | bash -
+curl -sL https://rpm.nodesource.com/setup_8.x | bash -
 
 yum update -y
-yum install -y ImageMagick ffmpeg redis rubygem-redis postgresql96-{server,contrib,devel} authd nodejs {openssl,readline,zlib,libxml2,libxslt,protobuf,ffmpeg,libidn,libicu}-devel protobuf-compiler nginx jq bind-utils
+yum install -y ImageMagick ffmpeg redis rubygem-redis postgresql96-{server,contrib,devel} authd nodejs {openssl,readline,zlib,libxml2,libxslt,protobuf,ffmpeg,libidn,libicu}-devel protobuf-compiler nginx jq bind-utils python-pip
 npm install -g yarn
 
 if [ $(dig ${DOMAIN} ns +short | egrep -c '^ns[0-9]+.gslb[0-9]+.sakura.ne.jp.$') -ne 2 ]
@@ -71,7 +79,7 @@ then
 	_motd fail
 fi
 API=${API}${RESID}
-cat <<_EOL_> ${DNSJS}
+cat <<_EOF_>${DNSJS}
 {
 	"CommonServiceItem": { "Settings": { "DNS":  { "ResourceRecordSets": [
 	{ "Name": "@", "Type": "A", "RData": "${IPADDR}" },
@@ -79,7 +87,7 @@ cat <<_EOL_> ${DNSJS}
 	{ "Name": "@", "Type": "TXT", "RData": "v=spf1 +ip4:${IPADDR} -all" }
 	]}}}
 }
-_EOL_
+_EOF_
 curl -s --user "${KEY}" -X PUT -d "$(cat ${DNSJS} | jq -c .)" ${API}
 export PGSETUP_INITDB_OPTIONS="--encoding=UTF-8 --no-locale"
 /usr/pgsql-9.6/bin/postgresql96-setup initdb
@@ -90,7 +98,7 @@ su - postgres -c "createuser --createdb mastodon"
 
 useradd mastodon
 SETUP=/home/mastodon/setup.sh
-cat <<_EOF_> ${SETUP}
+cat <<_EOF_>${SETUP}
 REPO=https://github.com/sstephenson
 git clone \${REPO}/rbenv.git ~/.rbenv
 echo 'export PATH="~/.rbenv/bin:/usr/pgsql-9.6/bin:$PATH"' >> ~/.bash_profile
@@ -139,7 +147,7 @@ chown mastodon. ${SETUP}
 su - mastodon -c "/bin/bash ${SETUP}"
 
 SDIR=/etc/systemd/system
-cat <<"_EOF_"> ${SDIR}/mastodon-web.service
+cat <<"_EOF_">${SDIR}/mastodon-web.service
 [Unit]
 Description=mastodon-web
 After=network.target
@@ -158,7 +166,7 @@ Restart=always
 WantedBy=multi-user.target
 _EOF_
 
-cat <<"_EOF_"> ${SDIR}/mastodon-sidekiq.service
+cat <<"_EOF_">${SDIR}/mastodon-sidekiq.service
 [Unit]
 Description=mastodon-sidekiq
 After=network.target
@@ -177,7 +185,7 @@ Restart=always
 WantedBy=multi-user.target
 _EOF_
 
-cat <<"_EOF_"> ${SDIR}/mastodon-streaming.service
+cat <<"_EOF_">${SDIR}/mastodon-streaming.service
 [Unit]
 Description=mastodon-streaming
 After=network.target
@@ -197,7 +205,7 @@ WantedBy=multi-user.target
 _EOF_
 systemctl enable mastodon-{web,sidekiq,streaming}
 
-sed -i -e 's/user nginx/user mastodon/' -e '1,/location/s/location \/ {/location ^~ \/.well-known\/acme-challenge\/ {}\n\tlocation \/ {\n\t\treturn 301 https:\/\/$host$request_uri;/' /etc/nginx/nginx.conf
+sed -i -e 's/user nginx/user mastodon/' -e '1,/location/s/location \/ {/location \/ {\n\t\treturn 301 https:\/\/$host$request_uri;/' /etc/nginx/nginx.conf
 chown -R mastodon. /var/{lib,log}/nginx
 sed -i 's/ nginx nginx/ mastodon mastodon/' /etc/logrotate.d/nginx
 
@@ -205,7 +213,7 @@ LD=/etc/letsencrypt/live/${DOMAIN}
 CERT=${LD}/fullchain.pem
 PKEY=${LD}/privkey.pem
 
-cat <<_EOF_> https.conf
+cat <<_EOF_>https.conf
 map \$http_upgrade \$connection_upgrade {
 	default upgrade;
 	''      close;
@@ -287,7 +295,7 @@ _EOF_
 systemctl enable nginx
 systemctl start nginx
 
-cat <<_EOL_>> /etc/postfix/main.cf
+cat <<_EOF_>>/etc/postfix/main.cf
 myhostname = ${DOMAIN}
 smtp_tls_CAfile = /etc/pki/tls/certs/ca-bundle.crt
 smtp_tls_security_level = may
@@ -295,17 +303,16 @@ smtp_tls_loglevel = 1
 smtpd_client_connection_count_limit = 9
 disable_vrfy_command = yes
 smtpd_discard_ehlo_keywords = dsn, enhancedstatuscodes, etrn
-_EOL_
+_EOF_
 sed -i -e 's/^inet_interfaces.*/inet_interfaces = all/' -e 's/^inet_protocols = all/inet_protocols = ipv4/' /etc/postfix/main.cf
 systemctl reload postfix
 
 firewall-cmd --permanent --add-port={25,80,443}/tcp
 firewall-cmd --reload
 
-CPATH=/usr/local/certbot
-git clone https://github.com/certbot/certbot ${CPATH}
-WROOT=/usr/share/nginx/html
-${CPATH}/certbot-auto -n certonly --webroot -w ${WROOT} -d ${DOMAIN} -m ${MADDR} --agree-tos --server https://acme-v02.api.letsencrypt.org/directory
+pip install --upgrade pip setuptools
+pip install certbot{,-dns-sakuracloud}
+certbot -n certonly --dns-sakuracloud --dns-sakuracloud-credentials ~/.sakura -d ${DOMAIN} -m ${MADDR} --agree-tos --manual-public-ip-logging-ok 
 
 if [ ! -f ${CERT} ]
 then
@@ -315,13 +322,13 @@ fi
 
 mv https.conf /etc/nginx/conf.d/
 R=${RANDOM}
-echo "$((${R}%60)) $((${R}%24)) * * $((${R}%7)) root ${CPATH}/certbot-auto renew --webroot -w ${WROOT} --post-hook 'systemctl reload nginx'" > /etc/cron.d/certbot-auto
+echo "$((${R}%60)) $((${R}%24)) * * $((${R}%7)) root certbot renew --post-hook 'systemctl reload nginx'" > /etc/cron.d/certbot
 
 API=${BASE}/ipaddress/${IPADDR}
 PTRJS=ptr.json
-cat <<_EOL_> ${PTRJS}
+cat <<_EOF_>${PTRJS}
 {"IPAddress": { "HostName": "${DOMAIN}" }}
-_EOL_
+_EOF_
 
 curl -s --user "${KEY}" -X PUT -d "$(cat ${PTRJS} | jq -c .)" ${API}
 RET=$(curl -s --user "${KEY}" -X GET ${API} | jq -r "select(.IPAddress.HostName == \"${DOMAIN}\") | .is_ok")
