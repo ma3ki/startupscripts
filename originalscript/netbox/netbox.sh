@@ -48,7 +48,11 @@ _chkvar PASSWORD "${PASSWORD}"
 _chkvar MADDR "${MADDR}"
 
 # NetBoxのバージョン
-NETBOX=2.3.3
+git clone https://github.com/digitalocean/netbox.git
+cd netbox
+# vx.x.x
+VERSION=$(git for-each-ref --sort=-taggerdate --format='%(refname:short)' refs/tags | grep -v "\-" | sort | tail -1)
+cd ..
 
 # 必要パッケージのインストール
 yum update -y
@@ -76,9 +80,10 @@ _EOL_
 "
 
 # NetBoxのインストールとセットアップ
-curl -L -O https://github.com/digitalocean/netbox/archive/v${NETBOX}.tar.gz
-tar -xzf v${NETBOX}.tar.gz -C /opt
-ln -s netbox-${NETBOX} /opt/netbox
+curl -L -O https://github.com/digitalocean/netbox/archive/${VERSION}.tar.gz
+tar -xzf ${VERSION}.tar.gz -C /opt
+VNUM=$(echo ${VERSION} | sed 's/v//')
+ln -s netbox-${VNUM} /opt/netbox
 cd /opt/netbox
 pip3 install -r requirements.txt
 pip3 install napalm
@@ -156,11 +161,13 @@ _EOL_
 
 systemctl enable supervisord nginx
 
-chown -R nginx. /opt/netbox/netbox/media/
+chown -R nginx. /opt/netbox/netbox/
 
-firewall-cmd --permanent --add-port=80/tcp
+# firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --permanent --add-rich-rule="rule family='ipv4' source address='61.211.224.11/32' accept"
 firewall-cmd --reload
 
+# supervisord は rc-local.service 起動後でないと起動できない為、一度reboot
 shutdown -r 1
 
 _motd end
