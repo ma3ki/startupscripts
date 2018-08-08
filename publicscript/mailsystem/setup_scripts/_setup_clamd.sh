@@ -33,6 +33,7 @@ ScanOLE2 yes
 ScanMail yes
 ScanArchive yes
 ArchiveBlockEncrypted no
+CommandReadTimeout 30
 _EOL_
 
 cat <<_EOL_>/etc/mail/clamav-milter.conf
