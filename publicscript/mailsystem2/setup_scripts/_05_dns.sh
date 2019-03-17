@@ -3,6 +3,16 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-cat dkim_ss1.ma3ki.net.keys | tr '\n' ' ' | sed -e 's/.*( "//' -e 's/".*"p=/p=/' -e 's/" ).*//'
-v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnB9xeOCIDwFxish0F5MSCYFtHsnOq5LhuNIcMdq6snKf8WbRKZCGqH2oeMW4HuqNLqG6B8iSZoUy5sdU+KcNkW1bqzxGO3THwLnztakAoWMr+s4GudHHp/GoJ77nIv4ftslrjiiW48Rmw9s8wO0WZztMvNWVOOJUUfvLHDHmKRQIDAQAB
+for domain in ${DOMAIN_LIST}
+do
+  RECORD=$(cat ${WORKDIR}/${domain}.keys | tr '\n' ' ' | sed -e 's/.*( "//' -e 's/".*"p=/p=/' -e 's/" ).*//')
+  usacloud dns record-add -y --name default._domainkey --type TXT --value "${RECORD}" ${domain}
+done
 
+for mldomain in ${ML_DOMAIN}
+do
+  domain=$(echo ${mldomain} | sed 's/\w\+\.//')
+  name=$(echo ${mldomain} | awk -F\. '{print $1}')
+  RECORD=$(cat ${WORKDIR}/${mldomain}.keys | tr '\n' ' ' | sed -e 's/.*( "//' -e 's/".*"p=/p=/' -e 's/" ).*//')
+  usacloud dns record-add -y --name default._domainkey.${name} --type TXT --value "${RECORD}" ${domain}
+done

@@ -95,10 +95,10 @@ relevance = true;
 _EOL_
 
 #-- DKIM
-for domain in ${DOMAIN_LIST}
+for domain in ${DOMAIN_LIST} ${ML_DOMAIN}
 do
-  rspamadm dkim_keygen -d ${domain} -s default -b 1024 > ${WORKDIR}/dkim_${domain}.keys
-  head -16 ${WORKDIR}/dkim_${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
+  rspamadm dkim_keygen -d ${domain} -s default -b 1024 > ${WORKDIR}/${domain}.keys
+  head -16 ${WORKDIR}/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
   chmod 600 /etc/rspamd/local.d/keys/default.${domain}.key
   chown _rspamd. /etc/rspamd/local.d/keys/default.${domain}.key
 done
@@ -112,14 +112,9 @@ sign_local = true;
 use_esld = false;
 try_fallback = false;
 
-#-- メーリングリストを使用しない場合
-# sign_headers = '(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post';
-#-- メーリングリストを使用する場合
-sign_headers = '(o)from:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post';
-
 _EOL_
 
-for domain in ${DOMAIN_LIST}
+for domain in ${DOMAIN_LIST} ${ML_DOMAIN}
 do
 	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
 	domain {
@@ -131,6 +126,19 @@ do
 	_EOL_
 done
 
+if [ "${ML_DOMAIN}x" = "x" ]
+then
+	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
+	#-- メーリングリストを使用しない場合
+	sign_headers = '(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post';
+	_EOL_
+else
+	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
+	#-- メーリングリストを使用する場合
+	sign_headers = '(o)from:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post';
+	_EOL_
+fi
+
 cat <<'_EOL_'> /etc/rspamd/local.d/arc.conf
 # メーリングリストや転送の対応
 allow_hdrfrom_mismatch = true;
@@ -141,14 +149,9 @@ use_domain = "envelope";
 use_esld = false;
 try_fallback = false;
 
-#-- メーリングリストを使用しない場合
-# sign_headers = "(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post:dkim-signature";
-#-- メーリングリストを使用する場合
-sign_headers = "(o)from:(o)sender:(o)reply-to:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post:dkim-signature";
-
 _EOL_
 
-for domain in ${DOMAIN_LIST}
+for domain in ${DOMAIN_LIST} ${ML_DOMAIN}
 do
 	cat <<-_EOL_>> /etc/rspamd/local.d/arc.conf
 	domain {
@@ -159,6 +162,19 @@ do
 	}
 	_EOL_
 done
+
+if [ "${ML_DOMAIN}x" = "x" ]
+then
+	cat <<-_EOL_>> /etc/rspamd/local.d/arc.conf
+	#-- メーリングリストを使用しない場合
+	sign_headers = "(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post:dkim-signature";
+	_EOL_
+else
+	cat <<-_EOL_>> /etc/rspamd/local.d/arc.conf
+	#-- メーリングリストを使用する場合
+	sign_headers = "(o)from:(o)sender:(o)reply-to:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post:dkim-signature";
+	_EOL_
+fi
 
 cat <<_EOL_> /etc/rspamd/local.d/history_redis.conf
 servers         = ${REDIS_SERVER}:6379;

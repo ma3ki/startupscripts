@@ -21,7 +21,7 @@
 # @sacloud-textarea required heredoc ADDR "作成するメールアドレスのリスト" ex="foo@example.com"
 # @sacloud-apikey required permission=create AK "APIキー"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
-# @sacloud-textarea required heredoc MLDOMAIN "作成するメーリングリストドメイン" ex="ml.example.com"
+# @sacloud-textarea required MLDOMAIN "作成するメーリングリストドメイン" ex="ml.example.com"
 
 _motd() {
 	LOG=$(ls /root/.sacloud-api/notes/*log)
@@ -79,14 +79,12 @@ source config.source
 mkdir -p ${WORKDIR}
 addr_list=${WORKDIR}/address.list
 cat > ${addr_list} @@@ADDR@@@
-mldomain_list=${WORKDIR}/mldomain.list
-cat > ${mldomain_list} @@@MLDOMAIN@@@
+mldomain="@@@MLDOMAIN@@@"
 mail_addr="@@@MAILADDR@@@"
 pass_list=${WORKDIR}/password.list
 
 #-- ドメイン、アドレス情報の取得
 domain_list="$(awk -F@ '{print $2}' ${addr_list} | sort | uniq | tr '\n' ' ' | sed 's/ $//')"
-mldomain_list="sort ${mldomain_list} | uniq | tr '\n' ' ' | sed 's/ $//')"
 first_address=$(egrep -v "^$|^#" ${addr_list} | grep '@' | head -1 )
 first_domain=$(echo ${first_address} | awk -F@ '{print $2}' )
 
@@ -96,14 +94,33 @@ source /etc/sysconfig/network-scripts/ifcfg-eth0
 #-- セットアップ設定ファイルの修正
 rpassword=$(mkpasswd -l 12 -d 3 -c 3 -C 3 -s 0)
 sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
-  -e "s/^MLDOMAIN_LIST=.*/MLDOMAIN_LIST=\"${mldomain_list}\"/" \
+  -e "s/^ML_DOMAIN=.*/ML_DOMAIN=\"${mldomain}\"/" \
   -e "s/^ML_MASTER=.*/ML_MASTER=\"admin@${first_domain}\"/" \
   -e "s/^FIRST_DOMAIN=.*/FIRST_DOMAIN=\"${first_domain}\"/" \
   -e "s/^FIRST_ADDRESS=.*/FIRST_ADDRESS=\"${first_address}\"/" \
   -e "s/^ROOT_PASSWORD=.*/ROOT_PASSWORD=${rpassword}/" \
   -e "s/^IPADDR=.*/IPADDR=${IPADDR}/" config.source
 
+#-- セットアップ実行
+cd ~/startupscripts/publicscript/mailsystem2/setup_scripts
+for x in /_0[1-8]*.sh
+do
+  ${x} 2>&1
+done
+
+for x in $(egrep -v "^$|^#" ${addr_list} | grep @ | sort | uniq)
+do
+  mail_password=$(./setup_scripts/_09_create_mailaddress.sh ${x})
+  echo "${x}: ${mail_password}" >> ${pass_list}
+done
+
+for x in /_1*.sh
+do
+  ${x} 2>&1
+done
+
+#-- スタートアップスクリプト終了
 _motd end
 
-# reboot
-# shutdown -r 1
+#-- reboot
+shutdown -r 1
