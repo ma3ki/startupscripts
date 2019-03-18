@@ -4,6 +4,8 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 name=$(hostname | awk -F\. '{print $1}')
+hostnamectl set-hostname ${name}.${FIRST_DOMAIN}
+
 for domain in ${DOMAIN_LIST}
 do
   usacloud dns record-add -y --name @ --type A   --ttl 600 --value ${IPADDR} ${domain}
