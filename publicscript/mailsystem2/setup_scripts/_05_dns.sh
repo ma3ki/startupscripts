@@ -4,7 +4,7 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 name=$(hostname | awk -F\. '{print $1}')
-usacloud ipv4 ptr-add --hostname ${name}.${FIRST_DOMAIN} ${IPADDR}
+usacloud ipv4 ptr-add -y --hostname ${name}.${FIRST_DOMAIN} ${IPADDR}
 
 for domain in ${DOMAIN_LIST}
 do
