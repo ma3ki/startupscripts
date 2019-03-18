@@ -102,18 +102,18 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
   -e "s/^IPADDR=.*/IPADDR=${IPADDR}/" config.source
 
 #-- セットアップ実行
-for x in ./setup_scripts/_0[1-8]*.sh
+for x in ./setup_scripts/_0[1-7]*.sh
 do
   ${x} 2>&1
 done
 
 for x in $(egrep -v "^$|^#" ${addr_list} | grep @ | sort | uniq)
 do
-  mail_password=$(./setup_scripts/_09_create_mailaddress.sh ${x})
+  mail_password=$(./setup_scripts/_08_create_mailaddress.sh ${x})
   echo "${x}: ${mail_password}" >> ${pass_list}
 done
 
-for x in ./setup_scripts/_1*.sh
+for x in ./setup_scripts/_09*.sh ./setup_scripts/_1*.sh
 do
   ${x} 2>&1
 done

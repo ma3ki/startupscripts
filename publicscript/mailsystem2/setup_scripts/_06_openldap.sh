@@ -87,26 +87,3 @@ systemctl restart rsyslog
 #-- slapd の起動
 systemctl enable slapd
 systemctl start slapd
-
-#mkdir -p ${WORKDIR}/ldap
-#domain=$(echo ${ROOT_DN} | sed -e 's/^cn=admin,//' -e 's/dc=//g' -e 's/,/./g')
-#TMPDN=""
-#for x in $(for y in $(echo "${domain}" | sed 's/\./ /g')
-#do
-#	echo ${y}
-#done | tac) 
-#do
-#	TMPDN="dc=${x}${TMPDN}"
-#	cat <<-_EOL_>>${WORKDIR}/ldap/init.ldif
-#	dn: ${TMPDN}
-#	objectClass: dcObject
-#	objectClass: organization
-#	dc: ${x}
-#	o: SAKURA Internet Inc.
-#	
-#	_EOL_
-#	TMPDN=",${TMPDN}"
-#done
-#
-#ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/init.ldif
-
