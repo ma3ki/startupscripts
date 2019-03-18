@@ -11,9 +11,8 @@ expect -c "
 set timeout 180
 spawn certbot certonly --dns-sakuracloud --dns-sakuracloud-credentials /root/.sakura --dns-sakuracloud-propagation-seconds 60 -d *.${FIRST_DOMAIN} -d ${FIRST_DOMAIN} -m admin@${FIRST_DOMAIN} --manual-public-ip-logging-ok --agree-tos
 expect \"(Y)es/(N)o:\"
-send \"Y\n\"
+send -- \"Y\n\"
 expect \"Congratulation\"
-exit 0
 "
 
 ls -l /etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem
