@@ -102,8 +102,7 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
   -e "s/^IPADDR=.*/IPADDR=${IPADDR}/" config.source
 
 #-- セットアップ実行
-cd ~/startupscripts/publicscript/mailsystem2/setup_scripts
-for x in /_0[1-8]*.sh
+for x in ./setup_scripts/_0[1-8]*.sh
 do
   ${x} 2>&1
 done
@@ -114,7 +113,7 @@ do
   echo "${x}: ${mail_password}" >> ${pass_list}
 done
 
-for x in /_1*.sh
+for x in ./setup_scripts/_1*.sh
 do
   ${x} 2>&1
 done

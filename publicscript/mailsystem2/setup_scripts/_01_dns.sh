@@ -15,7 +15,7 @@ do
   usacloud dns record-add -y --name autoconfig --type CNAME --value ${FIRST_DOMAIN}. ${domain}
 done
 
-usacloud ipv4 ptr-add --hostname ${FIRST_DOMAIN}} ${IPADDR}
+usacloud ipv4 ptr-add -y --hostname ${FIRST_DOMAIN} ${IPADDR}
 
 for mldomain in ${ML_DOMAIN}
 do
