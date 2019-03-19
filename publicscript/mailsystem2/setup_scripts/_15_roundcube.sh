@@ -12,9 +12,10 @@ cp -pr ../roundcubemail ${HTTPS_DOCROOT}/roundcubemail-${VERSION}
 ln -s ${HTTPS_DOCROOT}/roundcubemail-${VERSION} ${HTTPS_DOCROOT}/roundcube
 
 #-- roundcube の DB を作成
-mysql -e "create database roundcubemail character set utf8 collate utf8_bin;"
-mysql -e "grant all on roundcubemail.* to roundcube@localhost identified by 'roundcube';"
-mysql -e "FLUSH PRIVILEGES;"
+mysql -e "CREATE DATABASE roundcubemail CHARACTER SET utf8 collate utf8_bin;"
+mysql -e "GRANT ALL PRIVILEGES ON roundcubemail.* TO roundcube@localhost IDENTIFIED BY 'roundcube';"
+## mysql -e "GRANT ALL ON roundcubemail.* TO roundcube@localhost IDENTIFIED BY 'roundcube';"
+## mysql -e "FLUSH PRIVILEGES;"
 mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 
 #-- 必要なPHPのライブラリをインストール

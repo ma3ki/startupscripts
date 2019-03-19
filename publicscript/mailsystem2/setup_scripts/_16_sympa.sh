@@ -15,7 +15,7 @@ yum install -y sympa sympa-nginx
 #-- sympa の database を作成
 mysql -e "CREATE DATABASE sympa CHARACTER SET utf8;"
 mysql -e "GRANT ALL PRIVILEGES ON sympa.* TO 'sympa'@'localhost' IDENTIFIED BY 'sympass';"
-mysql -e "FLUSH PRIVILEGES;"
+## mysql -e "FLUSH PRIVILEGES;"
 
 cp -p /etc/sympa/sympa.conf{,.org}
 

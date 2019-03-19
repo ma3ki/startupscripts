@@ -54,3 +54,5 @@ mysql -e "SET GLOBAL validate_password_length=7;"
 
 sed -i 's/^#validate/validate/' /etc/my.cnf
 
+mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1');"
+mysql -e "FLUSH PRIVILEGES;"
