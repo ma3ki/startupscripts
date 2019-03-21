@@ -126,15 +126,17 @@ do
 done
 for x in ${ML_DOMAIN}
 do
+	echo "-- ${x} DNS Check --"
 	check_dns ${x} MX
 	check_dns ${x} TXT
 	check_dns _dmarc.${x} TXT
 	check_dns _adsp._domainkey.${x} TXT
 	check_dns default._domainkey.${x} TXT
+	echo
 done
 
 echo "-- ${FIRST_DOMAIN} TLS Check --"
-check_cert ${x}
+check_cert ${FIRST_DOMAIN}
 
 echo
 

@@ -95,10 +95,11 @@ relevance = true;
 _EOL_
 
 #-- DKIM
+mkdir -p ${WORKDIR}/keys
 for domain in ${DOMAIN_LIST} ${ML_DOMAIN}
 do
-  rspamadm dkim_keygen -d ${domain} -s default -b 1024 > ${WORKDIR}/${domain}.keys
-  head -16 ${WORKDIR}/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
+  rspamadm dkim_keygen -d ${domain} -s default -b 1024 > ${WORKDIR}/keys/${domain}.keys
+  head -16 ${WORKDIR}/keys/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
   chmod 600 /etc/rspamd/local.d/keys/default.${domain}.key
   chown _rspamd. /etc/rspamd/local.d/keys/default.${domain}.key
 done
