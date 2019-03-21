@@ -18,7 +18,6 @@ mysql -e "GRANT ALL PRIVILEGES ON roundcubemail.* TO roundcube@localhost IDENTIF
 mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 
 #-- 必要なPHPのライブラリをインストール
-rpm -Uvh https://rpms.remirepo.net/enterprise/remi-release-7.rpm
 yum install -y php73-php-{pdo,xml,pear,mbstring,intl,pecl-imagick,gd,mysqlnd,pspell}
 yum install -y php-pear-Mail-mimeDecode php-kolab-net-ldap3 php-pear-Net-IDNA2 php-pear-Auth-SASL php-pear-Net-SMTP php-pear-Net-Sieve
 
