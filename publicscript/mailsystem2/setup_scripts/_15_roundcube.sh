@@ -12,7 +12,8 @@ cp -pr ../roundcubemail ${HTTPS_DOCROOT}/roundcubemail-${VERSION}
 ln -s ${HTTPS_DOCROOT}/roundcubemail-${VERSION} ${HTTPS_DOCROOT}/roundcube
 
 #-- roundcube の DB を作成
-HOME=/root
+export HOME=/root
+env
 mysql -e "CREATE DATABASE roundcubemail CHARACTER SET utf8 collate utf8_bin;"
 mysql -e "GRANT ALL PRIVILEGES ON roundcubemail.* TO roundcube@localhost IDENTIFIED BY 'roundcube';"
 ## mysql -e "GRANT ALL ON roundcubemail.* TO roundcube@localhost IDENTIFIED BY 'roundcube';"
