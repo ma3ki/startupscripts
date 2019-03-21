@@ -1,6 +1,7 @@
-#!/bin/bash -ex
+#!/bin/bash -e
+#
 # usage)
-# ./_08_create_mailaddress.sh <mailaddress>
+# ./create_mailaddress.sh <mailaddress>
 
 address=$1
 source $(dirname $0)/../config.source
@@ -64,7 +65,7 @@ then
 	# 受信アーカイブ設定
 	if [ ! -f /etc/postfix/recipient_bcc_maps ]
 	then
-		cat <<-_EOL_>/etc/postfix/recipient_bcc_maps
+		cat <<-_EOL_>/etc/postfix-inbound/recipient_bcc_maps
 		if !/^archive\+/
 		/^(.*)@${domain}\$/  archive+\$1-Recv@${domain}
 		endif
@@ -72,6 +73,7 @@ then
 	else
 		sed -i "2i /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}" /etc/postfix/recipient_bcc_maps
 	fi
+	postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
 
 	# １年経過したアーカイブメールを削除
 	echo "0 $((${RANDOM}%6+1)) * * * root /usr/local/dovecot/bin/doveadm expunge -u archive@${domain} mailbox \* before 365d" >> /etc/cron.d/startup-script-cron

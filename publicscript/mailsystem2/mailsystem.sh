@@ -48,7 +48,7 @@ trap '_motd fail' ERR
 #-- tool のインストールと更新
 yum install -y epel-release
 yum install -y bind-utils telnet jq expect bash-completion sysstat mailx git
-yum update -y
+yum update -y || yum update -y --setopt=deltarpm=0
 
 #-- usacloud のインストール
 curl -fsSL http://releases.usacloud.jp/usacloud/repos/setup-yum.sh | sh
@@ -102,21 +102,60 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
   -e "s/^IPADDR=.*/IPADDR=${IPADDR}/" config.source
 
 #-- セットアップ実行
-for x in ./setup_scripts/_0[1-7]*.sh
+for x in ./setup_scripts/_*.sh
 do
   ${x} 2>&1
 done
 
+#-- ldap にドメインの登録
+./tools/create_domain.sh
+
+#-- ldap にメールアドレスを登録
 for x in $(egrep -v "^$|^#" ${addr_list} | grep @ | sort | uniq)
 do
-  mail_password=$(./setup_scripts/_08_create_mailaddress.sh ${x})
+  mail_password=$(./tools/create_mailaddress.sh ${x})
   echo "${x}: ${mail_password}" >> ${pass_list}
 done
 
-for x in ./setup_scripts/_09*.sh ./setup_scripts/_1*.sh
-do
-  ${x} 2>&1
-done
+set +x
+
+# セットアップ完了のメールを送信
+if [ $(echo ${MAILADDR} | egrep -c "@") -eq 1 ]
+then
+	echo -e "Subject: Setup Mail Server - ${FIRST_DOMAIN}
+From: admin@${FIRST_DOMAIN}
+To: ${MAILADDR}
+
+SETUP START : ${START}
+SETUP END   : ${END}
+
+-- Mail Server Domain --
+smtp server : ${FIRST_DOMAIN}
+pop  server : ${FIRST_DOMAIN}
+imap server : ${FIRST_DOMAIN}
+
+-- Rspamd Webui --
+LOGIN URL : https://${FIRST_DOMAIN}/rspamd
+PASSWORD  : ${rpassword}
+
+-- phpLDAPadmin --
+LOGIN URL : https://${FIRST_DOMAIN}/phpldapadmin
+LOGIN_DN  : ${ROOT_DN}
+PASSWORD  : ${rpassword}
+
+-- Roundcube Webmail --
+LOGIN URL : https://${FIRST_DOMAIN}/roundcube
+
+-- Sympa --
+LOGIN URL : https://${FIRST_DOMAIN}/sympa/firstpasswd
+
+$(./tools/check_mailsystem.sh 2>&1)
+
+-- create Mail Address and Password List --
+$(cat ${PASS_LIST})
+
+" | sendmail -f admin@${FIRST_DOMAIN} ${MAILADDR}
+fi
 
 #-- スタートアップスクリプト終了
 _motd end

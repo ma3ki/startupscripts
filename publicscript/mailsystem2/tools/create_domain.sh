@@ -1,4 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash -e
+#
+# ./create_domain.sh <domain>
 
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
@@ -12,6 +14,11 @@ then
 fi
 
 mkdir -p ${WORKDIR}/ldap
+
+if [ $# -ne 0 ]
+then
+  DOMAIN_LIST="$*"
+fi
 
 for domain in ${DOMAIN_LIST}
 do
@@ -71,6 +78,7 @@ do
 		fi
 		echo "mailLocalAddress: ${z}@${domain}" >> ${WORKDIR}/ldap/${domain}.ldif
 	done
+
 	echo >> ${WORKDIR}/ldap/${domain}.ldif
 	ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}.ldif
 	mv -f ${WORKDIR}/ldap/${domain}.ldif ${WORKDIR}/ldap/${domain}_admin.ldif

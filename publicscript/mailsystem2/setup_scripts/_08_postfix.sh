@@ -77,14 +77,6 @@ do
   postconf -c ${cf} -e tls_random_source=dev:/dev/urandom
 done
 
-#-- 送信アーカイブ設定があるか確認
-if [ -f "/etc/postfix/sender_bcc_maps" ]
-then
-  # 受信アーカイブ設定
-  postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
-  mv /etc/postfix/recipient_bcc_maps /etc/postfix-inbound/recipient_bcc_maps
-fi
-
 cat <<_EOL_>/etc/postfix-inbound/ldaprcptcheck.cf
 server_host = ${LDAP_SERVER}
 bind = no
