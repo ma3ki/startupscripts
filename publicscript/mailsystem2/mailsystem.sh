@@ -117,8 +117,6 @@ do
   echo "${x}: ${mail_password}" >> ${pass_list}
 done
 
-set +x
-
 # セットアップ完了のメールを送信
 if [ $(echo ${MAILADDR} | egrep -c "@") -eq 1 ]
 then
