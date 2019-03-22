@@ -113,7 +113,7 @@ systemctl enable sympa wwsympa
 systemctl start sympa wwsympa
 
 #-- sympa を mysql 起動後に起動するように設定
-sed -i "s/^After=syslog.target/After=syslog.target mysqld.service/' /usr/lib/systemd/system/sympa.service
+sed -i "s/^After=syslog.target/After=syslog.target mysqld.service/" /usr/lib/systemd/system/sympa.service
 systemctl daemon-reload
 
 #-- postfix の設定
