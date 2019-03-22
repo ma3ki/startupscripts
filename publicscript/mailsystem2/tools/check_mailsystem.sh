@@ -107,6 +107,7 @@ check_proc master root
 check_proc mysqld mysql
 check_proc php-fpm nginx
 check_proc nginx nginx
+check_proc wwsympa.fcgi sympa
 
 echo
 
