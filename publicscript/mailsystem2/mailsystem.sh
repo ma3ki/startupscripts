@@ -107,9 +107,6 @@ do
   ${x} 2>&1
 done
 
-#-- ldap にドメインの登録
-./tools/create_domain.sh
-
 #-- ldap にメールアドレスを登録
 for x in $(egrep -v "^$|^#" ${addr_list} | grep @ | sort | uniq)
 do
