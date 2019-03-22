@@ -87,3 +87,6 @@ systemctl restart rsyslog
 #-- slapd の起動
 systemctl enable slapd
 systemctl start slapd
+
+#-- ドメインの登録
+$(dirname $0)/../tools/create_domain.sh
