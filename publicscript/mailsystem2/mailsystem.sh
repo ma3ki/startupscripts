@@ -115,41 +115,38 @@ do
 done
 
 # セットアップ完了のメールを送信
-if [ $(echo ${MAILADDR} | egrep -c "@") -eq 1 ]
+if [ $(echo ${mail_addr} | egrep -c "@") -eq 1 ]
 then
-	echo -e "Subject: Setup Mail Server - ${FIRST_DOMAIN}
-From: admin@${FIRST_DOMAIN}
-To: ${MAILADDR}
-
-SETUP START : ${START}
-SETUP END   : ${END}
+	echo -e "Subject: Setup Mail Server - ${first_domain}
+From: admin@${first_domain}
+To: ${mail_addr}
 
 -- Mail Server Domain --
-smtp server : ${FIRST_DOMAIN}
-pop  server : ${FIRST_DOMAIN}
-imap server : ${FIRST_DOMAIN}
+smtp server : ${first_domain}
+pop  server : ${first_domain}
+imap server : ${first_domain}
 
 -- Rspamd Webui --
-LOGIN URL : https://${FIRST_DOMAIN}/rspamd
+LOGIN URL : https://${first_domain}/rspamd
 PASSWORD  : ${rpassword}
 
 -- phpLDAPadmin --
-LOGIN URL : https://${FIRST_DOMAIN}/phpldapadmin
+LOGIN URL : https://${first_domain}/phpldapadmin
 LOGIN_DN  : ${ROOT_DN}
 PASSWORD  : ${rpassword}
 
 -- Roundcube Webmail --
-LOGIN URL : https://${FIRST_DOMAIN}/roundcube
+LOGIN URL : https://${first_domain}/roundcube
 
 -- Sympa --
-LOGIN URL : https://${FIRST_DOMAIN}/sympa/firstpasswd
+LOGIN URL : https://${first_domain}/sympa/firstpasswd
 
 $(./tools/check_mailsystem.sh 2>&1)
 
--- create Mail Address and Password List --
-$(cat ${PASS_LIST})
+-- Mail Address and Password --
+$(cat ${pass_list})
 
-" | sendmail -f admin@${FIRST_DOMAIN} ${MAILADDR}
+" | sendmail -f admin@${first_domain} ${mail_addr}
 fi
 
 #-- スタートアップスクリプト終了

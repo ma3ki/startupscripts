@@ -136,11 +136,13 @@ do
 	echo
 done
 
-echo "-- print_version --"
+echo "-- application version --"
 for x in os slapd dovecot clamd rspamd postfix mysql php-fpm nginx roundcube phpldapadmin sympa
 do
 	check_version ${x}
 done
+
+echo
 
 echo "-- ${FIRST_DOMAIN} TLS Check --"
 check_cert ${FIRST_DOMAIN}

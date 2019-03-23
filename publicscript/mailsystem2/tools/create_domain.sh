@@ -82,5 +82,7 @@ do
 	echo >> ${WORKDIR}/ldap/${domain}.ldif
 	ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}.ldif
 	mv -f ${WORKDIR}/ldap/${domain}.ldif ${WORKDIR}/ldap/${domain}_admin.ldif
+
+	echo "${account}@${domain}: ${ROOT_PASSWORD}" >> ${WORKDIR}/password.list
 done
 
