@@ -40,7 +40,7 @@ $config['des_key'] = 'rcmail-!24ByteDESkey*Str';
 $config['plugins'] = array('managesieve', 'password', 'archive', 'zipdownload');
 $config['managesieve_host'] = 'localhost';
 $config['spellcheck_engine'] = 'pspell';
-$config['skin'] = 'larry';
+$config['skin'] = 'elastic';
 _EOL_
 
 sed -i "s#_DOMAIN_#ssl://${FIRST_DOMAIN}#" ${HTTPS_DOCROOT}/roundcube/config/config.inc.php

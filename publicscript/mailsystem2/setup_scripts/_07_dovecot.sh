@@ -67,6 +67,8 @@ protocol imap {
 ssl = no
 ssl_cert =
 ssl_key =
+lmtp_save_to_detail_mailbox = yes
+lda_mailbox_autocreate = yes
 _EOL_
 
 cp -p /etc/dovecot/conf.d/10-auth.conf{,.org}
