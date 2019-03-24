@@ -3,7 +3,7 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-if [ "${ML_DOMAIN}x" = "x" ]
+if [ "${MLDOMAIN_LIST}x" = "x" ]
 then
   exit 0
 fi
@@ -19,8 +19,8 @@ mysql -e "GRANT ALL PRIVILEGES ON sympa.* TO 'sympa'@'localhost' IDENTIFIED BY '
 
 cp -p /etc/sympa/sympa.conf{,.org}
 
-sed -i -e "/^#domain/a domain ${ML_DOMAIN}" \
-       -e "/^#listmaster/a listmaster ${ML_MASTER}" \
+sed -i -e "/^#domain/a domain ${FIRST_DOMAIN}" \
+       -e "/^#listmaster/a listmaster admin@${FIRST_MASTER}" \
        -e "/^#lang/a lang ja" \
        -e "/^#db_type/a db_type MySQL" \
        -e "/^#db_name/a db_name sympa" \
@@ -28,6 +28,13 @@ sed -i -e "/^#domain/a domain ${ML_DOMAIN}" \
        -e "/^#db_user/a db_user sympa" \
        -e "/^#db_passwd/a db_passwd sympass" \
        -e "/^#wwsympa_url/a wwsympa_url https://${FIRST_DOMAIN}/sympa" /etc/sympa/sympa.conf
+
+for x in ${MLDOMAIN_LIST}
+do
+  mkdir -p /etc/sympa/${x}
+  echo "wwsympa_url https://${FIRST_DOMAIN}/sympa/${x}"
+  chown -R sympa. /etc/sympa/${x}
+done
 
 #- sympa の設定の確認(何も表示されなければOK)
 sympa.pl --health_check
@@ -75,16 +82,19 @@ postalias /var/lib/sympa/sympa_aliases
 sed -i -e "s/\S*@my.domain.org/admin@${FIRST_DOMAIN}/" -e "s/postmaster/admin@${FIRST_DOMAIN}/" /etc/sympa/aliases.sympa.postfix
 postalias /etc/sympa/aliases.sympa.postfix
 
-#- postfix 用の宛先存在確認ルールを作成(上記コマンド実行後、２分以内に実行すること)
-/usr/local/bin/create_sympa_regex.sh ${ML_DOMAIN}
+for x in ${MLDOMAIN_LIST}
+do
+  #- postfix 用の宛先存在確認ルールを作成(上記コマンド実行後、２分以内に実行すること)
+  /usr/local/bin/create_sympa_regex.sh ${x}
 
-#- sympaでメーリングリストが追加された場合にpostfixに設定を反映するためのcron
-echo "* * * * * root /usr/local/bin/create_sympa_regex.sh ${ML_DOMAIN} >/dev/null 2>&1" >> /etc/cron.d/startup-script-cron
+  #- sympaでメーリングリストが追加された場合にpostfixに設定を反映するためのcron
+  echo "* * * * * root /usr/local/bin/create_sympa_regex.sh ${x} >/dev/null 2>&1" >> /etc/cron.d/startup-script-cron
+done
 
 #-- nginx に設定追加
 rm -f /etc/nginx/conf.d/sympa.conf
 cat <<'_EOF_'> /etc/nginx/conf.d/https.d/sympa.conf
-    location /sympa {
+    location ~ ^/sympa/.* {
         include       /etc/nginx/fastcgi_params;
         fastcgi_pass  unix:/var/run/sympa/wwsympa.socket;
 
@@ -118,14 +128,12 @@ systemctl daemon-reload
 
 #-- postfix の設定
 #- メールを受け付ける対象にml用ドメインを追加
-cat <<_EOF_>> /etc/postfix-inbound/relay_domains
-${ML_DOMAIN}
-_EOF_
-
 #- ml用ドメインはローカルに配送する(alias を適用する)設定を追加
-cat <<_EOF_>> /etc/postfix-inbound/transport
-${ML_DOMAIN} local:
-_EOF_
+for x in ${MLDOMAIN_LIST}
+do
+  echo "${x}" >> /etc/postfix-inbound/relay_domains
+  echo "${x} local:" >> /etc/postfix-inbound/transport
+done
 
 postmap /etc/postfix-inbound/transport
 
@@ -149,9 +157,10 @@ WHITELIST_SENDER_DOMAIN {
 }
 _EOF_
 
-cat <<_EOF_>/etc/rspamd/local.d/whitelist_sender_domain.map
-${ML_DOMAIN}
-_EOF_
+for x in ${MLDOMAIN_LIST}
+do
+  echo "${x}" >> /etc/rspamd/local.d/whitelist_sender_domain.map
+done
 
 #- rspamd 再起動
 systemctl restart rspamd

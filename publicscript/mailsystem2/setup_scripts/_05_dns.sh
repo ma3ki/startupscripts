@@ -12,7 +12,7 @@ do
   usacloud dns record-add -y --name default._domainkey --type TXT --value "${RECORD}" ${domain}
 done
 
-for mldomain in ${ML_DOMAIN}
+for mldomain in ${MLDOMAIN_LIST}
 do
   domain=$(echo ${mldomain} | sed 's/\w\+\.//')
   name=$(echo ${mldomain} | awk -F\. '{print $1}')

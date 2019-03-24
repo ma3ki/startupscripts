@@ -125,7 +125,7 @@ do
 	check_dns default._domainkey.${x} TXT
 	echo
 done
-for x in ${ML_DOMAIN}
+for x in ${MLDOMAIN_LIST}
 do
 	echo "-- ${x} DNS Check --"
 	check_dns ${x} MX

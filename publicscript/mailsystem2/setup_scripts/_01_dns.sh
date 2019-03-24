@@ -17,7 +17,7 @@ do
   usacloud dns record-add -y --name autoconfig --type CNAME --value ${FIRST_DOMAIN}. ${domain}
 done
 
-for mldomain in ${ML_DOMAIN}
+for mldomain in ${MLDOMAINN_LIST}
 do
   domain=$(echo ${mldomain} | sed 's/\w\+\.//')
   name=$(echo ${mldomain} | awk -F\. '{print $1}')

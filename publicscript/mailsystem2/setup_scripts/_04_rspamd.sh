@@ -96,7 +96,7 @@ _EOL_
 
 #-- DKIM
 mkdir -p ${WORKDIR}/keys
-for domain in ${DOMAIN_LIST} ${ML_DOMAIN}
+for domain in ${DOMAIN_LIST} ${MLDOMAIN_LIST}
 do
   rspamadm dkim_keygen -d ${domain} -s default -b 1024 > ${WORKDIR}/keys/${domain}.keys
   head -16 ${WORKDIR}/keys/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
@@ -115,7 +115,7 @@ try_fallback = false;
 
 _EOL_
 
-for domain in ${DOMAIN_LIST} ${ML_DOMAIN}
+for domain in ${DOMAIN_LIST} ${MLDOMAIN_LIST}
 do
 	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
 	domain {
@@ -127,7 +127,7 @@ do
 	_EOL_
 done
 
-if [ "${ML_DOMAIN}x" = "x" ]
+if [ "${MLDOMAIN_LIST}x" = "x" ]
 then
 	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
 	#-- メーリングリストを使用しない場合
@@ -152,7 +152,7 @@ try_fallback = false;
 
 _EOL_
 
-for domain in ${DOMAIN_LIST} ${ML_DOMAIN}
+for domain in ${DOMAIN_LIST} ${MLDOMAIN_LIST}
 do
 	cat <<-_EOL_>> /etc/rspamd/local.d/arc.conf
 	domain {
@@ -164,7 +164,7 @@ do
 	_EOL_
 done
 
-if [ "${ML_DOMAIN}x" = "x" ]
+if [ "${MLDOMAIN_LIST}x" = "x" ]
 then
 	cat <<-_EOL_>> /etc/rspamd/local.d/arc.conf
 	#-- メーリングリストを使用しない場合
