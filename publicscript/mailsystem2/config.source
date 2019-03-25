@@ -2,7 +2,7 @@
 DOMAIN_LIST=example.com
 FIRST_DOMAIN=example.com
 FIRST_ADDRESS=foo@example.com
-MDOMAIN_LIST=ml.example.com
+MLDOMAIN_LIST=ml.example.com
 ### ldap
 ROOT_DN="cn=admin,dc=sacloud"
 ROOT_PASSWORD=dummy

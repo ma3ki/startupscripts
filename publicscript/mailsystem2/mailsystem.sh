@@ -80,7 +80,7 @@ mkdir -p ${WORKDIR}
 addr_list=${WORKDIR}/address.list
 mldomain_list=${WORKDIR}/mldomain.list
 cat > ${addr_list} @@@ADDR@@@
-cat > ${mldomain_list}="@@@MLDOMAIN@@@"
+cat > ${mldomain_list} @@@MLDOMAIN@@@
 mail_addr="@@@MAILADDR@@@"
 pass_list=${WORKDIR}/password.list
 
