@@ -20,7 +20,7 @@
 # @sacloud-require-archive distro-centos distro-ver-7
 # @sacloud-textarea required heredoc ADDR "作成するメールアドレスのリスト" ex="foo@example.com"
 # @sacloud-apikey required permission=create AK "APIキー"
-# @sacloud-textarea heredoc MLDOMAIN "作成するメーリングリストドメイン" ex="ml.example.com\nlist.example.com"
+# @sacloud-textarea heredoc MLDOMAIN "作成するメーリングリストドメイン" ex="ml.example.com"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
 
 _motd() {
@@ -95,7 +95,7 @@ source /etc/sysconfig/network-scripts/ifcfg-eth0
 #-- セットアップ設定ファイルの修正
 rpassword=$(mkpasswd -l 12 -d 3 -c 3 -C 3 -s 0)
 sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
-  -e "s/^MLDOMAIN_LIST=.*/MLDOMAIN_LIST=\"$(cat ${mldomain_list| tr '\n' ' ' | sed 's/ $//')\"/" \
+  -e "s/^MLDOMAIN_LIST=.*/MLDOMAIN_LIST=\"$(cat ${mldomain_list} | tr '\n' ' ' | sed 's/ $//')\"/" \
   -e "s/^FIRST_DOMAIN=.*/FIRST_DOMAIN=\"${first_domain}\"/" \
   -e "s/^FIRST_ADDRESS=.*/FIRST_ADDRESS=\"${first_address}\"/" \
   -e "s/^ROOT_PASSWORD=.*/ROOT_PASSWORD=${rpassword}/" \
@@ -139,7 +139,7 @@ PASSWORD  : ${rpassword}
 LOGIN URL : https://${first_domain}/roundcube
 
 -- Sympa --
-$(for x in ${DOMAIN_LIST}
+$(for x in $(cat ${mldomain_list} )
 do
   echo "LOGIN URL : https://${first_domain}/sympa/${x}"
 done
