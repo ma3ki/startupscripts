@@ -55,7 +55,7 @@ check_version() {
 			VERSION=$(rspamd --version | awk '{print $NF}')
 			;;
 		sympa)
-			which sympa.pl 2>/dev/null
+			which sympa.pl > /dev/null 2>&1
 			if [ $? -eq 0 ]
 			then
 				VERSION=$(sympa.pl --version | awk '{print $NF}')

@@ -32,7 +32,7 @@ sed -i -e "/^#domain/a domain ${FIRST_DOMAIN}" \
 for x in ${MLDOMAIN_LIST}
 do
   mkdir -p /etc/sympa/${x}
-  echo "wwsympa_url https://${FIRST_DOMAIN}/sympa/${x}"
+  echo "wwsympa_url https://${FIRST_DOMAIN}/sympa/${x}" > /etc/sympa/${x}/robot.conf
   chown -R sympa. /etc/sympa/${x}
 done
 
