@@ -20,7 +20,7 @@ mysql -e "GRANT ALL PRIVILEGES ON sympa.* TO 'sympa'@'localhost' IDENTIFIED BY '
 cp -p /etc/sympa/sympa.conf{,.org}
 
 sed -i -e "/^#domain/a domain ${FIRST_DOMAIN}" \
-       -e "/^#listmaster/a listmaster admin@${FIRST_MASTER}" \
+       -e "/^#listmaster/a listmaster admin@${FIRST_DOMAIN}" \
        -e "/^#lang/a lang ja" \
        -e "/^#db_type/a db_type MySQL" \
        -e "/^#db_name/a db_name sympa" \
@@ -53,7 +53,7 @@ DOMAIN=$1
 SYMPA1=/etc/sympa/aliases.sympa.postfix
 SYMPA2=/var/lib/sympa/sympa_aliases
 REGEX=/etc/postfix-inbound/symparcptcheck.regexp
-TMP=/tmp/symparcptcheck.regexp
+TMP=/tmp/symparcptcheck.regexp.${DOMAIN}
 
 # 2分以内にメーリングリストの更新があったらpostfixに反映する
 LIMIT=120
