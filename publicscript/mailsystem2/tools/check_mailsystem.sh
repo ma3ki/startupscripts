@@ -55,7 +55,13 @@ check_version() {
 			VERSION=$(rspamd --version | awk '{print $NF}')
 			;;
 		sympa)
-			VERSION=$(sympa.pl --version | awk '{print $NF}')
+			which sympa.pl 2>/dev/null
+			if [ $? -eq 0 ]
+			then
+				VERSION=$(sympa.pl --version | awk '{print $NF}')
+			else
+				VERSION="not installed"
+			fi
 			;;
 	esac
 	echo "${PROC}: ${VERSION}"
