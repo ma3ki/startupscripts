@@ -93,18 +93,23 @@ done
 
 #-- nginx に設定追加
 rm -f /etc/nginx/conf.d/sympa.conf
-cat <<'_EOF_'> /etc/nginx/conf.d/https.d/sympa.conf
-    location ~ ^/sympa/.* {
+for x in ${MLDOMAIN_LIST}
+do
+cat <<"_EOF_">> /etc/nginx/conf.d/https.d/sympa.conf
+    location /sympa/${x} {
         include       /etc/nginx/fastcgi_params;
         fastcgi_pass  unix:/var/run/sympa/wwsympa.socket;
 
         # If you changed wwsympa_url in sympa.conf, change this regex too!
-        fastcgi_split_path_info ^(/sympa)(.*)$;
+        fastcgi_split_path_info ^(/sympa/${x})(.*)$;
         fastcgi_param SCRIPT_FILENAME /usr/libexec/sympa/wwsympa.fcgi;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_param PATH_INFO \$fastcgi_path_info;
 
     }
+_EOF_
+done
 
+cat <<'_EOF_'>> /etc/nginx/conf.d/https.d/sympa.conf
     location /static-sympa/css {
         alias /var/lib/sympa/css;
     }

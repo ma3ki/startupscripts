@@ -141,7 +141,7 @@ LOGIN URL : https://${first_domain}/roundcube
 -- Sympa --
 $(for x in $(cat ${mldomain_list} )
 do
-  echo "Setting URL : https://${first_domain}/sympa/${x}/firstpassword"
+  echo "Setting URL : https://${first_domain}/sympa/${x}/firstpasswd"
   echo "Login URL   : https://${first_domain}/sympa/${x}"
 done
 )
