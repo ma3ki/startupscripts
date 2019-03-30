@@ -95,7 +95,7 @@ done
 rm -f /etc/nginx/conf.d/sympa.conf
 for x in ${MLDOMAIN_LIST}
 do
-cat <<"_EOF_">> /etc/nginx/conf.d/https.d/sympa.conf
+cat <<_EOF_>> /etc/nginx/conf.d/https.d/sympa.conf
     location /sympa/${x} {
         include       /etc/nginx/fastcgi_params;
         fastcgi_pass  unix:/var/run/sympa/wwsympa.socket;
