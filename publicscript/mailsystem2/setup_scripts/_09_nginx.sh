@@ -38,7 +38,7 @@ mail {
   ssl_session_cache shared:MAIL:10m;
   smtp_capabilities PIPELINING 8BITMIME "SIZE 20480000";
   pop3_capabilities TOP USER UIDL;
-  imap_capabilities IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=LOGIN;
+  imap_capabilities IMAP4rev1;
   smtp_auth login plain;
 
   server {
