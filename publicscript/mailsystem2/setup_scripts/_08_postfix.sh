@@ -27,6 +27,7 @@ postconf -c /etc/postfix-inbound -e myhostname=${FIRST_DOMAIN}
 postconf -c /etc/postfix-inbound -e recipient_delimiter=+
 postconf -c /etc/postfix-inbound -e smtpd_milters=inet:${RSPAMD_SERVER}:${RSPAMD_PORT}
 postconf -c /etc/postfix-inbound -e smtpd_helo_restrictions=reject_invalid_hostname
+postconf -c /etc/postfix-inbound -e smtpd_sender_restrictions=reject_non_fqdn_sender
 postconf -c /etc/postfix-inbound -e transport_maps=ldap:/etc/postfix-inbound/ldaptransport.cf
 postconf -c /etc/postfix-inbound -e virtual_alias_maps=ldap:/etc/postfix-inbound/ldapvirtualalias.cf
 postconf -c /etc/postfix-inbound -e relay_domains=/etc/postfix-inbound/relay_domains
