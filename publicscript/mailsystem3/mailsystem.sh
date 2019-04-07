@@ -20,6 +20,7 @@
 # @sacloud-require-archive distro-centos distro-ver-7
 # @sacloud-textarea required heredoc ADDR "作成するメールアドレスのリスト" ex="foo@example.com"
 # @sacloud-apikey required permission=create AK "APIキー"
+# @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
 
 _motd() {
 	LOG=$(ls /root/.sacloud-api/notes/*log)
