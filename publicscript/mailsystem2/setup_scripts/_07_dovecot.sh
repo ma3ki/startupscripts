@@ -17,7 +17,7 @@ yum install -y openldap-devel expat-devel bzip2-devel zlib-devel
 
 #-- dovecot の設定
 cat <<_EOL_> /etc/dovecot/local.conf
-postmaster_address = postmater@${DOMAIN}
+postmaster_address = postmater@${FIRST_DOMAIN}
 auth_mechanisms = plain login
 deliver_log_format = from=%{from_envelope}, to=%{to_envelope}, size=%p, msgid=%m, delivery_time=%{delivery_time}, session_time=%{session_time}, %\$
 disable_plaintext_auth = no
