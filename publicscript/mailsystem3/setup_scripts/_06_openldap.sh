@@ -74,7 +74,7 @@ sed -i "s#^SLAPD_URLS=.*#SLAPD_URLS=\"ldap://${LDAP_MASTER}/\"#" /etc/sysconfig/
 mv /etc/openldap/slapd.d /etc/openldap/slapd.d.org
 
 #-- yum update で slapd.d が復活すると起動しないので定期的に確認して対応
-cat <<_EOL_>> /etc/cron.d/startup-script-cron
+cat <<_EOL_>> ${CRONFILE}
 * * * * * root rm -rf /etc/openldap/slapd.d >/dev/null 2>&1
 * * * * * root /usr/bin/mv -f /etc/openldap/slapd.conf{.bak,} >/dev/null 2>&1
 _EOL_

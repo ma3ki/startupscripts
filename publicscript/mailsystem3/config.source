@@ -25,3 +25,5 @@ HTTPS_DOCROOT=/var/www/html/https_root
 IPADDR=dummy
 ### working directory
 WORKDIR=~/startup-script-mailsystem
+### cron file
+CRONFILE=/etc/cron.d/startup-script-cron

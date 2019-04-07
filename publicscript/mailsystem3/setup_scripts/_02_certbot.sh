@@ -18,6 +18,4 @@ expect \"Congratulations\"
 ls -l /etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem
 
 #-- cron に証明書の更新処理を設定
-echo "$((${RANDOM}%60)) $((${RANDOM}%24)) * * $((${RANDOM}%7)) root certbot renew --post-hook 'systemctl reload nginx postfix'" > /etc/cron.d/certbot-auto
-
-
+echo "$((${RANDOM}%60)) $((${RANDOM}%24)) * * $((${RANDOM}%7)) root certbot renew --post-hook 'systemctl reload nginx postfix'" >> ${CRONFILE}

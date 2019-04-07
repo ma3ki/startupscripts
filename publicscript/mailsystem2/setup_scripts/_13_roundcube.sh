@@ -5,11 +5,12 @@ echo "---- $0 ----"
 
 git clone https://github.com/roundcube/roundcubemail.git ${WORKDIR}/git/roundcubemail
 cd ${WORKDIR}/git/roundcubemail
-VERSION=1.4-rc1
+base_version=1.4
+version=(git tag | grep "^${base_version}" | tail -1)
 
-git checkout ${VERSION}
-cp -pr ../roundcubemail ${HTTPS_DOCROOT}/roundcubemail-${VERSION}
-ln -s ${HTTPS_DOCROOT}/roundcubemail-${VERSION} ${HTTPS_DOCROOT}/roundcube
+git checkout ${version}
+cp -pr ../roundcubemail ${HTTPS_DOCROOT}/roundcubemail-${version}
+ln -s ${HTTPS_DOCROOT}/roundcubemail-${version} ${HTTPS_DOCROOT}/roundcube
 
 #-- roundcube の DB を作成
 export HOME=/root
@@ -56,7 +57,7 @@ sed -i -e "s/'sql'/'ldap'/" \
        -e "s/'uid=%login,ou=people,dc=exemple,dc=com'/'uid=%name,ou=People,%dc'/" \
        -e "s/'(uid=%login)'/'(uid=%name,ou=People,%dc)'/" ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
 
-chown -R nginx. ${HTTPS_DOCROOT}/roundcubemail-${VERSION}
+chown -R nginx. ${HTTPS_DOCROOT}/roundcubemail-${version}
 cd ${HTTPS_DOCROOT}/roundcube/bin
 ./install-jsdeps.sh
 

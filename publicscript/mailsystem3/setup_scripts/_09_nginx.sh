@@ -23,7 +23,7 @@ chgrp nginx /var/opt/remi/php73/lib/php/*
 ln -s /var/opt/remi/php73/log/php-fpm /var/log/php-fpm
 
 #-- php を update すると、permission が apache に戻るのでその対策
-cat <<_EOL_>> /etc/cron.d/startup-script-cron
+cat <<_EOL_>> ${CRONFILE}
 * * * * * root chown nginx /var/opt/remi/php73/log/php-fpm >/dev/null 2>&1
 * * * * * root chgrp nginx /var/opt/remi/php73/lib/php/{opcache,session,wsdlcache} >/dev/null 2>&1
 _EOL_

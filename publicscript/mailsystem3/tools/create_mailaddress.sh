@@ -76,7 +76,7 @@ then
 	postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
 
 	# １年経過したアーカイブメールを削除
-	echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u archive@${domain} mailbox \* before 365d" >> /etc/cron.d/startup-script-cron
+	echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u archive@${domain} mailbox \* before 365d" >> ${CRONFILE}
 fi
 
 echo ${password}
