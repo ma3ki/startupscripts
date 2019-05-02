@@ -50,6 +50,11 @@ access to dn.regex="uid=.*,ou=Termed,dc=.*"
 access to *
     by dn.exact="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" manage
     by * read
+database monitor
+access to *
+    by dn.exact="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" read
+    by dn.exact="${ROOT_DN}" read
+    by * none
 database bdb
 suffix  ""
 checkpoint 1024 15
