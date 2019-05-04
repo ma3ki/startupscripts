@@ -40,21 +40,35 @@ allow bind_v2
 pidfile  /var/run/openldap/slapd.pid
 argsfile /var/run/openldap/slapd.args
 moduleload syncprov.la
+#--- userPassword に対するアクセス制限
+#   自分自身は書き換え可能
+#   ROOT_DN は書き換え可能
+#   匿名接続ならば、認証したときにこの属性が使える
+#   その他のアクセスの際は何もできない
 access to attrs=UserPassword
-    by dn="${ROOT_DN}" write
     by self write
+    by dn="${ROOT_DN}" write
     by anonymous auth
     by * none
+#-- Termed は ROOT_DN のみ書き換え可能
 access to dn.regex="uid=.*,ou=Termed,dc=.*"
+    by dn="${ROOT_DN}" write
     by * none
+#-- その他の属性は ROOT_DN のみ書き換え可能
+#   ROOT_DN 以外は read のみ可能
 access to *
-    by dn.exact="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" manage
+    by dn="${ROOT_DN}" write
     by * read
+#-- monitor データベースに対するアクセス制限
+#   ROOT_DN のみ read 可能
+#   確認コマンド ldapsearch -x -D "${ROOT_DN}" -W +
 database monitor
 access to *
-    by dn.exact="gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth" read
     by dn.exact="${ROOT_DN}" read
     by * none
+# database config
+# rootdn  "${ROOT_DN}"
+# rootpw  "${root_pw}"
 database bdb
 suffix  ""
 checkpoint 1024 15
@@ -63,7 +77,7 @@ rootpw  "${root_pw}"
 directory /var/lib/ldap
 index objectClass   eq,pres
 index uid           eq,pres,sub
-index mailHost,mailRoutingAddress,mailLocalAddress,userPassword,sendmailMTAHost eq,pres
+index mailHost,mailRoutingAddress,mailLocalAddress,sendmailMTAHost eq,pres
 _EOL_
 
 #-- slapd の起動オプションの変更
