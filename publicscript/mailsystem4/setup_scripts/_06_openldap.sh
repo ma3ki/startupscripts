@@ -66,14 +66,12 @@ database monitor
 access to *
     by dn.exact="${ROOT_DN}" read
     by * none
-# database config
-# rootdn  "${ROOT_DN}"
-# rootpw  "${root_pw}"
+database config
+rootdn  "${ROOT_DN}"
+rootpw  "${root_pw}"
 database bdb
 suffix  ""
 checkpoint 1024 15
-rootdn  "${ROOT_DN}"
-rootpw  "${root_pw}"
 directory /var/lib/ldap
 index objectClass   eq,pres
 index uid           eq,pres,sub
@@ -82,13 +80,16 @@ _EOL_
 
 #-- slapd の起動オプションの変更
 sed -i "s#^SLAPD_URLS=.*#SLAPD_URLS=\"ldap://${LDAP_MASTER}/\"#" /etc/sysconfig/slapd
-mv /etc/openldap/slapd.d /etc/openldap/slapd.d.org
 
+#-- slapd.conf から olc に変換
+sudo -u ldap slaptest -f /etc/openldap/slapd.conf -F /etc/openldap/slapd.d
+
+# mv /etc/openldap/slapd.d /etc/openldap/slapd.d.org
 #-- yum update で slapd.d が復活すると起動しないので定期的に確認して対応
-cat <<_EOL_>> ${CRONFILE}
-* * * * * root rm -rf /etc/openldap/slapd.d >/dev/null 2>&1
-* * * * * root /usr/bin/mv -f /etc/openldap/slapd.conf{.bak,} >/dev/null 2>&1
-_EOL_
+#cat <<_EOL_>> ${CRONFILE}
+#* * * * * root rm -rf /etc/openldap/slapd.d >/dev/null 2>&1
+#* * * * * root /usr/bin/mv -f /etc/openldap/slapd.conf{.bak,} >/dev/null 2>&1
+#_EOL_
 
 #-- rsyslog に slapd のログ出力設定を追加
 echo "local4.*  /var/log/openldaplog" > /etc/rsyslog.d/openldap.conf

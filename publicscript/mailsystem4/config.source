@@ -3,7 +3,7 @@ DOMAIN_LIST=example.com
 FIRST_DOMAIN=example.com
 FIRST_ADDRESS=foo@example.com
 ### ldap
-ROOT_DN="cn=admin,dc=sacloud"
+ROOT_DN="cn=config"
 ROOT_PASSWORD=dummy
 LDAP_MASTER=127.0.0.1
 LDAP_SERVER=127.0.0.1
