@@ -14,6 +14,10 @@ set_lg_regionmax 262144
 set_lg_bsize 2097152
 _EOL_
 
+#-- 一度起動して停止 
+systemctl start slapd
+systemctl stop slapd
+
 root_pw=$(slappasswd -s ${ROOT_PASSWORD})
 
 #-- sendmail schema を保存
@@ -84,7 +88,6 @@ sed -i "s#^SLAPD_URLS=.*#SLAPD_URLS=\"ldap://${LDAP_MASTER}/\"#" /etc/sysconfig/
 #-- slapd.conf から olc に変換
 sudo -u ldap slaptest -f /etc/openldap/slapd.conf -F /etc/openldap/slapd.d
 
-# mv /etc/openldap/slapd.d /etc/openldap/slapd.d.org
 #-- yum update で slapd.d が復活すると起動しないので定期的に確認して対応
 #cat <<_EOL_>> ${CRONFILE}
 #* * * * * root rm -rf /etc/openldap/slapd.d >/dev/null 2>&1
