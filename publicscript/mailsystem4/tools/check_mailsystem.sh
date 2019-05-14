@@ -54,6 +54,9 @@ check_version() {
 		rspamd)
 			VERSION=$(rspamd --version | awk '{print $NF}')
 			;;
+		redis)
+			VERSION=$(redis-server -v | awk '{print $3}' | awk -F= '{print $2}')
+			;;
 		sympa)
 			which sympa.pl > /dev/null 2>&1
 			if [ $? -eq 0 ]
@@ -109,6 +112,7 @@ check_proc slapd ldap
 check_proc dovecot dovecot
 check_proc clamd clamscan
 check_proc rspamd _rspamd
+check_proc redis_server redis
 check_proc master root
 check_proc mysqld mysql
 check_proc php-fpm nginx
@@ -132,7 +136,7 @@ do
 done
 
 echo "-- application version --"
-for x in os slapd dovecot clamd rspamd postfix mysql php-fpm nginx roundcube phpldapadmin
+for x in os slapd dovecot clamd rspamd redis postfix mysql php-fpm nginx roundcube phpldapadmin
 do
 	check_version ${x}
 done
