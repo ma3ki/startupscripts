@@ -112,7 +112,7 @@ check_proc slapd ldap
 check_proc dovecot dovecot
 check_proc clamd clamscan
 check_proc rspamd _rspamd
-check_proc redis_server redis
+check_proc redis-server redis
 check_proc master root
 check_proc mysqld mysql
 check_proc php-fpm nginx
@@ -128,7 +128,7 @@ do
 	check_dns ${x} MX
 	check_dns ${x} TXT
 	check_dns ${HOST} A
-	check_dns autoconfig.${x} A
+	check_dns autoconfig.${x} CNAME
 	check_dns _dmarc.${x} TXT
 	check_dns _adsp._domainkey.${x} TXT
 	check_dns default._domainkey.${x} TXT
