@@ -98,7 +98,7 @@ check_dns() {
 
 check_cert() {
 	DOMAIN=$1
-	RESULT=$(openssl s_client -connect ${DOMAIN}:443 < /dev/null 2>/dev/null | openssl x509 -text 2>&1 | egrep "Before|After|DNS:" | sed -e 's/^ \+/ /' -e '1i Validity:' -e 's/^ DNS:/Subject Alternative Name:\n DNS:/'")
+	RESULT=$(openssl s_client -connect ${DOMAIN}:443 < /dev/null 2>/dev/null | openssl x509 -text 2>&1 | egrep "Before|After|DNS:" | sed -e 's/^ \+/ /' -e '1i Validity:' -e 's/^ DNS:/Subject Alternative Name:\n DNS:/')
 	if [ "${RESULT}x" = "x" ]
 	then
 		echo "ERROR"
