@@ -138,7 +138,7 @@ do
 	check_dns ${HOST} A
 	if [ "${FIRST_DOMAIN}" = "${x}" ]
 	then
-		check_dns autoconfig.${x} CNAME
+		check_dns autoconfig.${x} A
 	fi
 	check_dns _dmarc.${x} TXT
 	check_dns _adsp._domainkey.${x} TXT

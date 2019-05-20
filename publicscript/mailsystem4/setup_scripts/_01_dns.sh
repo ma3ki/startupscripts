@@ -16,7 +16,7 @@ do
   usacloud dns record-add -y --name _adsp._domainkey --type TXT --value "dkim=discardable" ${domain}
   if [ "${FIRST_DOMAIN}" = "${domain}" ]
   then
-    usacloud dns record-add -y --name autoconfig --type CNAME --value ${FIRST_DOMAIN}. ${domain}
+    usacloud dns record-add -y --name autoconfig --type A --value ${IPADDR}. ${domain}
   fi
 done
 
