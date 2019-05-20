@@ -98,7 +98,7 @@ check_dns() {
 
 check_cert() {
 	DOMAIN=$1
-	RESULT=$(openssl s_client -connect ${DOMAIN}:443 < /dev/null 2>/dev/null | openssl x509 -text 2>&1 | egrep "Before|After")
+	RESULT=$(openssl s_client -connect ${DOMAIN}:443 < /dev/null 2>/dev/null | openssl x509 -text 2>&1 | egrep "Before|After|DNS:" | sed -e 's/^ \+/ /' -e '1i Validity:' -e 's/^ DNS:/Subject Alternative Name:\n DNS:/'x")
 	if [ "${RESULT}x" = "x" ]
 	then
 		echo "ERROR"
@@ -120,6 +120,14 @@ check_proc nginx nginx
 
 echo
 
+echo "-- Application Version --"
+for x in os slapd dovecot clamd rspamd redis postfix mysql php-fpm nginx roundcube phpldapadmin
+do
+	check_version ${x}
+done
+
+echo
+
 for x in ${DOMAIN_LIST}
 do
 	HOST=$(hostname | sed "s/${FIRST_DOMAIN}/${x}/")
@@ -128,20 +136,15 @@ do
 	check_dns ${x} MX
 	check_dns ${x} TXT
 	check_dns ${HOST} A
-	check_dns autoconfig.${x} CNAME
+	if [ "${FIRST_DOMAIN}" = "${x}" ]
+	then
+		check_dns autoconfig.${x} CNAME
+	fi
 	check_dns _dmarc.${x} TXT
 	check_dns _adsp._domainkey.${x} TXT
 	check_dns default._domainkey.${x} TXT
 	echo
 done
-
-echo "-- application version --"
-for x in os slapd dovecot clamd rspamd redis postfix mysql php-fpm nginx roundcube phpldapadmin
-do
-	check_version ${x}
-done
-
-echo
 
 echo "-- ${FIRST_DOMAIN} TLS Check --"
 check_cert ${FIRST_DOMAIN}

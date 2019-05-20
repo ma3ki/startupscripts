@@ -14,6 +14,9 @@ do
   usacloud dns record-add -y --name ${name} --type A       --value ${IPADDR} ${domain}
   usacloud dns record-add -y --name _dmarc --type TXT      --value "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}" ${domain}
   usacloud dns record-add -y --name _adsp._domainkey --type TXT --value "dkim=discardable" ${domain}
-  usacloud dns record-add -y --name autoconfig --type CNAME --value ${FIRST_DOMAIN}. ${domain}
+  if [ "${FIRST_DOMAIN}" = "${x}" ]
+  then
+    usacloud dns record-add -y --name autoconfig --type CNAME --value ${FIRST_DOMAIN}. ${domain}
+  fi
 done
 

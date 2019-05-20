@@ -41,7 +41,7 @@ cat <<'_EOL_'>${HTTPS_DOCROOT}/.well-known/autoconfig/mail/config-v1.1.xml
          <authentication>password-cleartext</authentication>
       </outgoingServer>
     </emailProvider>
-    <clientConfigUpdate url="http://_DOMAIN_/mail/config-v1.1.xml" />
+    <clientConfigUpdate url="https://_DOMAIN_/.well-known/autoconfig/mail/config-v1.1.xml" />
 </clientConfig>
 _EOL_
 
