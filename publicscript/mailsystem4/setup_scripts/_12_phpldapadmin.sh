@@ -3,9 +3,9 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
+#-- phpldapadmin本家は php7.x に対応していない為、 fork されたものを clone する
 mkdir -p ${WORKDIR}/git
-#git clone https://github.com/breisig/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
-git clone https://github.com/leenooks/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
+git clone https://github.com/breisig/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
 
 cp -pr ${WORKDIR}/git/phpldapadmin ${HTTPS_DOCROOT}/phpldapadmin
 cp -p ${HTTPS_DOCROOT}/phpldapadmin/config/config.php{.example,}
