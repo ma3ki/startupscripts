@@ -237,7 +237,7 @@ do
 	if [ ${FLAG} -ne 0 ]
 	then
 		_motd start
-		echo ${MESSAGE} >> /etc/motd
+		echo -e "${MESSAGE}" >> /etc/motd
 	fi
 
 	if [ ${FLAG} -eq 0 ]
