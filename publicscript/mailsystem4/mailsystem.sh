@@ -47,7 +47,7 @@ trap '_motd fail' ERR
 #-- tool のインストールと更新
 yum install -y epel-release
 yum install -y bind-utils telnet jq expect bash-completion sysstat mailx git
-yum update -y || yum update -y --setopt=deltarpm=0
+yum update -y 
 
 #-- usacloud のインストール
 curl -fsSL http://releases.usacloud.jp/usacloud/repos/setup-yum.sh | sh
