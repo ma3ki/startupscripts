@@ -112,11 +112,11 @@ then
 	_EOL_
 
 	cat <<-'_EOL_'> /etc/rspamd/local.d/dkim_signing.conf
-	#-- メーリングリストや転送の対応
+	#-- メーリングリストや転送の為の設定
 	allow_hdrfrom_mismatch = true;
 	sign_local = true;
 	
-	#-- subdomain の sign 対応を無効化
+	#-- 設定したドメインのみ署名する(サブドメインは署名しない)
 	use_esld = false;
 	try_fallback = false;
 	
@@ -137,6 +137,10 @@ then
 			}
 		}
 		_EOL_
+
+		cat <<-_EOL_>>/etc/rspamd/local.d/whitelist_sender_domain.map
+		${x}
+		_EOL_
 	done
 
 	cat <<-_EOL_> /etc/rspamd/local.d/history_redis.conf
@@ -146,6 +150,32 @@ then
 	compress        = true;
 	subject_privacy = false;
 	_EOL_
+
+	cat <<-'_EOL_'>/etc/rspamd/local.d/multimap.conf
+	WHITELIST_SENDER_DOMAIN {
+		type = "from";
+		map = "/etc/rspamd/local.d/whitelist_sender_domain.map";
+		filter = "email:domain";
+		score = -10.0
+	}
+	WHITELIST_IP {
+		type = "ip";
+		map = "/etc/rspamd/local.d/whitelist_ip.map";
+		prefilter = true;
+		action = "accept";
+	}
+	_EOL_
+
+	cat <<-_EOL_>/etc/rspamd/local.d/whitelist_ip.map
+	${IPADDR}
+	_EOL_
+
+	for x in $(cat ipaddress.list)
+	do
+		cat <<-_EOL_>>/etc/rspamd/local.d/whitelist_ip.map
+		${x}
+		_EOL_
+	done
 
 	#-- redis, rspamd の有効化
 	systemctl enable redis rspamd
