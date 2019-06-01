@@ -74,16 +74,17 @@ ${POSTCONF} smtpd_helo_restrictions="reject_invalid_hostname reject_non_fqdn_hos
 ${POSTCONF} smtpd_sender_restrictions="reject_non_fqdn_sender reject_unknown_sender_domain"
 ${POSTCONF} inet_protocols=ipv4
 ${POSTCONF} smtpd_helo_required=yes
-${POSTCONF} message_size_limit=20480000
+${POSTCONF} message_size_limit=52428800
 ${POSTCONF} disable_vrfy_command=yes
 ${POSTCONF} smtpd_discard_ehlo_keywords=dsn,enhancedstatuscodes,etrn
 ${POSTCONF} smtpd_sender_restrictions="check_sender_access hash:/etc/postfix/access, reject"
 ${POSTCONF} smtp_tls_loglevel=1
 ${POSTCONF} smtp_tls_security_level=may
 ${POSTCONF} smtp_use_tls=yes
+${POSTCONF} smtp_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
 ${POSTCONF} tls_random_source=dev:/dev/urandom
 
-MYNETWORKS="127.0.0.1,${IPADDR},"
+MYNETWORKS="127.0.0.1,${IPADDR}"
 for x in $(cat ipaddress.list)
 do
 	MYNETWORKS="${MYNETWORKS},${x}"
@@ -115,13 +116,12 @@ then
 	#-- メーリングリストや転送の為の設定
 	allow_hdrfrom_mismatch = true;
 	sign_local = true;
-	
-	#-- 設定したドメインのみ署名する(サブドメインは署名しない)
 	use_esld = false;
 	try_fallback = false;
-	
-	#-- 署名対象のヘッダー
-	sign_headers = '(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post';
+	auth_only = false;
+	use_domain = 'header';
+	sign_networks = "/etc/rspamd/local.d/dkim_signing_network.map" ;
+
 	_EOL_
 
 	for x in $(cat domain.list)
@@ -175,6 +175,11 @@ then
 		cat <<-_EOL_>>/etc/rspamd/local.d/whitelist_ip.map
 		${x}
 		_EOL_
+	
+		cat <<-_EOL_>/etc/rspamd/local.d/dkim_signing_network.map
+		${x}/32
+		_EOL_
+	
 	done
 
 	#-- redis, rspamd の有効化
