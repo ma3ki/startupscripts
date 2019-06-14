@@ -3,7 +3,8 @@
 # @sacloud-name "Let's Encrypt"
 # @sacloud-once
 # @sacloud-desc-begin
-# このスクリプトは usacloud, certbot-auto をインストールし、Let's Encryptで example.com と *.example.com のTLS証明書を取得します
+# このスクリプトは usacloud, certbot-auto をインストールし、Let's Encryptで "指定ドメイン" と "*.指定ドメイン" のTLS証明書を取得します
+# CAA レコードを登録する場合は、 issue と issuewild タグを登録します。
 # (CentOS7.X でのみ動作します)
 #
 # 事前作業として以下の2つが必要となります
@@ -84,14 +85,13 @@ expect \"Congratulations\"
 ls -l /etc/letsencrypt/live/${domain}/fullchain.pem
 
 #-- cron に証明書の更新処理を設定
-echo "$((${RANDOM}%60)) $((${RANDOM}%24)) * * $((${RANDOM}%7)) root certbot renew" >> /etc/cron.d/update-sacloud-certbot
+echo "$((${RANDOM}%60)) $((${RANDOM}%24)) * * $((${RANDOM}%7)) root certbot renew " >> /etc/cron.d/update-sacloud-certbot
 
 #-- CAA レコードの登録
 if [ ${caa_flag} -ne 0 ]
 then
 	  usacloud dns record-add -y --name @ --type CAA --value '0 issue "letsencrypt.org"' ${domain}
 	  usacloud dns record-add -y --name @ --type CAA --value '0 issuewild "letsencrypt.org"' ${domain}
-	  usacloud dns record-add -y --name @ --type CAA --value '0 iodef "${mail_addr}"' ${domain}
 fi
 
 _motd end
