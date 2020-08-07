@@ -44,14 +44,14 @@ set -ex
 _motd start
 trap '_motd fail' ERR
 
+#-- usacloud のインストール
+curl -fsSL https://releases.usacloud.jp/usacloud/repos/install.sh | bash
+zone=$(dmidecode -t system | awk '/Family/{print $NF}')
+
 #-- tool のインストールと更新
 dnf install -y epel-release
 dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
 dnf update -y
-
-#-- usacloud のインストール
-curl -fsSL https://releases.usacloud.jp/usacloud/repos/install.sh | bash
-zone=$(dmidecode -t system | awk '/Family/{print $NF}')
 
 set +x
 
