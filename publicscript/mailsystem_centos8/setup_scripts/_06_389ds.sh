@@ -19,4 +19,4 @@ systemctl enable dirsrv@localhost.service
 systemctl start dirsrv@localhost
 
 #-- ドメインの登録
-$(dirname $0)/../tools/389ds_create_domain.sh
+sh -x $(dirname $0)/../tools/389ds_create_domain.sh
