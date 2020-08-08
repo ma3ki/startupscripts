@@ -38,6 +38,8 @@ _motd() {
 	esac
 }
 
+LANG=C export LANG
+
 set -ex
 
 #-- スタートアップスクリプト開始
