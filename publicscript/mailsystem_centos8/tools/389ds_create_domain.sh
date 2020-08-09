@@ -15,14 +15,15 @@ fi
 for domain in ${DOMAIN_LIST}
 do
 	account=$(echo ${ADMINS} | awk '{print $1}')
-	BASE=$(echo ${domain} | sed -e 's/\(^\|\.\)/,dc=/g' -e 's/^,//')
-	if [ $(ldapsearch -h ${LDAP_MASTER} -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${BASE}" | grep -c ^dn:) -eq 0 ]
+	base=$(echo ${domain} | sed -e 's/\(^\|\.\)/,dc=/g' -e 's/^,//')
+	dc=$(echo ${domain} | awk -F\. '{print $1}')
+	if [ $(ldapsearch -h ${LDAP_MASTER} -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${base}" | grep -c ^dn:) -eq 0 ]
 	then
 		cat <<-_EOL_>>${WORKDIR}/ldap/${domain}.ldif
-		dn: ${BASE}
+		dn: ${base}
 		objectClass: dcObject
 		objectClass: organization
-		dc: ${x}
+		dc: ${dc}
 		o: ${domain}
 		
 		_EOL_
@@ -31,29 +32,29 @@ do
 	#-- create root
 	while :;
 	do
-		COUNT=1
-		if [ $(dsconf localhost backend suffix list | fgrep -ci "(userroot${COUNT})") -eq 0 ]
+		count=1
+		if [ $(dsconf localhost backend suffix list | fgrep -ci "(userroot${count})") -eq 0 ]
 		then
-			dsconf localhost backend create --suffix ${BASE} --be-name userRoot${COUNT}
+			dsconf localhost backend create --suffix ${base} --be-name userRoot${count}
 			break
 		else
-			COUNT=$(expr ${COUNT} + 1)
+			count=$(expr ${count} + 1)
 		fi
 	done
 
-	PEOPLE="ou=People,${BASE}"
-	TERMED=$(echo ${PEOPLE} | sed 's/ou=People/ou=Termed/')
+	people="ou=People,${base}"
+	termed=$(echo ${people} | sed 's/ou=People/ou=Termed/')
 
 	cat <<-_EOL_>>${WORKDIR}/ldap/${domain}.ldif
-	dn: ${PEOPLE}
+	dn: ${people}
 	ou: People
 	objectclass: organizationalUnit
 
-	dn: ${TERMED}
+	dn: ${termed}
 	ou: Termed
 	objectclass: organizationalUnit
 	
-	dn: uid=${account},${PEOPLE}
+	dn: uid=${account},${people}
 	objectClass: mailRecipient
 	objectClass: top
 	userPassword: ${ROOT_PASSWORD}
@@ -79,7 +80,7 @@ do
 	echo "${account}@${domain}: ${ROOT_PASSWORD}" >> ${WORKDIR}/password.list
 
 	#-- acl
-	echo "dn: ${BASE}" > ${WORKDIR}/ldap/${domain}_acl.ldif
+	echo "dn: ${base}" > ${WORKDIR}/ldap/${domain}_acl.ldif
 	cat <<-'_EOL_'>> ${WORKDIR}/ldap/${domain}_acl.ldif
 	changeType: modify
 	replace: aci
