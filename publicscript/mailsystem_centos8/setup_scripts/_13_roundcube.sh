@@ -21,13 +21,13 @@ mysql -e "flush privileges;"
 mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 
 #-- 必要なPHPのライブラリをインストール
-dnf install -y php-{pdo,xml,pear,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip} unzip php-pear-Net-SMTP
+dnf install -y php-{pdo,xml,pear,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip,json} unzip php-pear-Net-SMTP
 pear channel-update pear.php.net
-pear install -a Mail_mime
+#pear install -a Mail_mime
 pear install Net_LDAP
-pear install channel://pear.php.net/Net_IDNA2-0.2.0
-pear channel-discover pear.horde.org
-pear install channel://pear.horde.org/Horde_ManageSieve
+#pear install channel://pear.php.net/Net_IDNA2-0.2.0
+#pear channel-discover pear.horde.org
+#pear install channel://pear.horde.org/Horde_ManageSieve
 #pear install Net_Sieve-1.4.4
 
 dnf config-manager --set-enabled PowerTools
@@ -72,8 +72,14 @@ sed -i -e "s/'sql'/'ldap'/" \
        -e "s/'(uid=%login)'/'(uid=%name,ou=People,%dc)'/" ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
 
 chown -R nginx. ${HTTPS_DOCROOT}/roundcubemail-${version}
-cd ${HTTPS_DOCROOT}/roundcube/bin
-./install-jsdeps.sh
+cd ${HTTPS_DOCROOT}/roundcube
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'e5325b19b381bfd88ce90a5ddb7823406b2a38cff6bb704b0acc289a09c8128d4a8ce2bbafcd1fcbdc38666422fe2806') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+sed -e 's/suggest/require/' -e '/ required .*//'  composer.json-dist > composer.json
+php composer.phar install --no-dev
+bin/install-jsdeps.sh
 
 mv ${HTTPS_DOCROOT}/roundcube/installer ${HTTPS_DOCROOT}/roundcube/_installer
 

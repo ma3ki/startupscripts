@@ -10,10 +10,8 @@ dnf -y install mysql-{server,devel}
 systemctl enable mysqld
 systemctl start mysqld
 
-mysqld --initialize-insecure
+(mysqld --initialize-insecure || true)
 mysqladmin -u root password "${ROOT_PASSWORD}"
-
-mysql -e "INSTALL COMPONENT 'file://component_validate_password';"
 
 cat <<_EOL_> /root/.my.cnf
 [client]
@@ -24,6 +22,8 @@ socket   = /var/lib/mysql/mysql.sock
 _EOL_
 
 #-- 設定変更
+mysql -e "INSTALL COMPONENT 'file://component_validate_password';"
+
 cat <<_EOL_>> /etc/my.cnf.d/mysql-server.cnf
 
 default_authentication_plugin=mysql_native_password
