@@ -107,7 +107,7 @@ include /etc/nginx/mail.conf;
 _EOL_
 
 cat <<_EOL_> /etc/nginx/default.d/${FIRST_DOMAIN}_ssl.conf
-ssl_protocols TLSv1.2 ;
+ssl_protocols TLSv1.2 TOSv1.3 ;
 ssl_ciphers EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH;
 ssl_ecdh_curve prime256v1;
 ssl_prefer_server_ciphers on;
@@ -132,7 +132,7 @@ server {
 
   location ~ \.php\$ {
     allow 127.0.0.1;
-    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
     include fastcgi_params;
@@ -173,7 +173,7 @@ server {
   include /etc/nginx/conf.d/https.d/*.conf;
 
   location ~ \.php\$ {
-    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME \$document_root/\$fastcgi_script_name;
     include fastcgi_params;

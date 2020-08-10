@@ -14,16 +14,30 @@ ln -s ${HTTPS_DOCROOT}/roundcubemail-${version} ${HTTPS_DOCROOT}/roundcube
 
 #-- roundcube の DB を作成
 export HOME=/root
-mysql -e "CREATE DATABASE roundcubemail CHARACTER SET utf8 collate utf8_bin;"
-mysql -e "GRANT ALL PRIVILEGES ON roundcubemail.* TO roundcube@localhost IDENTIFIED BY 'roundcube';"
+mysql -e "create database roundcubemail character set utf8 collate utf8_bin;"
+mysql -e "create user roundcube@localhost identified by 'roundcube';"
+mysql -e "grant all privileges ON roundcubemail.* TO roundcube@localhost ;"
+mysql -e "flush privileges;"
 mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 
 #-- 必要なPHPのライブラリをインストール
-yum install -y php73-php-{pdo,xml,pear,mbstring,intl,pecl-imagick,gd,mysqlnd,pspell}
-yum install -y php-pear-Mail-mimeDecode php-kolab-net-ldap3 php-pear-Net-IDNA2 php-pear-Auth-SASL php-pear-Net-SMTP php-pear-Net-Sieve
+dnf install -y php-{pdo,xml,pear,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip} unzip php-pear-Net-SMTP
+pear channel-update pear.php.net
+pear install -a Mail_mime
+pear install Net_LDAP
+pear install channel://pear.php.net/Net_IDNA2-0.2.0
+pear channel-discover pear.horde.org
+pear install channel://pear.horde.org/Horde_ManageSieve
+#pear install Net_Sieve-1.4.4
+
+dnf config-manager --set-enabled PowerTools
+dnf install -y ImageMagick ImageMagick-devel
+pecl channel-update pecl.php.net
+yes | pecl install Imagick
+echo extension=imagick.so >> /etc/php.d/99-imagick.ini
 
 #-- php-fpm の再起動
-systemctl restart php73-php-fpm
+systemctl restart php-fpm
 
 #-- roundcube の設定
 cat <<'_EOL_'> ${HTTPS_DOCROOT}/roundcube/config/config.inc.php
@@ -64,7 +78,7 @@ cd ${HTTPS_DOCROOT}/roundcube/bin
 mv ${HTTPS_DOCROOT}/roundcube/installer ${HTTPS_DOCROOT}/roundcube/_installer
 
 #-- elastic テーマを使用するため、lessc コマンドをインストール
-yum install -y npm
+dnf install -y npm
 npm install -g less
 
 cd ${HTTPS_DOCROOT}/roundcube/skins/elastic
