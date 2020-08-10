@@ -107,7 +107,7 @@ include /etc/nginx/mail.conf;
 _EOL_
 
 cat <<_EOL_> /etc/nginx/default.d/${FIRST_DOMAIN}_ssl.conf
-ssl_protocols TLSv1.2 TOSv1.3 ;
+ssl_protocols TLSv1.2 TLSv1.3 ;
 ssl_ciphers EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH;
 ssl_ecdh_curve prime256v1;
 ssl_prefer_server_ciphers on;
