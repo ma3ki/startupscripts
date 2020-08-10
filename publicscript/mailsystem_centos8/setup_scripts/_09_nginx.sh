@@ -15,7 +15,7 @@ sed -i -e "s/^max_execution_time = 30/max_execution_time = 300/" \
        -e "s/^;date.timezone =/date.timezone = 'Asia\/Tokyo'/" /etc/php.ini
 
 cp -p /etc/php-fpm.d/www.conf{,.org}
-sed -i "s/apache/nginx/" /etc/php-fpm.d/www.conf
+sed -i -e "s/user = apache/user = nginx/" -e "s/group = apache/group = nginx/" /etc/php-fpm.d/www.conf
 chown nginx /var/log/php-fpm
 chgrp nginx /var/lib/php/*
 
