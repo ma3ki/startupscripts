@@ -27,7 +27,7 @@ sed -i -e "301i \$servers->setValue('server','base',array(${ARRAY_LIST}));" ${HT
 
 #-- 使用しないテンプレートを移動
 mkdir ${HTTPS_DOCROOT}/phpldapadmin/templates/creation_backup
-for x in courierMailAccount.xml courierMailAlias.xml mozillaOrgPerson.xml sambaDomain.xml sambaGroupMapping.xml sambaMachine.xml sambaSamAccount.xml
+for x in courierMailAccount.xml courierMailAlias.xml mozillaOrgPerson.xml sambaDomain.xml sambaGroupMapping.xml sambaMachine.xml sambaSamAccount.xml dNSDomain.xml
 do
 	mv ${HTTPS_DOCROOT}/phpldapadmin/templates/creation/${x} ${HTTPS_DOCROOT}/phpldapadmin/templates/creation_backup
 done
