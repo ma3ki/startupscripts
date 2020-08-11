@@ -81,10 +81,10 @@ hosts = ${LDAP_SERVER}
 auth_bind = yes
 base = ""
 pass_attrs=mailRoutingAddress=User,userPassword=password
-pass_filter = (&(objectClass=inetLocalMailRecipient)(mailRoutingAddress=%u))
+pass_filter = (mailRoutingAddress=%u)
 iterate_attrs = mailRoutingAddress=user
-iterate_filter = (&(objectClass=inetLocalMailRecipient)(mailRoutingAddress=*))
-user_filter = (&(objectClass=inetLocalMailRecipient)(mailRoutingAddress=%u))
+iterate_filter = (mailRoutingAddress=*)
+user_filter = (mailRoutingAddress=%u)
 user_attrs = \
   =uid=dovecot, \
   =gid=dovecot, \

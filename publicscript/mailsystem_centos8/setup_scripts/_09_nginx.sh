@@ -291,13 +291,13 @@ $protomap = array(
   "465" => "smtps",
 );
 
-// ldap setting
+// ldap setting // attribuite は全て小文字で記述すること
 $ldap = array(
   "host" => "127.0.0.1",
   "port" => 389,
   "basedn" => "",
   "filter" => "(mailRoutingAddress=" . $env['user'] . ")",
-  "attribute" => "mailMessageStore",
+  "attribute" => "mailmessagestore",
   "dn" => "",
   "passwd" => "",
 );

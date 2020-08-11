@@ -48,6 +48,7 @@ trap '_motd fail' ERR
 
 #-- tool のインストールと更新
 dnf install -y epel-release
+dnf config-manager --set-enabled PowerTools
 dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
 dnf update -y
 

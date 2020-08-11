@@ -30,7 +30,6 @@ pear install Net_LDAP
 #pear install channel://pear.horde.org/Horde_ManageSieve
 #pear install Net_Sieve-1.4.4
 
-dnf config-manager --set-enabled PowerTools
 dnf install -y ImageMagick ImageMagick-devel
 pecl channel-update pecl.php.net
 yes | pecl install Imagick
