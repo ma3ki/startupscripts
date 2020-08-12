@@ -30,9 +30,9 @@ do
 	fi
 
 	#-- create root
+	count=1
 	while :;
 	do
-		count=1
 		if [ $(dsconf localhost backend suffix list | fgrep -ci "(userroot${count})") -eq 0 ]
 		then
 			dsconf localhost backend create --suffix ${base} --be-name userRoot${count}
