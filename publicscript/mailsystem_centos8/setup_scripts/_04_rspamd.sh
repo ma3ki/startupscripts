@@ -5,7 +5,6 @@ echo "---- $0 ----"
 
 #-- リポジトリの設定と rspamd, redis のインストール
 curl -L -o /etc/yum.repos.d/rspamd.repo https://rspamd.com/rpm-stable/centos-8/rspamd.repo 
-#rpm --import https://rspamd.com/rpm-stable/gpg.key
 (dnf install -y rspamd || true)
 dnf install -y redis
 
@@ -30,7 +29,7 @@ _EOL_
 
 cat <<'_EOL_'> /etc/rspamd/local.d/actions.conf
 reject = null;
-add_header = 2.0 ;
+add_header = 6 ;
 greylist = null;
 _EOL_
 
