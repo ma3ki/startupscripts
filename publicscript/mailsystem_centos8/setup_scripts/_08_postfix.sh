@@ -149,8 +149,6 @@ systemctl start postfix
 postmulti -i postfix-inbound -e enable
 postmulti -i postfix-inbound -p start
 
-alternatives --set mta /usr/sbin/sendmail.postfix
-
 #-- aliases の設定変更
 sed -i "s/^postmaster:.*/postmaster:	root@${FIRST_DOMAIN}/" /etc/aliases
 newaliases
