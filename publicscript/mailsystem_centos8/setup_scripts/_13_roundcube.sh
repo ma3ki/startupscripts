@@ -23,7 +23,7 @@ mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 #-- 必要なPHPのライブラリをインストール
 dnf install -y php-{pdo,xml,pear,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip,json} unzip php-pear-Net-SMTP
 pear channel-update pear.php.net
-#pear install -a Mail_mime
+pear install -a Mail_mime
 pear install Net_LDAP
 #pear install channel://pear.php.net/Net_IDNA2-0.2.0
 #pear channel-discover pear.horde.org
