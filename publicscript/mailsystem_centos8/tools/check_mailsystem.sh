@@ -37,10 +37,10 @@ check_version() {
 			VERSION=$(/usr/sbin/postconf | awk '/^mail_version/{print $NF}')
 			;;
 		mysql)
-			VERSION=$(/usr/bin/mysql --version | sed -e 's/, .*//' -e 's/^.*Ver/Ver/')
+			VERSION=$(/usr/bin/mysql --version | awk '{print $3}')
 			;;
 		php-fpm)
-			VERSION=$(/opt/remi/php73/root/usr/sbin/php-fpm -v | awk '/^PHP/{print $2}')
+			VERSION=$(php-fpm -v | awk '/^PHP/{print $2}')
 			;;
 		nginx)
 			VERSION=$(/usr/sbin/nginx -v 2>&1 | awk -F\/ '{print $NF}')
