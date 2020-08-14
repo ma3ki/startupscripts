@@ -63,7 +63,7 @@ then
 	postconf -c /etc/postfix -e sender_bcc_maps=regexp:/etc/postfix/sender_bcc_maps
 
 	# 受信アーカイブ設定
-	if [ ! -f /etc/postfix/recipient_bcc_maps ]
+	if [ ! -f /etc/postfix-inbound/recipient_bcc_maps ]
 	then
 		cat <<-_EOL_>/etc/postfix-inbound/recipient_bcc_maps
 		if !/^archive\+/
