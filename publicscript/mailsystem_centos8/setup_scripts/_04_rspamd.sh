@@ -110,9 +110,8 @@ cat <<'_EOL_'> /etc/rspamd/local.d/dkim_signing.conf
 allow_hdrfrom_mismatch = true;
 sign_local = true;
 
-# subdomain の sign 対応
 use_esld = false;
-try_fallback = false;
+try_fallback = true;
 
 _EOL_
 
@@ -139,9 +138,8 @@ allow_hdrfrom_mismatch = true;
 sign_local = true;
 use_domain = "envelope";
 
-# subdomain の sign 対応
 use_esld = false;
-try_fallback = false;
+try_fallback = true;
 
 _EOL_
 
