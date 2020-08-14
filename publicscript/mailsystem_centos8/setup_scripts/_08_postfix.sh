@@ -149,6 +149,10 @@ systemctl start postfix
 postmulti -i postfix-inbound -e enable
 postmulti -i postfix-inbound -p start
 
+#-- OS再起動時にpostfixの起動に失敗することがあるので、その対応
+sed -i -e "s/^\(After=syslog.target network.target\)/\1 network-online.target\nWants=network-online.target/" /usr/lib/systemd/system/postfix.service
+systemctl daemon-reload
+
 #-- aliases の設定変更
 sed -i "s/^postmaster:.*/postmaster:	root@${FIRST_DOMAIN}/" /etc/aliases
 newaliases
