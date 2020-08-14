@@ -115,8 +115,8 @@ ssl_session_timeout  5m;
 ssl_certificate /etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem;
 ssl_certificate_key /etc/letsencrypt/live/${FIRST_DOMAIN}/privkey.pem;
 ssl_trusted_certificate /etc/letsencrypt/live/${FIRST_DOMAIN}/chain.pem;
-resolver          8.8.8.8 8.8.4.4 valid=300s;
-resolver_timeout  10s;
+resolver 8.8.8.8 8.8.4.4 valid=300s;
+resolver_timeout 10s;
 _EOL_
 
 cat <<_EOL_> /etc/nginx/conf.d/http.conf
@@ -346,6 +346,10 @@ _EOL_
 #-- nginx, php-fpm の起動
 systemctl enable nginx php-fpm
 systemctl start nginx php-fpm
+
+#-- OS再起動時にnginxの起動に失敗することがあるので、その対応
+sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 network-online.target\nWants=network-online.target/" /usr/lib/systemd/system/nginx.service
+systemctl daemon-reload
 
 #-- firewall の設定
 firewall-cmd --permanent --add-port={25,587,465,993,995,443}/tcp
