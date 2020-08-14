@@ -314,7 +314,7 @@ $ldap['dn'] = 'uid=' . $spmra[0] . ',ou=People,' . $tmpdn[0];
 
 // set search attribute
 if ( $env['proto'] === 'smtp' ) {
-  $ldap['attribute'] = 'sendmailmtahost' ;
+  $ldap['attribute'] = 'mailhost' ;
 }
 
 // set log
