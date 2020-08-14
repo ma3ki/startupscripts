@@ -28,7 +28,7 @@ pear install Net_LDAP
 #pear install channel://pear.php.net/Net_IDNA2-0.2.0
 #pear channel-discover pear.horde.org
 #pear install channel://pear.horde.org/Horde_ManageSieve
-#pear install Net_Sieve-1.4.4
+pear install Net_Sieve-1.4.4
 
 dnf install -y ImageMagick ImageMagick-devel
 pecl channel-update pecl.php.net
