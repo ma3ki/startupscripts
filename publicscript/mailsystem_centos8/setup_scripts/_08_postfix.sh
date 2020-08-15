@@ -39,7 +39,6 @@ postconf -c /etc/postfix -e smtpd_authorized_xclient_hosts=${XAUTH_HOST}
 postconf -c /etc/postfix -e smtpd_sasl_auth_enable=yes
 postconf -c /etc/postfix -e smtpd_sender_restrictions=reject_sender_login_mismatch
 postconf -c /etc/postfix -e smtpd_sender_login_maps=ldap:/etc/postfix/ldapsendercheck.cf
-postconf -c /etc/postfix -e alias_maps=hash:/etc/aliases
 
 postconf -c /etc/postfix-inbound -X master_service_disable
 postconf -c /etc/postfix-inbound -e inet_interfaces=${IPADDR}
@@ -68,6 +67,7 @@ postconf -c /etc/postfix-inbound -e smtpd_use_tls=yes
 
 for cf in /etc/postfix /etc/postfix-inbound
 do
+  postconf -c ${cf} -e alias_maps=hash:/etc/aliases
   postconf -c ${cf} -e inet_protocols=ipv4
   postconf -c ${cf} -e milter_default_action=tempfail
   postconf -c ${cf} -e milter_protocol=6

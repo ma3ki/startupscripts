@@ -79,7 +79,7 @@ _EOL_
 cat <<_EOL_>/etc/dovecot/dovecot-ldap.conf.ext
 hosts = ${LDAP_SERVER}
 auth_bind = yes
-base = ""
+base = dc=%Dd
 pass_attrs=mailRoutingAddress=User,userPassword=password
 pass_filter = (mailRoutingAddress=%u)
 iterate_attrs = mailRoutingAddress=user

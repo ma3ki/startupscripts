@@ -12,6 +12,18 @@ then
   DOMAIN_LIST="$*"
 fi
 
+if [ ! -f "${WORKDIR}/ldap/config.ldif" ]
+then
+	cat <<-_EOL_>> ${WORKDIR}/ldap/config.ldif
+	dn: cn=config
+	changetype: modify
+	replace: nsslapd-allow-hashed-passwords
+	nsslapd-allow-hashed-passwords: on
+	
+	_EOL_
+	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/config.ldif
+fi
+
 for domain in ${DOMAIN_LIST}
 do
 	account=$(echo ${ADMINS} | awk '{print $1}')
@@ -85,10 +97,9 @@ do
 	changeType: modify
 	replace: aci
 	aci: (targetattr="UserPassword")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "1"; allow(write) userdn="ldap:///self";)
-	aci: (targetattr="UserPassword")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "2"; allow(compare) userdn="ldap:///anyone";)
-	aci: (targetattr="*")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "3"; allow(search) userdn="ldap:///anyone";)
-	aci: (targetattr="uid||mail*")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "4"; allow(read) userdn="ldap:///anyone";)
 	aci: (targetattr="*")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "5"; allow(read) userdn="ldap:///self";)
+	aci: (targetattr="UserPassword")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "2"; allow(compare) userdn="ldap:///anyone";)
+	aci: (targetattr!="UserPassword")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "3"; allow(search,read) userdn="ldap:///anyone";)
 	_EOL_
 	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_acl.ldif
 
