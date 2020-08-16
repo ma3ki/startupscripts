@@ -16,6 +16,9 @@ sed -i -e "s/^max_execution_time = 30/max_execution_time = 300/" \
 
 cp -p /etc/php-fpm.d/www.conf{,.org}
 sed -i -e "s/user = apache/user = nginx/" -e "s/group = apache/group = nginx/" /etc/php-fpm.d/www.conf
+#-- 10000 ユーザ対応
+sed -i -e 's/^;php_admin_value\[memory_limit\] = 128M/php_admin_value\[memory_limit\] = 256M/' /etc/php-fpm.d/www.conf
+
 chown nginx /var/log/php-fpm
 chgrp nginx /var/lib/php/*
 
