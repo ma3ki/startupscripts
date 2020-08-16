@@ -20,6 +20,9 @@ then
 	replace: nsslapd-allow-hashed-passwords
 	nsslapd-allow-hashed-passwords: on
 	
+	changetype: modify
+	replace: nssizelimit
+	nssizelimit: -1
 	_EOL_
 	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/config.ldif
 fi
