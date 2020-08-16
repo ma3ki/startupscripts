@@ -41,7 +41,6 @@ postconf -c /etc/postfix -e non_smtpd_milters=inet:${RSPAMD_SERVER}:${RSPAMD_POR
 postconf -c /etc/postfix -e smtpd_authorized_xclient_hosts=${XAUTH_HOST}
 postconf -c /etc/postfix -e smtpd_sasl_auth_enable=yes
 postconf -c /etc/postfix -e smtpd_sender_restrictions=reject_sender_login_mismatch
-postconf -c /etc/postfix -e smtpd_sender_login_maps=ldap:/etc/postfix/ldapsendercheck.cf
 
 postconf -c /etc/postfix-inbound -X master_service_disable
 postconf -c /etc/postfix-inbound -e inet_interfaces=${IPADDR}
@@ -50,11 +49,8 @@ postconf -c /etc/postfix-inbound -e recipient_delimiter=+
 postconf -c /etc/postfix-inbound -e smtpd_milters=inet:${RSPAMD_SERVER}:${RSPAMD_PORT}
 postconf -c /etc/postfix-inbound -e smtpd_helo_restrictions="reject_invalid_hostname reject_non_fqdn_hostname reject_unknown_hostname"
 postconf -c /etc/postfix-inbound -e smtpd_sender_restrictions="reject_non_fqdn_sender reject_unknown_sender_domain"
-postconf -c /etc/postfix-inbound -e transport_maps=ldap:/etc/postfix-inbound/ldaptransport.cf
-postconf -c /etc/postfix-inbound -e virtual_alias_maps=ldap:/etc/postfix-inbound/ldapvirtualalias.cf
 postconf -c /etc/postfix-inbound -e relay_domains=/etc/postfix-inbound/relay_domains
 postconf -c /etc/postfix-inbound -e authorized_submit_users=static:anyone
-postconf -c /etc/postfix-inbound -e smtpd_recipient_restrictions="check_recipient_access ldap:/etc/postfix-inbound/ldaprcptcheck.cf reject"
 postconf -c /etc/postfix-inbound -e smtpd_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
 postconf -c /etc/postfix-inbound -e smtpd_tls_ask_ccert=yes
 postconf -c /etc/postfix-inbound -e smtpd_tls_cert_file=/etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem
@@ -102,41 +98,65 @@ do
   postconf -c ${cf} -e tls_ssl_options=NO_RENEGOTIATION
 done
 
-cat <<_EOL_>/etc/postfix-inbound/ldaprcptcheck.cf
-server_host = ${LDAP_SERVER}
-bind = no
-version = 3
-scope = sub
-timeout = 15
-query_filter = (&(objectClass=mailRecipient)(mailAlternateAddress=%s))
-result_attribute = mailRoutingAddress
-result_format = OK
-_EOL_
+tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldaptransport${x}.cf "; done)
+postconf -c /etc/postfix-inbound -e transport_maps="${tmpcf}"
+tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldapvirtualalias${x}.cf "; done)
+postconf -c /etc/postfix-inbound -e virtual_alias_maps="${tmpcf}"
+tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldaprcptcheck${x}.cf "; done)
+postconf -c /etc/postfix-inbound -e smtpd_recipient_restrictions="check_recipient_access ${tmpcf} reject"
+tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix/ldapsendercheck${x}.cf "; done)
+postconf -c /etc/postfix -e smtpd_sender_login_maps="${tmpcf}"
+done
 
-cat <<_EOL_>/etc/postfix-inbound/ldaptransport.cf
-server_host = ${LDAP_SERVER}
-bind = no
-version = 3
-scope = sub
-timeout = 15
-query_filter = (&(objectClass=mailRecipient)(mailAlternateAddress=%s))
-result_attribute = mailMessageStore
-result_format = lmtp:[%s]:${LMTP_PORT}
-_EOL_
+for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL})
+do
+	sb="search_base = "
+	for y in $(seq ${x} -1 1)
+	do
+		sb="${sb}dc=%${y},"
+	done
+	sb=$(echo ${sb} | sed 's/,$//')
 
-cp /etc/postfix-inbound/ldaprcptcheck.cf /etc/postfix-inbound/ldapvirtualalias.cf
-sed -i 's/result_format = OK/result_format = %s/' /etc/postfix-inbound/ldapvirtualalias.cf
+	cat <<-_EOL_>/etc/postfix-inbound/ldaprcptcheck${x}.cf
+	server_host = ${LDAP_SERVER}
+	bind = no
+	version = 3
+	scope = sub
+	timeout = 15
+	query_filter = (&(objectClass=mailRecipient)(mailAlternateAddress=%s))
+	result_attribute = mailRoutingAddress
+	result_format = OK
+	${sb}
+	_EOL_
 
-cat <<_EOL_>/etc/postfix/ldapsendercheck.cf
-server_host = ${LDAP_SERVER}
-bind = no
-version = 3
-scope = sub
-timeout = 15
-query_filter = (&(objectClass=mailRecipient)(mailRoutingAddress=%s))
-result_attribute = mailRoutingAddress
-result_format = %s
-_EOL_
+	cat <<-_EOL_>/etc/postfix-inbound/ldaptransport{$x}.cf
+	server_host = ${LDAP_SERVER}
+	bind = no
+	version = 3
+	scope = sub
+	timeout = 15
+	query_filter = (&(objectClass=mailRecipient)(mailAlternateAddress=%s))
+	result_attribute = mailMessageStore
+	result_format = lmtp:[%s]:${LMTP_PORT}
+	${sb}
+	_EOL_
+
+	cp /etc/postfix-inbound/ldaprcptcheck${x}.cf /etc/postfix-inbound/ldapvirtualalias{$x}.cf
+	sed -i 's/result_format = OK/result_format = %s/' /etc/postfix-inbound/ldapvirtualalias${x}.cf
+
+	cat <<-_EOL_>/etc/postfix/ldapsendercheck${x}.cf
+	server_host = ${LDAP_SERVER}
+	bind = no
+	version = 3
+	scope = sub
+	timeout = 15
+	query_filter = (&(objectClass=mailRecipient)(mailRoutingAddress=%s))
+	result_attribute = mailRoutingAddress
+	result_format = %s
+	${sb}
+	_EOL_
+
+done
 
 #-- ドメインの追加
 for domain in ${DOMAIN_LIST}

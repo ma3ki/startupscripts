@@ -94,6 +94,10 @@ domain_list="$(awk -F@ '{print $2}' ${addr_list} | sort | uniq | tr '\n' ' ' | s
 first_address=$(egrep -v "^$|^#" ${addr_list} | grep '@' | head -1 )
 first_domain=$(echo ${first_address} | awk -F@ '{print $2}' )
 
+domain_level=$(for x in ma3ki.net test.ma3ki.net; do echo ${x} | awk '{cnt += (split($0, a, ".") - 1)}END{print cnt}'; done)
+min_domain_level=$(($(echo "${domain_level}" | sort -n | head -1) + 1))
+max_domain_level=$(($(echo "${domain_level}" | sort -nr | head -1) + 1))
+
 #-- ipaddress の取得
 source /etc/sysconfig/network-scripts/ifcfg-eth0
 
@@ -103,7 +107,9 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
   -e "s/^FIRST_DOMAIN=.*/FIRST_DOMAIN=\"${first_domain}\"/" \
   -e "s/^FIRST_ADDRESS=.*/FIRST_ADDRESS=\"${first_address}\"/" \
   -e "s/^ROOT_PASSWORD=.*/ROOT_PASSWORD=${rpassword}/" \
-  -e "s/^IPADDR=.*/IPADDR=${IPADDR}/" config.source
+  -e "s/^IPADDR=.*/IPADDR=${IPADDR}/" \
+  -e "s/^MIN_DOMAIN_LEVEL=.*/MIN_DOMAIN_LEVEL=${min_domain_level}/" \
+  -e "s/^MAX_DOMAIN_LEVEL=.*/MAN_DOMAIN_LEVEL=${max_domain_level}/" config.source
 
 #-- セットアップ実行
 for x in ./setup_scripts/_*.sh
