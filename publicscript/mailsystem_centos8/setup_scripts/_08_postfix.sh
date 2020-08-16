@@ -3,9 +3,6 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-#-- rsyslog の RateLimit を解除
-echo '$SystemLogRateLimitInterval 0' > /etc/rsyslog.d/ratelimitoff.conf
-
 #-- 必要なパッケージのインストール
 dnf install -y postfix {cyrus-sasl,openldap,pcre,libdb,libnsl2,mysql,openssl}-devel cyrus-sasl-plain
 grep -v ExecStartPre= /usr/lib/systemd/system/postfix.service > /var/tmp/postfix.service
