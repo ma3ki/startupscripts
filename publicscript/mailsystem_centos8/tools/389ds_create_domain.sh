@@ -21,10 +21,18 @@ then
 	nsslapd-allow-hashed-passwords: on
 	
 	changetype: modify
-	replace: nssizelimit
-	nssizelimit: -1
+	replace: nsslapd-sizelimit
+	nsslapd-sizelimit: -1
 	_EOL_
 	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/config.ldif
+
+	cat <<-_EOL_>> ${WORKDIR}/ldap/limit.ldif
+	dn: cn=config,cn=ldbm database,cn=plugins,cn=config
+	changetype: modify
+	replace: nsslapd-lookthroughlimit
+	nsslapd-lookthroughlimit: -1
+	_EOL_
+	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/limit.ldif
 fi
 
 for domain in ${DOMAIN_LIST}
