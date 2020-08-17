@@ -103,7 +103,6 @@ tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap
 postconf -c /etc/postfix-inbound -e smtpd_recipient_restrictions="check_recipient_access ${tmpcf} reject"
 tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix/ldapsendercheck${x}.cf "; done)
 postconf -c /etc/postfix -e smtpd_sender_login_maps="${tmpcf}"
-done
 
 for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL})
 do
