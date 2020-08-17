@@ -6,7 +6,7 @@ echo "---- $0 ----"
 #-- 必要なパッケージのインストール
 dnf install -y postfix {cyrus-sasl,openldap,pcre,libdb,libnsl2,mysql,openssl}-devel cyrus-sasl-plain
 grep -v ExecStartPre= /usr/lib/systemd/system/postfix.service > /var/tmp/postfix.service
-yum remove -y postfix
+dnf remove -y postfix
 
 #-- 標準の postfix では ldap が使用できないため、ソースから build する
 mkdir -p ${WORKDIR}/src
