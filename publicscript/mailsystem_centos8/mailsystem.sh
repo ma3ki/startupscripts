@@ -109,7 +109,7 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
   -e "s/^ROOT_PASSWORD=.*/ROOT_PASSWORD=${rpassword}/" \
   -e "s/^IPADDR=.*/IPADDR=${IPADDR}/" \
   -e "s/^MIN_DOMAIN_LEVEL=.*/MIN_DOMAIN_LEVEL=${min_domain_level}/" \
-  -e "s/^MAX_DOMAIN_LEVEL=.*/MAN_DOMAIN_LEVEL=${max_domain_level}/" config.source
+  -e "s/^MAX_DOMAIN_LEVEL=.*/MAX_DOMAIN_LEVEL=${max_domain_level}/" config.source
 
 #-- セットアップ実行
 for x in ./setup_scripts/_*.sh

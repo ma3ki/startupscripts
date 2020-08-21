@@ -137,7 +137,7 @@ do
 	${sb}
 	_EOL_
 
-	cp /etc/postfix-inbound/ldaprcptcheck${x}.cf /etc/postfix-inbound/ldapvirtualalias{$x}.cf
+	cp /etc/postfix-inbound/ldaprcptcheck${x}.cf /etc/postfix-inbound/ldapvirtualalias${x}.cf
 	sed -i 's/result_format = OK/result_format = %s/' /etc/postfix-inbound/ldapvirtualalias${x}.cf
 
 	cat <<-_EOL_>/etc/postfix/ldapsendercheck${x}.cf
