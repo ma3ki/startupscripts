@@ -21,10 +21,9 @@ password = "${ROOT_PASSWORD}"
 socket   = /var/lib/mysql/mysql.sock
 _EOL_
 
-systemctl restart mysqld
-
 #-- 設定変更
-mysql -e "INSTALL COMPONENT 'file://component_validate_password';"
+HOME=/root
+export mysql -e "INSTALL COMPONENT 'file://component_validate_password';"
 
 cat <<_EOL_>> /etc/my.cnf.d/mysql-server.cnf
 
