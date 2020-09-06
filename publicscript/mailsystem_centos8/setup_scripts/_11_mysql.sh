@@ -22,8 +22,7 @@ socket   = /var/lib/mysql/mysql.sock
 _EOL_
 
 #-- 設定変更
-HOME=/root
-mysql -e "INSTALL COMPONENT 'file://component_validate_password';"
+mysql --user=root --password=${ROOT_PASSWORD} -e "INSTALL COMPONENT 'file://component_validate_password';"
 
 cat <<_EOL_>> /etc/my.cnf.d/mysql-server.cnf
 
