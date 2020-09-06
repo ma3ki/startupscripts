@@ -7,6 +7,7 @@ git clone https://github.com/roundcube/roundcubemail.git ${WORKDIR}/git/roundcub
 cd ${WORKDIR}/git/roundcubemail
 base_version=1.4
 version=$(git tag | grep "^${base_version}" | tail -1)
+version=1.4.7
 
 git checkout ${version}
 cp -pr ../roundcubemail ${HTTPS_DOCROOT}/roundcubemail-${version}
