@@ -125,7 +125,7 @@ do
 	${sb}
 	_EOL_
 
-	cat <<-_EOL_>/etc/postfix-inbound/ldaptransport{$x}.cf
+	cat <<-_EOL_>/etc/postfix-inbound/ldaptransport${x}.cf
 	server_host = ${LDAP_SERVER}
 	bind = no
 	version = 3
