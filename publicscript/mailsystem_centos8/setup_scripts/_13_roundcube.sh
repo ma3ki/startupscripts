@@ -8,7 +8,7 @@ cd ${WORKDIR}/git/roundcubemail
 base_version=1.4
 version=$(git tag | grep "^${base_version}" | tail -1)
 
-git checkout ${version}
+# git checkout ${version}
 cp -pr ../roundcubemail ${HTTPS_DOCROOT}/roundcubemail-${version}
 ln -s ${HTTPS_DOCROOT}/roundcubemail-${version} ${HTTPS_DOCROOT}/roundcube
 
