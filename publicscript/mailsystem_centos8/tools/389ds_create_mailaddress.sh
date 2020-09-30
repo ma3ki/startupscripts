@@ -68,7 +68,7 @@ then
 		endif
 		_EOL_
 	else
-		sed -i "2i /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}" /etc/postfix/recipient_bcc_maps
+		sed -i "2i /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}" /etc/postfix-inbound/recipient_bcc_maps
 	fi
 	postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
 
