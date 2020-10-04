@@ -20,6 +20,8 @@ do
   if [ "${FIRST_DOMAIN}" = "${domain}" ]
   then
     usacloud dns record-add -y --name autoconfig --type A --value ${IPADDR} ${domain}
+  else
+    usacloud dns record-add -y --name autoconfig --type CNAME --value autoconfig.${FIRST_DOMAIN}. ${domain}
   fi
 done
 
