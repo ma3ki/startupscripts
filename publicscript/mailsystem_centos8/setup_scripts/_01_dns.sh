@@ -11,7 +11,10 @@ do
   usacloud dns record-add -y --name @ --type A   --ttl 600 --value ${IPADDR} ${domain}
   usacloud dns record-add -y --name @ --type MX  --ttl 600 --value ${FIRST_DOMAIN}. ${domain}
   usacloud dns record-add -y --name @ --type TXT --ttl 600 --value "v=spf1 +ip4:${IPADDR} -all" ${domain}
-  usacloud dns record-add -y --name ${name} --type A       --value ${IPADDR} ${domain}
+  if [ "${domain}" = "${FIRST_DOMAIN}" ]
+  then
+    usacloud dns record-add -y --name ${name} --type A       --value ${IPADDR} ${domain}
+  fi
   usacloud dns record-add -y --name _dmarc --type TXT      --value "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}" ${domain}
   usacloud dns record-add -y --name _adsp._domainkey --type TXT --value "dkim=discardable" ${domain}
   if [ "${FIRST_DOMAIN}" = "${domain}" ]

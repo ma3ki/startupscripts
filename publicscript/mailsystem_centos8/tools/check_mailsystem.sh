@@ -110,6 +110,14 @@ check_cert() {
 	fi
 }
 
+echo "-- Application Version --"
+for x in os 389ds dovecot clamd rspamd redis postfix mysql php-fpm nginx roundcube phpldapadmin
+do
+	check_version ${x}
+done
+
+echo
+
 echo "-- Process Check --"
 check_proc ns-slapd dirsrv 
 check_proc dovecot dovecot
@@ -123,14 +131,6 @@ check_proc nginx nginx
 
 echo
 
-echo "-- Application Version --"
-for x in os 389ds dovecot clamd rspamd redis postfix mysql php-fpm nginx roundcube phpldapadmin
-do
-	check_version ${x}
-done
-
-echo
-
 for x in ${DOMAIN_LIST}
 do
 	HOST=$(hostname | sed "s/${FIRST_DOMAIN}/${x}/")
@@ -138,9 +138,9 @@ do
 	check_dns ${x} A
 	check_dns ${x} MX
 	check_dns ${x} TXT
-	check_dns ${HOST} A
 	if [ "${FIRST_DOMAIN}" = "${x}" ]
 	then
+		check_dns ${HOST} A
 		check_dns autoconfig.${x} A
 	fi
 	check_dns _dmarc.${x} TXT
