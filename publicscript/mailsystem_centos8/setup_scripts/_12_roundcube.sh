@@ -8,7 +8,7 @@ cd ${WORKDIR}/git/roundcubemail
 base_version=1.4
 version=$(git tag | grep "^${base_version}" | tail -1)
 
-# git checkout ${version}
+git checkout ${version}
 cp -pr ../roundcubemail ${HTTPS_DOCROOT}/roundcubemail-${version}
 ln -s ${HTTPS_DOCROOT}/roundcubemail-${version} ${HTTPS_DOCROOT}/roundcube
 
@@ -90,3 +90,28 @@ lessc -x styles/styles.less > styles/styles.css
 lessc -x styles/print.less > styles/print.css
 lessc -x styles/embed.less > styles/embed.css
 
+cat <<'_EOL_' > /etc/nginx/conf.d/https.d/roundcube.conf
+  location ^~ /roundcube {
+    location ~ \.php$ {
+      try_files $uri =404;
+      fastcgi_pass unix:/run/php-fpm/www.sock;
+      fastcgi_index index.php;
+      fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+      include fastcgi_params;
+    }
+    location ~ ^/roundcube/(README|INSTALL|LICENSE|CHANGELOG|UPGRADING)$ {
+      deny all;
+    }
+
+    location ~ ^/roundcube/(bin|SQL)/ {
+      deny all;
+    }
+
+    # A long browser cache lifetime can speed up repeat visits to your page
+    location ~* ^/roundcube/.*\.(jpg|jpeg|gif|png|webp|svg|woff|woff2|ttf|css|js|ico|xml)$ {
+      access_log        off;
+      log_not_found     off;
+      expires           360d;
+    }
+  }
+_EOL_
