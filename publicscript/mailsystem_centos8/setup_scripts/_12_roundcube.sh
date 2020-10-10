@@ -25,15 +25,15 @@ dnf install -y php-{pdo,xml,pear,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip,jso
 pear channel-update pear.php.net
 pear install -a Mail_mime
 pear install Net_LDAP
-#pear install channel://pear.php.net/Net_IDNA2-0.2.0
-#pear channel-discover pear.horde.org
-#pear install channel://pear.horde.org/Horde_ManageSieve
 pear install Net_Sieve-1.4.4
 
 dnf install -y ImageMagick ImageMagick-devel
 pecl channel-update pecl.php.net
 yes | pecl install Imagick
 echo extension=imagick.so >> /etc/php.d/99-imagick.ini
+
+echo "no" | pecl install redis
+echo extension=redis.so  >> /etc/php.d/99-redis.ini
 
 #-- php-fpm の再起動
 systemctl restart php-fpm
