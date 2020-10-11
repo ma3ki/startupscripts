@@ -60,6 +60,7 @@ postconf -c /etc/postfix-inbound -e 'smtpd_tls_protocols=!SSLv2,!SSLv3,!TLSv1,!T
 postconf -c /etc/postfix-inbound -e smtpd_tls_received_header=yes
 postconf -c /etc/postfix-inbound -e smtpd_tls_session_cache_database=btree:/var/lib/postfix-inbound/smtpd_tls_session_cache
 postconf -c /etc/postfix-inbound -e smtpd_use_tls=yes
+postconf -c /etc/postfix-inbound -e lmtp_destination_concurrency_limit=40
 
 for cf in /etc/postfix /etc/postfix-inbound
 do
