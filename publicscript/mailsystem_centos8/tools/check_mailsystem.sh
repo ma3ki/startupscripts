@@ -16,7 +16,7 @@ check_version() {
 			VERSION=$(/usr/sbin/slapd -V 2>&1 | awk '/^@/{print $4}')
 			;;
 		389ds)
-			VERSION=$(/usr/sbin/ns-slapd -v 2>&1 | awk -F/ '/389-Directory/{print $2}')
+			VERSION=$(/usr/sbin/ns-slapd -v 2>&1 | awk -F[/\ ] '/389-Directory/{print $2}')
 			;;
 		opendkim)
 			VERSION=$(/usr/sbin/opendkim -V | awk '/^opendkim/{print $NF}')
