@@ -65,10 +65,10 @@ sed -i -e "s/managesieve_vacation'] = 0/managesieve_vacation'] = 1/" ${HTTPS_DOC
 cp -p ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php{.dist,}
 
 sed -i -e "s/'sql'/'ldap'/" \
-       -e "s/'ou=people,dc=example,dc=com'/''/" \
-       -e "s/'dc=exemple,dc=com'/''/" \
-       -e "s/'uid=%login,ou=people,dc=exemple,dc=com'/'uid=%name,ou=People,%dc'/" \
-       -e "s/'(uid=%login)'/'(uid=%name,ou=People,%dc)'/" ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
+  -e "s/'ou=people,dc=example,dc=com'/''/" \
+  -e "s/'dc=exemple,dc=com'/''/" \
+  -e "s/'uid=%login,ou=people,dc=exemple,dc=com'/'uid=%name,ou=People,%dc'/" \
+  -e "s/'(uid=%login)'/'(uid=%name,ou=People,%dc)'/" ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
 
 chown -R nginx. ${HTTPS_DOCROOT}/roundcubemail-${version}
 cd ${HTTPS_DOCROOT}/roundcube

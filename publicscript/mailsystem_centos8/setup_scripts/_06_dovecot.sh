@@ -63,37 +63,52 @@ ssl_cert =
 ssl_key =
 lmtp_save_to_detail_mailbox = yes
 lda_mailbox_autocreate = yes
-_EOL_
-
-cp -p /etc/dovecot/conf.d/10-auth.conf{,.org}
-cp -p /etc/dovecot/conf.d/auth-static.conf.ext{,.org}
-sed -i 's/auth-system.conf.ext/auth-static.conf.ext/' /etc/dovecot/conf.d/10-auth.conf
-cat <<_EOL_>/etc/dovecot/conf.d/auth-static.conf.ext
 passdb {
   driver = static
   args = nopassword=y
 }
 userdb {
-  driver = ldap
-  args = /etc/dovecot/dovecot-ldap.conf.ext
+  args = uid=dovecot gid=dovecot home=/var/dovecot/%Ld/%Ln allow_all_users=yes
+  driver = static
 }
 _EOL_
 
-cat <<_EOL_>/etc/dovecot/dovecot-ldap.conf.ext
+cnt=1
+for base in ($for domain in ${DOMAIN_LIST}
+  do
+    tmpdc=""
+    for dc in $(echo ${domain} | sed 's/\./ /g')
+    do
+      tmpdc="${tmpdc}dc=${dc},"
+    done
+    echo ${tmpdc}
+  done | sed 's/,$//')
+do
+cat <<_EOL_>>/etc/dovecot/local.conf
+userdb {
+  args = /etc/dovecot/dovecot-ldap${cnt}.conf.ext
+  driver = ldap
+}
+_EOL_  
+
+cat <<_EOL_>/etc/dovecot/dovecot-ldap${cnt}.conf.ext
 hosts = ${LDAP_SERVER}
 auth_bind = yes
-base = dc=%Dd
+base = ${base}
 pass_attrs=mailRoutingAddress=User,userPassword=password
 pass_filter = (mailRoutingAddress=%u)
-iterate_attrs = mailRoutingAddress=user
-iterate_filter = (mailRoutingAddress=*)
-user_filter = (mailRoutingAddress=%u)
 user_attrs = \
   =uid=dovecot, \
   =gid=dovecot, \
   =mail=maildir:/var/dovecot/%Ld/%Ln, \
   =home=/var/dovecot/%Ld/%Ln
+user_filter = (mailRoutingAddress=%u)
+iterate_attrs = mailRoutingAddress=user
+iterate_filter = (mailRoutingAddress=*)
 _EOL_
+
+  cnt=$(($cnt + 1))
+done
 
 mkdir /var/dovecot
 chown dovecot. /var/dovecot
