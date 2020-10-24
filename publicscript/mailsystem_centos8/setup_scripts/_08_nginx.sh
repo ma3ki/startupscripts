@@ -124,6 +124,12 @@ _EOL_
 
 cat <<_EOL_> /etc/nginx/conf.d/http.conf
 server {
+  listen ${IPADDR}:80;
+  server_name _;
+  return 301 https://$host$request_uri;
+}
+
+server {
   listen 127.0.0.1:80;
   server_name _;
   index index.html, index.php;
