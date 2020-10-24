@@ -117,5 +117,5 @@ cat <<'_EOL_' > /etc/nginx/conf.d/https.d/roundcube.conf
 _EOL_
 
 #-- libreoffice
-dnf install -y libreoffice-{langpack-ja,draw,calc,impress,writer}
+# dnf install -y libreoffice-{langpack-ja,draw,calc,impress,writer}
 
