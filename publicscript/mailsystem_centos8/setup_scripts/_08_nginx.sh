@@ -212,5 +212,5 @@ sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 net
 systemctl daemon-reload
 
 #-- firewall の設定
-firewall-cmd --permanent --add-port={25,587,465,993,995,443}/tcp
+firewall-cmd --permanent --add-port={25,587,465,993,995,80,443}/tcp
 firewall-cmd --reload
