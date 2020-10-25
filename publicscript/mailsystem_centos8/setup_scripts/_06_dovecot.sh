@@ -74,7 +74,7 @@ userdb {
 _EOL_
 
 cnt=1
-for base in ($for domain in ${DOMAIN_LIST}
+for base in $(for domain in ${DOMAIN_LIST}
   do
     tmpdc=""
     for dc in $(echo ${domain} | sed 's/\./ /g')
