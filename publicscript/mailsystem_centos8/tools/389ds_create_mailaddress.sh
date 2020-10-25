@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #
 # usage)
-# ./create_mailaddress.sh <mailaddress>
+# ./389ds_create_mailaddress.sh <mailaddress>
 
 address=$1
 source $(dirname $0)/../config.source
@@ -72,9 +72,8 @@ then
 	fi
 	postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
 
-	# １年経過したアーカイブメールを削除
+	# 1年経過したアーカイブメールを削除
 	echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u archive@${domain} mailbox \* before 365d" >> ${CRONFILE}
 fi
 
 echo ${password}
-

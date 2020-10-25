@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# ./create_domain.sh <domain>
+# ./389ds_create_domain.sh <domain>
 
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
