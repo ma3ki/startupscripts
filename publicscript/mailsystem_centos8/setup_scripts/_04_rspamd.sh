@@ -222,3 +222,11 @@ cat <<'_EOL_' > /etc/nginx/conf.d/https.d/rspamd.conf
     }
   }
 _EOL_
+
+#-- dkim record 追加
+for domain in ${DOMAIN_LIST}
+do
+  record=$(cat ${WORKDIR}/keys/${domain}.keys | tr '\n' ' ' | sed -e 's/.*( "//' -e 's/".*"p=/p=/' -e 's/" ).*//')
+  usacloud dns record-add -y --name default._domainkey --type TXT --value "${record}" ${domain}
+done
+
