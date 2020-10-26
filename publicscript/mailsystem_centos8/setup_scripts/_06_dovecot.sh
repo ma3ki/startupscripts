@@ -89,7 +89,7 @@ userdb {
   args = /etc/dovecot/dovecot-ldap${cnt}.conf.ext
   driver = ldap
 }
-_EOL_  
+_EOL_
 
 cat <<_EOL_>/etc/dovecot/dovecot-ldap${cnt}.conf.ext
 hosts = ${LDAP_SERVER}
