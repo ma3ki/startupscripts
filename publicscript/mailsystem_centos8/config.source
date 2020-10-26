@@ -1,12 +1,12 @@
 ### domain
-DOMAIN_LIST=example.com
-FIRST_DOMAIN=example.com
-FIRST_ADDRESS=foo@example.com
+DOMAIN_LIST="sub.sub.ma3ki.net test.ma3ki.net test2.ma3ki.net"
+FIRST_DOMAIN="sub.sub.ma3ki.net"
+FIRST_ADDRESS="test@sub.sub.ma3ki.net"
 MIN_DOMAIN_LEVEL=2
 MAX_DOMAIN_LEVEL=3
 ### ldap
 ROOT_DN="cn=manager"
-ROOT_PASSWORD=dummy
+ROOT_PASSWORD=xuqWGb2M51of
 LDAP_MASTER=127.0.0.1
 LDAP_SERVER=127.0.0.1
 ### mail
@@ -24,7 +24,7 @@ RSPAMD_PORT=11332
 HTTP_DOCROOT=/var/www/html/http_root
 HTTPS_DOCROOT=/var/www/html/https_root
 ### dns zone
-IPADDR=dummy
+IPADDR=163.43.128.111
 ### working directory
 WORKDIR=~/startup-script-mailsystem
 ### cron file
