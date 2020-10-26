@@ -94,7 +94,7 @@ domain_list="$(awk -F@ '{print $2}' ${addr_list} | sort | uniq | tr '\n' ' ' | s
 first_address=$(egrep -v "^$|^#" ${addr_list} | grep '@' | head -1 )
 first_domain=$(echo ${first_address} | awk -F@ '{print $2}' )
 
-domain_level=$(for x in ma3ki.net test.ma3ki.net; do echo ${x} | awk '{cnt += (split($0, a, ".") - 1)}END{print cnt}'; done)
+domain_level=$(for x in ${domain_list}; do echo ${x} | awk '{cnt += (split($0, a, ".") - 1)}END{print cnt}'; done)
 min_domain_level=$(($(echo "${domain_level}" | sort -n | head -1) + 1))
 max_domain_level=$(($(echo "${domain_level}" | sort -nr | head -1) + 1))
 
