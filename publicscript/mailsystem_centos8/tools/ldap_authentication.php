@@ -202,7 +202,7 @@ if (_ldapauth($ldap['host'], $ldap['port'], $ldap['dn'], $ldap['passwd'])) {
       $failcnt += 1;
     }
 
-    $log = sprintf('%s, failcnt=%s, rejectcnt=%s, ttl=%s',$log,$failcnt,$rejectcnt);
+    $log = sprintf('%s, failcnt=%s, rejectcnt=%s',$log,$failcnt,$rejectcnt);
   }
   catch(Exception $e) {
   }
