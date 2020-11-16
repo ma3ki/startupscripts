@@ -10,7 +10,7 @@ ROOT_PASSWORD=xuqWGb2M51of
 LDAP_MASTER=127.0.0.1
 LDAP_SERVER=127.0.0.1
 ### mail
-ADMINS=" admin root postmaster abuse nobody dmarc-report "
+ADMINS=" admin root postmaster abuse nobody dmarc-report sts-report archive "
 DOVECOT_SERVER=127.0.0.1
 LMTP_PORT=24
 XAUTH_HOST=127.0.0.1

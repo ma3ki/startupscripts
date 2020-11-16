@@ -51,29 +51,4 @@ mailAlternateAddress: ${account}@${domain}
 _EOL_
 ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_${account}.ldif >/dev/null
 
-# アーカイブ
-if [ "${account}" = "archive" ]
-then
-
-	# 送信アーカイブ設定
-	echo "/^(.*)@${domain}\$/    archive+\$1-Sent@${domain}" >> /etc/postfix/sender_bcc_maps
-	postconf -c /etc/postfix -e sender_bcc_maps=regexp:/etc/postfix/sender_bcc_maps
-
-	# 受信アーカイブ設定
-	if [ ! -f /etc/postfix/recipient_bcc_maps ]
-	then
-		cat <<-_EOL_>/etc/postfix-inbound/recipient_bcc_maps
-		if !/^archive\+/
-		/^(.*)@${domain}\$/  archive+\$1-Recv@${domain}
-		endif
-		_EOL_
-	else
-		sed -i "2i /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}" /etc/postfix-inbound/recipient_bcc_maps
-	fi
-	postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
-
-	# 1年経過したアーカイブメールを削除
-	echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u archive@${domain} mailbox \* before 365d" >> ${CRONFILE}
-fi
-
 echo ${password}

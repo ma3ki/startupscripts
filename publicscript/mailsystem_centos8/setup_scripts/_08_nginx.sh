@@ -4,7 +4,7 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 #-- リポジトリの設定と nginx, php7.3 のインストール
-dnf install -y nginx php php-{fpm,ldap,devel,xml}
+dnf install -y nginx php php-{fpm,ldap,devel,xml,pear,json}
 
 #-- php, php-fpm の設定
 cp -p /etc/php.ini{,.org}
@@ -46,7 +46,7 @@ mail {
     protocol   smtp;
     starttls   on;
     xclient    on;
-    resolver   8.8.8.8;
+    resolver   8.8.8.8 8.8.4.4;
     auth_http_header PORT 587;
   }
   server {
@@ -54,7 +54,7 @@ mail {
     protocol   smtp;
     ssl        on;
     xclient    on;
-    resolver   8.8.8.8;
+    resolver   8.8.8.8 8.8.4.4;
     auth_http_header PORT 465;
   }
   server {
@@ -111,7 +111,7 @@ _EOL_
 
 cat <<_EOL_> /etc/nginx/default.d/${FIRST_DOMAIN}_ssl.conf
 ssl_protocols TLSv1.2 TLSv1.3 ;
-ssl_ciphers EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH;
+ssl_ciphers EECDH+AESGCM;
 ssl_ecdh_curve prime256v1;
 ssl_prefer_server_ciphers on;
 ssl_session_timeout  5m;
@@ -198,10 +198,22 @@ server {
 }
 _EOL_
 
+#-- mta-sts へ対応
+mkdir -p ${HTTPS_DOCROOT}/.well-known
+cat <<_EOL_> ${HTTPS_DOCROOT}/.well-known/mta-sts.txt
+version: STSv1
+mx: ${FIRST_DOMAIN}
+mode: enforce
+max_age: 86400
+_EOL_
+
 #-- nginx-mail-proxy用の認証スクリプトを作成
 mkdir -p ${HTTP_DOCROOT}/nginx_mail_proxy
 cp -p $(dirname $0)/../tools/ldap_authentication.php ${HTTP_DOCROOT}/nginx_mail_proxy/
 sed -i "s/#IPV4/${IPADDR}/" ${HTTP_DOCROOT}/nginx_mail_proxy/ldap_authentication.php
+
+echo "no" | pecl install redis
+echo extension=redis.so  >> /etc/php.d/99-redis.ini
 
 #-- nginx, php-fpm の起動
 systemctl enable nginx php-fpm

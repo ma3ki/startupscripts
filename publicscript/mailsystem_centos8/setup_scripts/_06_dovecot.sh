@@ -110,6 +110,8 @@ _EOL_
   cnt=$(($cnt + 1))
 done
 
+sed -i 's/^\!include auth-system.conf.ext/#\|include auth-system.conf.ext/' /etc/dovecot/conf.d/10-auth.conf
+
 mkdir /var/dovecot
 chown dovecot. /var/dovecot
 

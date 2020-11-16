@@ -146,6 +146,8 @@ do
 	check_dns _dmarc.${x} TXT
 	check_dns _adsp._domainkey.${x} TXT
 	check_dns default._domainkey.${x} TXT
+	check_dns _mta-sts.${x} TXT
+	check_dns _smtp._tls.${x} TXT
 	echo
 done
 

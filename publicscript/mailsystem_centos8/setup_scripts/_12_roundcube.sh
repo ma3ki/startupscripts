@@ -21,7 +21,7 @@ mysql -e "flush privileges;"
 mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 
 #-- 必要なPHPのライブラリをインストール
-dnf install -y php-{pdo,xml,pear,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip,json} unzip php-pear-Net-SMTP
+dnf install -y php-{pdo,xml,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip} unzip php-pear-Net-SMTP
 pear channel-update pear.php.net
 pear install -a Mail_mime
 pear install Net_LDAP
@@ -31,9 +31,6 @@ dnf install -y ImageMagick ImageMagick-devel
 pecl channel-update pecl.php.net
 yes | pecl install Imagick
 echo extension=imagick.so >> /etc/php.d/99-imagick.ini
-
-echo "no" | pecl install redis
-echo extension=redis.so  >> /etc/php.d/99-redis.ini
 
 #-- php-fpm の再起動
 systemctl restart php-fpm
@@ -76,7 +73,7 @@ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
 sed -e 's/suggest/require/' -e 's/ required .*/"/' composer.json-dist | perl -ne '{if(/net_ldap3/){chomp; print "$_,\n";}else{print;}}' > composer.json
-php composer.phar install --no-dev
+yes | php composer.phar install --no-dev
 bin/install-jsdeps.sh
 
 mv ${HTTPS_DOCROOT}/roundcube/installer ${HTTPS_DOCROOT}/roundcube/_installer

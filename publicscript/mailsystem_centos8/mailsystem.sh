@@ -21,6 +21,7 @@
 # @sacloud-textarea required heredoc ADDR "作成するメールアドレスのリスト" ex="foo@example.com"
 # @sacloud-apikey required permission=create AK "APIキー"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
+# @sacloud-checkbox default= archive "メールアーカイブを有効にする"
 
 _motd() {
 	LOG=$(ls /root/.sacloud-api/notes/*log)
@@ -47,9 +48,8 @@ _motd start
 trap '_motd fail' ERR
 
 #-- tool のインストールと更新
-dnf install -y epel-release
 dnf config-manager --set-enabled PowerTools
-dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
+dnf install -y telnet jq expect sysstat mailx 
 dnf update -y
 
 set +x
@@ -116,6 +116,34 @@ for x in ./setup_scripts/_*.sh
 do
   ${x} 2>&1
 done
+
+#-- メールアーカイブの設定
+ARCHIVE=@@@archive@@@
+if [ ! -z ${ARCHIVE} ]; then
+  for domain in ${domain_list}
+  do
+    # 送信アーカイブ設定
+    echo "/^(.*)@${domain}\$/    archive+\$1-Sent@${domain}" >> /etc/postfix/sender_bcc_maps
+    postconf -c /etc/postfix -e sender_bcc_maps=regexp:/etc/postfix/sender_bcc_maps
+
+    # 受信アーカイブ設定
+    if [ ! -f /etc/postfix/recipient_bcc_maps ]
+    then
+      cat <<-_EOL_>/etc/postfix-inbound/recipient_bcc_maps
+      if !/^archive\+/
+      /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}
+      endif
+      _EOL_
+    else
+      sed -i "2i /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}" /etc/postfix-inbound/recipient_bcc_maps
+    fi
+    postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
+
+    # 1年経過したアーカイブメールを削除
+    echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u admin@${domain} mailbox \*-Sent before 365d" >> ${CRONFILE}
+    echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u admin@${domain} mailbox \*-Recv before 365d" >> ${CRONFILE}
+  done
+fi
 
 #-- ldap にメールアドレスを登録
 for x in $(egrep -v "^$|^#" ${addr_list} | grep @ | sort | uniq)

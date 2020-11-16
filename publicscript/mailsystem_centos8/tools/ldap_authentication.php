@@ -137,30 +137,31 @@ $whitelist = [
   "#IPV4"
 ];
 
-$redis = new Redis();
-try {
-  $redis->connect('127.0.0.1', 6379);
-  $key = $protomap[$env['port']] . ":" . $env['client'] ;
-  $clientip = $env['client'] ;
-  $failcnt = $redis->Get($key);
-  $ttl = $redis->ttl($key);
+// check whitelist
+if ( ! preg_grep("/^$clientip$/", $whitelist) ) {
+  $redis = new Redis();
+  try {
+    $redis->connect('127.0.0.1', 6379);
 
-  if ($failcnt >= $max_failcnt) {
-    // check whitelist 
-    if ( ! preg_grep("/^$clientip$/", $whitelist) ) {
-      // authentication failure
-      $log = sprintf('auth=reject, %s, passwd=%s, ttl=%s', $log, $ldap['passwd'], $ttl);
-      // $log = sprintf('auth=failure, %s', $log);
+    $key = $protomap[$env['port']] . ":" . $env['client'] ;
+    $clientip = $env['client'] ;
+    $failcnt = $redis->Get($key);
+    $ttl = $redis->ttl($key);
+    $rejectcnt = $redis->hGet('blacklist', $key);
+
+    if ($failcnt >= $max_failcnt && $ttl > 0 ) {
+      // $log = sprintf('auth=reject, %s, failcnt=%s, rejectcnt=%s, ttl=%s',$log,$failcnt,$rejectcnt,$ttl);
+      $log = sprintf('auth=reject, %s, passwd=%s, failcnt=%s, rejectcnt=%s, ttl=%s',$log,$ldap['passwd'],$failcnt,$rejectcnt,$ttl);
       header('Content-type: text/html');
       header('Auth-Status: Invalid login');
       _writelog($log);
       exit;
     }
   }
+  catch(Exception $e) {
+  }
+  $redis->close();
 }
-catch(Exception $e) {
-}
-$redis->close();
 
 // ldap authentication
 if (_ldapauth($ldap['host'], $ldap['port'], $ldap['dn'], $ldap['passwd'])) {
@@ -171,43 +172,49 @@ if (_ldapauth($ldap['host'], $ldap['port'], $ldap['dn'], $ldap['passwd'])) {
   $log = sprintf('%s, %s', $log, $result);
 } else {
   // authentication failure
-  $log = sprintf('auth=failure, %s', $log);
-  // $log = sprintf('auth=failure, %s, passwd=%s', $log, $ldap['passwd']);
+  // $log = sprintf('auth=failure, %s', $log);
+  $log = sprintf('auth=failure, %s, passwd=%s', $log, $ldap['passwd']);
 
-  $redis = new Redis();
-  try {
-    $redis->connect('127.0.0.1', 6379);
-    $key = $protomap[$env['port']] . ":" . $env['client'] ;
-    $failcnt = $redis->Get($key);
-    $rejectcnt = $redis->hGet('blacklist', $key);
+  // check whitelist
+  if ( ! preg_grep("/^$clientip$/", $whitelist) ) {
+    // set failcnt to redis
+    $redis = new Redis();
+    try {
+      $redis->connect('127.0.0.1', 6379);
 
-    if ( empty($rejectcnt) ) {
-      $redis->hSet('blacklist', $key, 0);
-      $rejectcnt = 0;
-    }
-    if ( empty($failcnt)  ) {
-      $redis->Set($key,1,$expire_time);
-      $failcnt = 1;
-    } else if ( $max_failcnt == $failcnt + 1) {
-      $redis->hSet('blacklist', $key, $rejectcnt + 1);
-      $rejectcnt += 1;
-      if ( $rejectcnt % $max_rejectcnt == 0 ) {
-        $reject_time = $max_reject_time ;
-        $redis->hSet('blacklist', $key, 0);
+      $key = $protomap[$env['port']] . ":" . $env['client'] ;
+      $ttl = $redis->ttl($key);
+      $failcnt = $redis->Get($key) + 1;
+      $rejectcnt = $redis->hGet('blacklist', $key);
+
+      if ( $failcnt > $max_failcnt ) {
+        $failcnt = 1 ;
       }
-      $redis->Set($key, $failcnt + 1, $reject_time);
-      $failcnt += 1;
-    } else if ( $failcnt > 0 && $failcnt < $max_failcnt) {
-      $redis->Set($key, $failcnt + 1, $expire_time);
-      $failcnt += 1;
+
+      if ( $failcnt < $max_failcnt ) {
+        $redis->Set($key,$failcnt,$expire_time + $ttl);
+        if ( empty($rejectcnt) ) {
+          $rejectcnt = 0;
+          $redis->hSet('blacklist', $key, $rejectcnt);
+        }
+      } else {
+        $rejectcnt += 1;
+        $redis->hSet('blacklist', $key, $rejectcnt);
+        if ( $rejectcnt >= $max_rejectcnt ) {
+          $reject_time = $max_reject_time ;
+          $redis->hSet('blacklist', $key, 0);
+        }
+        $redis->Set($key, $failcnt, $reject_time);
+      }
+
+      $ttl = $redis->ttl($key);
+      $log = sprintf('%s, failcnt=%s, rejectcnt=%s, ttl=%s',$log,$failcnt,$rejectcnt,$ttl);
+
     }
-
-    $log = sprintf('%s, failcnt=%s, rejectcnt=%s',$log,$failcnt,$rejectcnt);
+    catch(Exception $e) {
+    }
+    $redis->close();
   }
-  catch(Exception $e) {
-  }
-  $redis->close();
-
   header('Content-type: text/html');
   header('Auth-Status: Invalid login');
 }

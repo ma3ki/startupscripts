@@ -39,7 +39,7 @@
 ```
 下記は example.com をドメインとした場合の例です
 ```
-- "アーカイブ選択" で CentOS 7.x を選択
+- "アーカイブ選択" で CentOS 8.x を選択
 ![create01](https://user-images.githubusercontent.com/7104966/30677348-40a0b3ae-9ec6-11e7-8ed3-a7f841196a0b.png)
 - "ホスト名" はドメインを省いたものを入力 (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
@@ -183,13 +183,13 @@ archive@example.com: ***********
 ## 補足
 - 1通のメールサイズは20MBまで、MBOXのサイズ、メッセージ数に制限はしていない
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
-    - admin, root, postmaster, abuse, nobody, dmarc-report
+    - admin, root, postmaster, abuse, nobody, dmarc-report, sts-report, archive
 - virus メールの対応
     - clamavで Virus と判定したメールは reject される
 - rspamd が正常に動作していない場合、postfixは tempfail を応答する
 - メールアーカイブ機能
-    - archive@ドメイン というメールアドレスを作成すると、該当ドメインの全てのユーザの送信/受信メールが該当アドレスに複製配送(bcc)される
-    - archive アドレスのメールボックスのみ cron で 受信日時から1年経過したメールを削除する
+    - メールアーカイブを有効にすると、全てのユーザの送信/受信メールがarchive用のアドレスに複製配送(bcc)される
+    - archive用のメールボックスのみ cron で 受信日時から1年経過したメールを自動で削除する
 - マルチドメイン設定方法
     - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
     - Thunderbird の autoconfig はマルチドメインに対応していない

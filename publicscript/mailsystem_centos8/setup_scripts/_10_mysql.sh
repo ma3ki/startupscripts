@@ -3,7 +3,7 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-#-- mysql リポジトリの追加
+#-- mysql のインストール
 dnf -y install mysql-{server,devel}
 
 #-- mysqld の起動
@@ -21,7 +21,7 @@ password = "${ROOT_PASSWORD}"
 socket   = /var/lib/mysql/mysql.sock
 _EOL_
 
-#-- 設定変更
+#-- validate_passwordのコンポーネントをインストール
 mysql --user=root --password=${ROOT_PASSWORD} -e "INSTALL COMPONENT 'file://component_validate_password';"
 
 cat <<_EOL_>> /etc/my.cnf.d/mysql-server.cnf

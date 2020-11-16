@@ -17,6 +17,8 @@ do
   fi
   usacloud dns record-add -y --name _dmarc --type TXT      --value "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}" ${domain}
   usacloud dns record-add -y --name _adsp._domainkey --type TXT --value "dkim=discardable" ${domain}
+  usacloud dns record-add -y --name _mta-sts --type TXT --value "v=STSv1; id=$(date +%Y%m%d%H%M%S);" ${domain}
+  usacloud dns record-add -y --name _smtp._tls --type TXT --value "v=TLSRPTv1; rua=mailto:sts-report@${domain}" ${domain}
   if [ "${FIRST_DOMAIN}" = "${domain}" ]
   then
     usacloud dns record-add -y --name autoconfig --type A --value ${IPADDR} ${domain}
