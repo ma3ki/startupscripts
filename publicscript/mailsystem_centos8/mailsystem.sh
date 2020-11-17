@@ -129,11 +129,11 @@ if [ ! -z ${ARCHIVE} ]; then
     # 受信アーカイブ設定
     if [ ! -f /etc/postfix/recipient_bcc_maps ]
     then
-      cat <<-_EOL_>/etc/postfix-inbound/recipient_bcc_maps
-      if !/^archive\+/
-      /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}
-      endif
-      _EOL_
+cat <<_EOL_>/etc/postfix-inbound/recipient_bcc_maps
+if !/^archive\+/
+/^(.*)@${domain}\$/  archive+\$1-Recv@${domain}
+endif
+_EOL_
     else
       sed -i "2i /^(.*)@${domain}\$/  archive+\$1-Recv@${domain}" /etc/postfix-inbound/recipient_bcc_maps
     fi
