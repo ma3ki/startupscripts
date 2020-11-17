@@ -3,7 +3,7 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-phpldapadmin本家は php7.x に対応していない為、 fork されて対応した下記を clone
+#-- phpldapadmin本家は php7.x に対応していない為、 fork されて対応した下記を clone
 mkdir -p ${WORKDIR}/git
 git clone https://github.com/breisig/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
 
