@@ -13,7 +13,7 @@
 # ・ホスト名はドメインを含めないこと(例: mail)
 # ・使用するDNSゾーンはリソースレコードが未登録であること
 # ・ローカルパートが下記のメールアドレスはシステムで作成するため、入力しないこと
-#   [admin root postmaster abuse nobody dmarc-report]
+#   [ admin root postmaster abuse nobody dmarc-report sts-report archive ]
 # ・セットアップ後、サーバを再起動します
 # @sacloud-desc-end
 #
