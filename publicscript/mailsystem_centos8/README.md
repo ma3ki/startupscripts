@@ -1,36 +1,40 @@
 # 概要
 - メールシステム
-    - このスクリプトは単体のメールサーバをセットアップします。
-    - セットアップにはサーバの作成から20分程度、お時間がかかります。
+  - このスクリプトはCentOS8で単体のメールサーバをセットアップします。
+  - セットアップにはサーバの作成から20分程度、お時間がかかります。
 # 提供機能
 - メール送信
-    - SPF
-    - DKIM 署名
-    - DMARC
-    - ARC 署名
-    - Virus Scan
-    - SMTP-AUTH
-    - STARTTLS
-    - SMTP over TLS
+  - SMTP Submission(587/tcp)
+  - STARTTLS
+  - SMTP over TLS(465/tcp)
+  - SMTP-AUTH
+  - Virus Check (パスワード付きZIPファイルは送信拒否)
+  - 各種メール認証技術
+    - SPF, DKIM, DMARC, ARC 署名
 - メール受信
-    - SPF 検証
-    - DKIM 検証
-    - DMARC 検証
-    - ARC 検証
-    - Virus Scan
-    - Spam Check
-    - STARTTLS
+  - SMTP(25/tcp)
+  - STARTTLS
+  - Virus Check (パスワード付きZIPファイルは受信拒否)
+  - Spam Check
+  - 各種メール認証技術
+    - SPF, DKIM, DMARC, ARC 認証
 - メール参照
-    - POP over TLS
-    - IMAP over TLS
+  - POP over TLS(995/tcp)
+  - IMAP over TLS(993/tcp)
 - Webmail
-    - Roundcube
-- ユーザ管理
-    - phpldapadmin
+  - Roundcube
+    - フィルタリング (managesieve)
+    - パスワード変更 (password)
+- アカウント管理
+  - phpldapadmin
+    - メールアドレス追加/削除/停止
+    - パスワード変更
 - 他
-    - Thunderbird の autoconfig 対応
-    - メールアーカイブ機能
-    - マルチドメイン対応
+  - Thunderbird の autoconfig 対応
+  - メールアーカイブ機能
+  - マルチドメイン対応
+  - MTA-STS に対応
+  - SMTP/POP/IMAP の辞書アタックへの ratelimit機能
 
 # セットアップ手順
 ### 1. メールアドレス用ドメインの準備とAPIキーの登録
