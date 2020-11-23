@@ -15,6 +15,7 @@ send -- \"Y\n\"
 expect \"Congratulations\"
 "
 
+#-- 証明書が作成されたことを確認
 ls -l /etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem
 
 #-- cron に証明書の更新処理を設定

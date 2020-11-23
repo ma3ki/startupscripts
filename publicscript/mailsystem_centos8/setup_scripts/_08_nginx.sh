@@ -204,7 +204,7 @@ cat <<_EOL_> ${HTTPS_DOCROOT}/.well-known/mta-sts.txt
 version: STSv1
 mx: ${FIRST_DOMAIN}
 mode: enforce
-max_age: 86400
+max_age: 10368000
 _EOL_
 
 #-- nginx-mail-proxy用の認証スクリプトを作成
