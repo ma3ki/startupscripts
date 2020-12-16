@@ -4,7 +4,7 @@
 # @sacloud-once
 # @sacloud-desc-begin
 # このスクリプトはメールサーバをセットアップします
-# (このスクリプトは、CentOS8.Xでのみ動作します)
+# (このスクリプトは、CentOS Stream 8 でのみ動作します)
 #
 # 事前作業として以下の2つが必要となります
 # ・さくらのクラウドDNSのゾーンに作成するメールアドレスで使用するドメインを登録していること
@@ -48,8 +48,8 @@ _motd start
 trap '_motd fail' ERR
 
 #-- tool のインストールと更新
-dnf config-manager --set-enabled PowerTools
-dnf install -y telnet jq expect sysstat mailx 
+dnf config-manager --set-enabled powertools
+dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
 dnf update -y
 
 set +x
