@@ -90,7 +90,7 @@ do
   postconf -c ${cf} -e smtp_tls_loglevel=1
   postconf -c ${cf} -e smtp_tls_security_level=may
   postconf -c ${cf} -e smtp_use_tls=yes
-  postconf -c ${cf} -e tls_high_cipherlist=EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+  postconf -c ${cf} -e tls_high_cipherlist=EECDH+AESGCM
   postconf -c ${cf} -e tls_preempt_cipherlist=yes
   postconf -c ${cf} -e tls_random_source=dev:/dev/urandom
   postconf -c ${cf} -e tls_ssl_options=NO_RENEGOTIATION
