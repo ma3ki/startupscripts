@@ -34,7 +34,7 @@ ScanELF yes
 ScanOLE2 yes
 ScanMail yes
 ScanArchive yes
-ArchiveBlockEncrypted yes
+AlertEncrypted yes
 StreamMaxLength 128M
 _EOL_
 
