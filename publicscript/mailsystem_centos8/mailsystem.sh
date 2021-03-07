@@ -22,6 +22,7 @@
 # @sacloud-apikey required permission=create AK "APIキー"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
 # @sacloud-checkbox default= archive "メールアーカイブを有効にする"
+# @sacloud-checkbox default= cockpit "cockpitを有効にする"
 
 _motd() {
 	LOG=$(ls /root/.sacloud-api/notes/*log)
@@ -46,6 +47,9 @@ set -ex
 #-- スタートアップスクリプト開始
 _motd start
 trap '_motd fail' ERR
+
+#-- CentOS Stream 8 は 通信が可能になるまで少し時間がかかる模様
+sleep 20
 
 #-- tool のインストールと更新
 dnf config-manager --set-enabled powertools
@@ -111,6 +115,20 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
   -e "s/^MIN_DOMAIN_LEVEL=.*/MIN_DOMAIN_LEVEL=${min_domain_level}/" \
   -e "s/^MAX_DOMAIN_LEVEL=.*/MAX_DOMAIN_LEVEL=${max_domain_level}/" config.source
 
+#-- cockpit 確認
+COCKPIT=@@@cockpit@@@
+echo "COCKPIT=${COCKPIT}" >> config.source
+
+if [ ! -z ${COCKPIT} ]
+then
+cat <<_EOL_>>cockpit.txt
+-- Cockpit --
+LOGIN URL : https://${first_domain}/cockpit
+_EOL_
+else
+  touch cockpit.txt
+fi
+
 #-- セットアップ実行
 for x in ./setup_scripts/_*.sh
 do
@@ -119,7 +137,8 @@ done
 
 #-- メールアーカイブの設定
 ARCHIVE=@@@archive@@@
-if [ ! -z ${ARCHIVE} ]; then
+if [ ! -z ${ARCHIVE} ]
+then
   for domain in ${domain_list}
   do
     # 送信アーカイブ設定
@@ -176,6 +195,7 @@ PASSWORD  : ${rpassword}
 -- Roundcube Webmail --
 LOGIN URL : https://${first_domain}/roundcube
 
+$(cat cockpit.txt)
 $(./tools/check_mailsystem.sh 2>&1)
 
 -- Mail Address and Password --
