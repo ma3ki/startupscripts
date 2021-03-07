@@ -43,14 +43,15 @@
 ```
 下記は example.com をドメインとした場合の例です
 ```
-- "アーカイブ選択" で CentOS 8.x を選択
-![create01](https://user-images.githubusercontent.com/7104966/30677348-40a0b3ae-9ec6-11e7-8ed3-a7f841196a0b.png)
+- "アーカイブ選択" で CentOS Stream 8 を選択
+![create01](https://user-images.githubusercontent.com/7104966/110229165-d56e1180-7f4a-11eb-9cb3-92cc39a76c42.png)
 - "ホスト名" はドメインを省いたものを入力 (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
 - "配置するスタートアップスクリプト"で MailSystem を選択
 - "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを１行に1アドレス入力
 ![create02](https://user-images.githubusercontent.com/7104966/30677401-8a5291a2-9ec6-11e7-8219-dfec28f7bf90.png)
 - "APIキー" を選択 (DNSのレコード登録に使用します)
+- "メールアーカイブを有効にする" 場合は チェック
 - "セットアップ完了メールを送信する宛先" に、メールを受信できるアドレスを入力
 ![create03](https://user-images.githubusercontent.com/7104966/30677427-a4594988-9ec6-11e7-9f40-506e31c2e707.png)
 - 必要な項目を入力したら作成
@@ -73,14 +74,28 @@ PASSWORD  : ***********
 
 -- phpLDAPadmin --
 LOGIN URL : https://example.com/phpldapadmin
-LOGIN_DN  : cn=config
+LOGIN_DN  : cn=manager
 PASSWORD  : ***********
 
 -- Roundcube Webmail --
 LOGIN URL : https://example.com/roundcube
 
+-- Application Version --
+os: CentOS Stream release 8
+389ds: 1.4.3.16
+dovecot: 2.3.8
+clamd: 0.103.0
+rspamd: 2.7
+redis: 5.0.3
+postfix: 3.5.7
+mysql: 8.0.21
+php-fpm: 7.2.24
+nginx: 1.14.1
+roundcube: 1.4.11
+phpldapadmin: 1.2.3
+
 -- Process Check --
-OK: slapd
+OK: ns-slapd
 OK: dovecot
 OK: clamd
 OK: rspamd
@@ -89,18 +104,6 @@ OK: postfix
 OK: mysqld
 OK: php-fpm
 OK: nginx
-
--- Application Version --
-os: CentOS Linux release 7.3.1611 (Core) 
-slapd: 2.4.44
-dovecot: 2.3.6
-clamd: 0.101.2
-postfix: 2.10.1
-mysql: Ver 14.14 Distrib 5.7.26
-php-fpm: 7.3.5
-nginx: 1.12.2
-roundcube: 1.4-git
-phpldapadmin: 1.2.3
 
 -- example.com DNS Check --
 OK: example.com A 27.133.152.XX
@@ -111,11 +114,13 @@ OK: autoconfig.example.com A 27.133.152.XX
 OK: _dmarc.example.com TXT "v=DMARC1\; p=reject\; rua=mailto:admin@example.com"
 OK: _adsp._domainkey.example.com TXT "dkim=discardable"
 OK: default._domainkey.example.com TXT "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkviwuC8KvC6OP7HwUPQEZDA+ZnY1mRzZrCJcM4sMRhhVse7Cwy/VOldbIxGTAnsRSaLmmxcz96aiCftvctue7mzIvFscCDRm35PtAS5mvlWXRP1f2brHROLoc0rv7upliPdwNXmc7UhZ2b8/gJhSDw76nFiOiOG7/x5GkLCZLCQIDAQAB"
+OK: _mta-sts.example.com TXT "v=STSv1; id=20210225090207;"
+OK: _smtp._tls.example.com TXT "v=TLSRPTv1; rua=mailto:sts-report@example.com"
 
 -- example.com TLS Check --
 Validity:
- Not Before: May 16 05:52:58 2019 GMT
- Not After : Aug 14 05:52:58 2019 GMT
+ Not Before: Feb 24 23:04:05 2021 GMT
+ Not After : May 25 23:04:05 2021 GMT
 Subject Alternative Name:
  DNS:*.example.com, DNS:example.com
 
@@ -126,15 +131,15 @@ user02@example.com: ***********
 archive@example.com: ***********
 ```
 # インストールアプリケーションと主な用途
-- openldap
+- 389 directory server
     - LDAPサーバ
     - メールアドレスの管理
 - usacloud
     - さくらのクラウドDNSへのレコード登録に使用
-- さくらのクラウドDNSへのレコード登録(PTRを除いた8レコード)
+- さくらのクラウドDNSへのレコード登録
     - A レコード (メールドメイン用、ホスト名用)
     - MX レコード
-    - TXT レコード (SPF, DKIM, DKIM-ADSP, DMARC)
+    - TXT レコード (SPF, DKIM, DKIM-ADSP, DMARC, MTA-STS)
     - CNAME レコード (Thunderbird の autoconfig用)
 - dovecot
     - LMTP,POP,IMAP,ManageSieveサーバ
@@ -152,7 +157,7 @@ archive@example.com: ***********
 - postfix, postfix-inbound
     - メール送信サーバ(postfix)
     - メール受信サーバ(postfix-inbound)
-- nginx, php-fpm(7.3系)
+- nginx, php-fpm
     - Webサーバ(HTTPS)
     - メールプロキシサーバ(SMTP Submission,SMTPS,POPS,IMAPS)
     - メールプロキシ用認証サーバ(HTTP)
@@ -186,9 +191,9 @@ archive@example.com: ***********
 ## 補足
 - 1通のメールサイズは20MBまで、MBOXのサイズ、メッセージ数に制限はしていない
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
-    - admin, root, postmaster, abuse, nobody, dmarc-report, sts-report, archive
-- virus メールの対応
-    - clamavで Virus と判定したメールは reject される
+    - admin, root, postmaster, abuse, nobody, dmarc-report, sts-report
+- virus メールについて
+    - clamavで Virus と判定したメールは reject する
 - rspamd が正常に動作していない場合、postfixは tempfail を応答する
 - メールアーカイブ機能
     - メールアーカイブを有効にすると、全てのユーザの送信/受信メールがarchive用のアドレスに複製配送(bcc)される
@@ -203,32 +208,32 @@ archive@example.com: ***********
 ```
 ・メールアドレスの確認
 # ldapsearch -x mailroutingaddress=admin@example.com
-dn: uid=admin,ou=People,dc=example,dc=com
-objectClass: uidObject
-objectClass: simpleSecurityObject
-objectClass: inetLocalMailRecipient
-objectClass: sendmailMTA
-uid: sakura
+objectClass: mailRecipient
+objectClass: top
+mailMessageStore: 127.0.0.1
 mailHost: 127.0.0.1
-sendmailMTAHost: 127.0.0.1
+mailAccessDomain: example.com
 mailRoutingAddress: admin@example.com
-mailLocalAddress: admin@example.com
-mailLocalAddress: root@example.com
-mailLocalAddress: postmaster@example.com
-mailLocalAddress: abuse@example.com
-mailLocalAddress: virus-report@example.com
-mailLocalAddress: nobody@example.com
+mailAlternateAddress: admin@example.com
+mailAlternateAddress: root@example.com
+mailAlternateAddress: postmaster@example.com
+mailAlternateAddress: abuse@example.com
+mailAlternateAddress: nobody@example.com
+mailAlternateAddress: dmarc-report@example.com
+mailAlternateAddress: sts-report@example.com
+mailAlternateAddress: archive@example.com
+uid: admin
 
-※)mailLocalAddress 宛のメールが mailRoutingAddress のMBOXに配送される
-※)nginx mail proxy は mailHost に POP/IMAP を Proxy する
-※)nginx mail proxy は sendmailTMAHost に SMTP を Proxy する
-※)postfix-inbound は mailHost に LMTP で配送をする
+※)mailAlternateAddress 宛のメールが mailRoutingAddress のMBOXに配送される
+※)nginx mail proxy は mailHost に SMTP を Proxy する
+※)nginx mail proxy は mailMessageStore に POP/IMAP を Proxy する
+※)postfix-inbound は mailMessageStore に LMTP で配送をする
 
 ・パスワード変更: archive@example.com のパスワードを xxxxxx に変更する(******は ROOT_DNのパスワード)
-# ldappasswd -x -D "cn=config" -w ****** -s xxxxxx "uid=archive,ou=People,dc=example,dc=com"
+# ldappasswd -x -D "cn=manager" -w ****** -s xxxxxx "uid=archive,ou=People,dc=example,dc=com"
 
 ・メールアドレス無効化: foobar@example.com の ou を People から Termed に変更する
-ldapmodify -D cn=config -W
+ldapmodify -D cn=manager -W
 dn: uid=foobar,ou=People,dc=example,dc=com
 changetype: modrdn
 newrdn: uid=foobar
@@ -236,6 +241,6 @@ deleteoldrdn: 0
 newsuperior: ou=Termed,dc=example,dc=com
 
 ・メールアドレス追加 (作成したメールアドレスのパスワードが出力されます)
-# /root/.sacloud-api/notes/cloud-startupscripts/publicscript/mailsystem/tools/create_mailaddress.sh adduser@example.com
+# /root/.sacloud-api/notes/cloud-startupscripts/publicscript/mailsystem/tools/389ds_create_mailaddress.sh adduser@example.com
 
 ```
