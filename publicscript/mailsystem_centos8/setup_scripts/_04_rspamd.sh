@@ -5,6 +5,8 @@ echo "---- $0 ----"
 
 #-- リポジトリの設定と rspamd, redis のインストール
 curl -L -o /etc/yum.repos.d/rspamd.repo https://rspamd.com/rpm-stable/centos-8/rspamd.repo 
+sed -i 's/http:/https:/' /etc/yum.repos.d/rspamd.repo
+rpm --import https://rspamd.com/rpm/gpg.key || true
 (dnf install -y rspamd || true)
 dnf install -y redis
 

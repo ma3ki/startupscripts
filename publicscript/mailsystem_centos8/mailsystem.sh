@@ -117,13 +117,13 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
 
 #-- cockpit 確認
 COCKPIT=@@@cockpit@@@
-echo "COCKPIT=${COCKPIT}" >> config.source
 
 if [ ! -z ${COCKPIT} ]
 then
 cat <<_EOL_>>cockpit.txt
 -- Cockpit --
 LOGIN URL : https://${first_domain}/cockpit
+
 _EOL_
 else
   touch cockpit.txt
