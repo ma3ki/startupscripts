@@ -9,7 +9,7 @@ then
 fi
 
 #-- cockpit インストール
-dnf -y install cockpit
+dnf -y install cockpit cockpit-storaged
 
 #-- cockpit 設定
 cat <<_EOF_> /etc/cockpit/cockpit.conf

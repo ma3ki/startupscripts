@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @sacloud-name "MailSystem"
+# @sacloud-name "MailSystem for CentOS Stream"
 # @sacloud-once
 # @sacloud-desc-begin
 # このスクリプトはメールサーバをセットアップします
@@ -15,6 +15,7 @@
 # ・ローカルパートが下記のメールアドレスはシステムで作成するため、入力しないこと
 #   [ admin root postmaster abuse nobody dmarc-report sts-report archive ]
 # ・セットアップ後、サーバを再起動します
+# ・usacloud と certbot の動作の為、ACCESS_TOKEN と ACCESS_TOKEN_SECRET をサーバに保存します
 # @sacloud-desc-end
 #
 # @sacloud-require-archive distro-centos distro-ver-8
@@ -23,6 +24,7 @@
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
 # @sacloud-checkbox default= archive "メールアーカイブを有効にする"
 # @sacloud-checkbox default= cockpit "cockpitを有効にする"
+# @sacloud-checkbox default= update "dnf update を実行する"
 
 _motd() {
 	LOG=$(ls /root/.sacloud-api/notes/*log)
@@ -54,7 +56,14 @@ sleep 20
 #-- tool のインストールと更新
 dnf config-manager --set-enabled powertools
 dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
-dnf update -y
+
+#-- update 確認
+UPDATE=@@@update@@@
+
+if [ ! -z ${UPDATE} ]
+then
+  dnf update -y
+fi
 
 set +x
 
@@ -165,7 +174,8 @@ _EOL_
 fi
 
 #-- ldap にメールアドレスを登録
-for x in $(egrep -v "^$|^#" ${addr_list} | grep @ | sort | uniq)
+ignore_list="admin|root|postmaster|abuse|nobody|dmarc-report|sts-report|archive"
+for x in $(egrep -v "^$|^#" ${addr_list} | egrep -v "^(${ignore_list})@"| grep @ | sort | uniq)
 do
   mail_password=$(./tools/389ds_create_mailaddress.sh ${x})
   echo "${x}: ${mail_password}" >> ${pass_list}

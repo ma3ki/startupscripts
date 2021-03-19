@@ -45,10 +45,10 @@
 ```
 - "アーカイブ選択" で CentOS Stream 8 を選択
 ![create01](https://user-images.githubusercontent.com/7104966/110229165-d56e1180-7f4a-11eb-9cb3-92cc39a76c42.png)
-- "ホスト名" はドメインを省いたものを入力 (例: mail と入力した場合、 mail.example.com というホスト名になります)
+- "ホスト名" はドメインを省いたものを入力してください (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
-- "配置するスタートアップスクリプト"で MailSystem を選択
-- "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを１行に1アドレス入力
+- "配置するスタートアップスクリプト"で MailSystem for CentOS Stream を選択
+- "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを1行に1つ入力
 ![create02](https://user-images.githubusercontent.com/7104966/30677401-8a5291a2-9ec6-11e7-8219-dfec28f7bf90.png)
 - "APIキー" を選択 (DNSのレコード登録に使用します)
 - "メールアーカイブを有効にする" 場合は チェック
