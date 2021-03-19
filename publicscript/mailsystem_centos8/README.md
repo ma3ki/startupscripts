@@ -75,7 +75,7 @@ PASSWORD  : ***********
 
 -- phpLDAPadmin --
 LOGIN URL : https://example.com/phpldapadmin
-LOGIN_DN  : cn=manager
+LOGIN_DN  : cn=********
 PASSWORD  : ***********
 
 -- Roundcube Webmail --
