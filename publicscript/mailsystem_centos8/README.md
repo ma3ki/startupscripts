@@ -1,6 +1,6 @@
 # 概要
 - メールシステム
-  - このスクリプトはCentOS Stream 8で単体のメールサーバをセットアップします。
+  - このスクリプトはCentOS Stream で単体のメールサーバをセットアップします。
   - セットアップにはサーバの作成から20分程度、お時間がかかります。
 # 提供機能
 - メール送信
@@ -23,7 +23,7 @@
   - IMAP over TLS(993/tcp)
 - Webmail
   - Roundcube
-    - フィルタリング (managesieve)
+    - フィルタリング/転送 (managesieve)
     - パスワード変更 (password)
 - アカウント管理
   - phpldapadmin
@@ -34,7 +34,7 @@
   - メールアーカイブ機能
   - マルチドメイン対応
   - MTA-STS に対応
-  - SMTP/POP/IMAP の辞書アタックへの ratelimit機能
+  - SMTP/POP/IMAP への辞書アタックを拒否する機能
 # セットアップ手順
 ## 1. APIキーの登録
 ## 2. メールアドレス用ドメインの追加
@@ -44,14 +44,15 @@
 下記は example.com をドメインとした場合の例です
 ```
 - "アーカイブ選択" で CentOS Stream 8 を選択
-![create01](https://user-images.githubusercontent.com/7104966/110229165-d56e1180-7f4a-11eb-9cb3-92cc39a76c42.png)
 - "ホスト名" はドメインを省いたものを入力してください (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
 - "配置するスタートアップスクリプト"で MailSystem for CentOS Stream を選択
 - "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを1行に1つ入力
 ![create02](https://user-images.githubusercontent.com/7104966/30677401-8a5291a2-9ec6-11e7-8219-dfec28f7bf90.png)
 - "APIキー" を選択 (DNSのレコード登録に使用します)
-- "メールアーカイブを有効にする" 場合は チェック
+- "メールアーカイブを有効にする" 場合は チェックしてください
+- "cockpitを有効にする" 場合は チェックしてください
+- "dnf updateを実行する" 場合は チェックしてください
 - "セットアップ完了メールを送信する宛先" に、メールを受信できるアドレスを入力
 ![create03](https://user-images.githubusercontent.com/7104966/30677427-a4594988-9ec6-11e7-9f40-506e31c2e707.png)
 - 必要な項目を入力したら作成
@@ -80,14 +81,17 @@ PASSWORD  : ***********
 -- Roundcube Webmail --
 LOGIN URL : https://example.com/roundcube
 
+-- Cockpit --
+LOGIN URL : https://example.com/cockpit
+
 -- Application Version --
 os: CentOS Stream release 8
-389ds: 1.4.3.16
+389ds: 1.4.3.17
 dovecot: 2.3.8
 clamd: 0.103.0
 rspamd: 2.7
 redis: 5.0.3
-postfix: 3.5.7
+postfix: 3.5.9
 mysql: 8.0.21
 php-fpm: 7.2.24
 nginx: 1.14.1
@@ -128,53 +132,53 @@ Subject Alternative Name:
 admin@example.com: ***********
 user01@example.com: ***********
 user02@example.com: ***********
-archive@example.com: ***********
+user03@example.com: ***********
 ```
 # インストールアプリケーションと主な用途
-- 389 directory server
-    - LDAPサーバ
-    - メールアドレスの管理
 - usacloud
-    - さくらのクラウドDNSへのレコード登録に使用
-- さくらのクラウドDNSへのレコード登録
+  - さくらのクラウドDNSへのレコード登録
     - A レコード (メールドメイン用、ホスト名用)
     - MX レコード
     - TXT レコード (SPF, DKIM, DKIM-ADSP, DMARC, MTA-STS)
     - CNAME レコード (Thunderbird の autoconfig用)
-- dovecot
-    - LMTP,POP,IMAP,ManageSieveサーバ
-    - メール保存 (LMTP)
-    - メール参照 (POP/IMAP)
-    - メールフィルタリング (Sieve)
-    - メール転送 (Sieve)
-- rspamd
-    - 送信メールの DKIM, ARC 署名
-    - 受信メールの SPF, DKIM, DMARC, ARC 検証
-    - 受信メールの Spam Check
-    - 送受信メールの Virus Scan (clamav と連携)
-- clamav
-    - 送受信メールの ウィルススキャンサーバ
-- postfix, postfix-inbound
-    - メール送信サーバ(postfix)
-    - メール受信サーバ(postfix-inbound)
-- nginx, php-fpm
-    - Webサーバ(HTTPS)
-    - メールプロキシサーバ(SMTP Submission,SMTPS,POPS,IMAPS)
-    - メールプロキシ用認証サーバ(HTTP)
-- mysql
-    - roundcube用データベース
-- roundcube(1.4系)
-    - Webメール
-    - パスワード変更
-    - メールフィルタ設定
-    - メール転送設定
-- phpldapadmin
-    - メールドメイン管理
-    - メールアカウント管理
-- DNS登録(PTR)
     - PTR レコード
-- TLS対応(Lets Encrypt)
-    - 証明書
+- 389 directory server
+  - LDAPサーバ
+  - メールアドレスの管理
+- dovecot
+  - LMTP,POP,IMAP,ManageSieveサーバ
+  - メール保存 (LMTP)
+  - メール参照 (POP/IMAP)
+  - メールフィルタリング (Sieve)
+  - メール転送 (Sieve)
+- rspamd
+  - 送信メールの DKIM, ARC 署名
+  - 受信メールの SPF, DKIM, DMARC, ARC 検証
+  - 受信メールの Spam Check
+  - 送受信メールの Virus Scan (clamav と連携)
+- clamav
+  - 送受信メールの ウィルススキャンサーバ
+- postfix, postfix-inbound (multi-instance)
+  - メール送信サーバ(postfix)
+  - メール受信サーバ(postfix-inbound)
+- nginx, php-fpm
+  - Webサーバ(HTTPS)
+  - メールプロキシサーバ(SMTP Submission,SMTPS,POPS,IMAPS)
+  - メールプロキシ用認証サーバ(HTTP)
+- mysql
+  - roundcube用データベース
+- roundcube
+  - Webメール
+  - パスワード変更
+  - メールフィルタ設定
+  - メール転送設定
+- phpldapadmin
+  - メールドメイン管理
+  - メールアカウント管理
+- certbot
+  - TLS対応(Lets Encrypt)
+- cockpit
+  - サーバ管理ツール
 - thunderbird の autoconfig設定
     - Thunderbird へのアカウント登録簡略化
 ## phpldapadminのログイン
@@ -189,18 +193,30 @@ archive@example.com: ***********
 ![thunderbird](https://user-images.githubusercontent.com/7104966/30680317-d9df3d70-9ed9-11e7-8168-fffb5fa4aa9d.png)
 
 ## 補足
-- 1通のメールサイズは20MBまで、MBOXのサイズ、メッセージ数に制限はしていない
+- 1通のメールサイズは20MBまで、MBOXのサイズ、保存通数に制限は設定していない
+- 転送設定の最大転送先アドレスは32アドレス
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
     - admin, root, postmaster, abuse, nobody, dmarc-report, sts-report
 - virus メールについて
-    - clamavで Virus と判定したメールは reject する
+    - clamavで Virus と判定したメールは、送受信を拒否する(reject)
 - rspamd が正常に動作していない場合、postfixは tempfail を応答する
 - メールアーカイブ機能
     - メールアーカイブを有効にすると、全てのユーザの送信/受信メールがarchive用のアドレスに複製配送(bcc)される
     - archive用のメールボックスのみ cron で 受信日時から1年経過したメールを自動で削除する
 - マルチドメイン設定方法
     - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
-    - Thunderbird の autoconfig はマルチドメインに対応していない
+- SMTP/POP/IMAP への辞書アタックを拒否する機能
+  - 1. POP/IMAP/SMTPの認証処理を一定時間(最大6分)以内に3回失敗したIPアドレスからの認証処理を10分間拒否する(接続元には認証エラーを返す)
+  - 2. 1の拒否を3回繰り返したIPアドレスからの認証処理を24時間拒否する
+  - IPをホワイトリストへ追加する方法
+    - /var/www/html/http_root/nginx_mail_proxy/ldap_authentication.php の $whitelist(配列) に IPを追加する
+  - 1,2 の処理で使用されている全てのカウンターをリセットする方法
+```
+# redis-cli
+127.0.0.1:6379> flushall
+OK
+127.0.0.1:6379> quit
+```
 - 各種OSSの設定、操作方法についてはOSSの公式のドキュメントをご参照ください
 
 ## コマンドでのメールアドレスの管理
@@ -221,12 +237,11 @@ mailAlternateAddress: abuse@example.com
 mailAlternateAddress: nobody@example.com
 mailAlternateAddress: dmarc-report@example.com
 mailAlternateAddress: sts-report@example.com
-mailAlternateAddress: archive@example.com
 uid: admin
 
 ※)mailAlternateAddress 宛のメールが mailRoutingAddress のMBOXに配送される
-※)nginx mail proxy は mailHost に SMTP を Proxy する
-※)nginx mail proxy は mailMessageStore に POP/IMAP を Proxy する
+※)nginx は mailHost に SMTP を Proxy する
+※)nginx は mailMessageStore に POP/IMAP を Proxy する
 ※)postfix-inbound は mailMessageStore に LMTP で配送をする
 
 ・パスワード変更: archive@example.com のパスワードを xxxxxx に変更する(******は ROOT_DNのパスワード)
