@@ -3,13 +3,18 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-#-- phpldapadmin本家は php7.x に対応していない為、 fork されて対応した下記を clone
 mkdir -p ${WORKDIR}/git
-git clone https://github.com/breisig/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
+#git clone https://github.com/breisig/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
+git clone https://github.com/leenooks/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
 
-cp -pr ${WORKDIR}/git/phpldapadmin ${HTTPS_DOCROOT}/phpldapadmin
+cd ${WORKDIR}/git/phpldapadmin
+version=$(git tag | sort --version-sort | tail -1)
+git checkout ${version}
+
+cp -pr ${WORKDIR}/git/phpldapadmin ${HTTPS_DOCROOT}/phpldapadmin-${version}
+ln -s ${HTTPS_DOCROOT}/phpldapadmin-${version} ${HTTPS_DOCROOT}/phpldapadmin
 cp -p ${HTTPS_DOCROOT}/phpldapadmin/config/config.php{.example,}
-chown -R nginx. ${HTTPS_DOCROOT}/phpldapadmin
+chown -R nginx. ${HTTPS_DOCROOT}/phpldapadmin-${version}
 
 #-- 複数ドメインがある場合は、カンマ区切りで追加する
 ARRAY_LIST=$(for domain in ${DOMAIN_LIST}
