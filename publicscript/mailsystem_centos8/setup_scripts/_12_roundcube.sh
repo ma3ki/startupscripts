@@ -24,7 +24,8 @@ mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 dnf install -y php-{pdo,xml,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip} unzip php-pear-Net-SMTP
 pear channel-update pear.php.net
 pear install -a Mail_mime
-pear install Net_LDAP
+#pear install Net_LDAP
+pear install Net_LDAP2
 pear install Net_Sieve-1.4.4
 
 dnf install -y ImageMagick ImageMagick-devel
@@ -81,7 +82,8 @@ mv ${HTTPS_DOCROOT}/roundcube/installer ${HTTPS_DOCROOT}/roundcube/_installer
 #-- elastic テーマを使用するため、lessc コマンドをインストール
 dnf install -y npm
 #-- less 4.0.0 だと問題が発生する為、3.13.1 を指定してインストール
-npm install -g less@3.13.1
+#-- npm install -g less@3.13.1
+npm install less
 
 cd ${HTTPS_DOCROOT}/roundcube/skins/elastic
 lessc -x styles/styles.less > styles/styles.css

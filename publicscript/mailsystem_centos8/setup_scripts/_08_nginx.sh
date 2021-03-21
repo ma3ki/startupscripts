@@ -212,6 +212,9 @@ mkdir -p ${HTTP_DOCROOT}/nginx_mail_proxy
 cp -p $(dirname $0)/../tools/ldap_authentication.php ${HTTP_DOCROOT}/nginx_mail_proxy/
 sed -i "s/#IPV4/${IPADDR}/" ${HTTP_DOCROOT}/nginx_mail_proxy/ldap_authentication.php
 
+#-- phpredis のインストール
+dnf install -y re2c
+pecl channel-update pecl.php.net
 echo "no" | pecl install redis
 echo extension=redis.so  >> /etc/php.d/99-redis.ini
 
