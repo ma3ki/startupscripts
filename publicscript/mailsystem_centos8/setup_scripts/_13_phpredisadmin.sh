@@ -15,24 +15,26 @@ ln -s ${HTTPS_DOCROOT}/phpredisadmin-${version} ${HTTPS_DOCROOT}/phpredisadmin
 cp -p ${HTTPS_DOCROOT}/phpredisadmin/includes/config.{sample.inc.php,inc.php}
 chown -R nginx. ${HTTPS_DOCROOT}/phpredisadmin-${version}
 
-sed -ei '$d' ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
-sed -ei '$d' ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
+tail2=$(tail -2 ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php | head -1)
+tail1=$(tail -1 ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php)
+sed -i '$d' ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
+sed -i '$d' ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
 
 cat <<"_EOF_">> ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
-  'scansize' => 1000,
+${tail2},
   //enable HTTP authentication
   'login' => array(
     // Username => Password
     // Multiple combinations can be used
     'admin' => array(
-      'password' => 'ADMINPASSWORD',
+      'password' => 'root_password',
     ),
     'guest' => array(
-      'password' => 'ADMINPASSWORD',
+      'password' => 'root_password',
       'servers'  => array(1) // Optional list of servers this user can access.
     )
   )
-);
+${tail1}
 _EOF_
 
-sed -i "/ADMINPASSWORD/${ROOT_PASSWORD}/" ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
+sed -i "/root_password/${ROOT_PASSWORD}/" ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
