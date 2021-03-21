@@ -86,6 +86,7 @@ dnf install -y npm
 npm install less
 
 cd ${HTTPS_DOCROOT}/roundcube/skins/elastic
+export PATH=${PATH}:${HTTPS_DOCROOT}/roundcube/node_modules/less/bin
 lessc -x styles/styles.less > styles/styles.css
 lessc -x styles/print.less > styles/print.css
 lessc -x styles/embed.less > styles/embed.css
