@@ -20,7 +20,7 @@ tail1=$(tail -1 ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php)
 sed -i '$d' ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
 sed -i '$d' ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
 
-cat <<"_EOF_">> ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
+cat <<_EOL_>> ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
 ${tail2},
   //enable HTTP authentication
   'login' => array(
@@ -35,6 +35,6 @@ ${tail2},
     )
   )
 ${tail1}
-_EOF_
+_EOL_
 
-sed -i "/root_password/${ROOT_PASSWORD}/" ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php
+sed -i -e "s/root_password/${ROOT_PASSWORD}/" ${HTTPS_DOCROOT}/phpredisadmin/includes/config.inc.php

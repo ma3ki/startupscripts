@@ -12,15 +12,15 @@ fi
 dnf -y install cockpit cockpit-storaged
 
 #-- cockpit 設定
-cat <<_EOF_> /etc/cockpit/cockpit.conf
+cat <<_EOL_> /etc/cockpit/cockpit.conf
 [WebService]
 Origins = https://${FIRST_DOMAIN} wss://${FIRST_DOMAIN}
 ProtocolHeader = X-Forwarded-Proto
 UrlRoot=/cockpit
-_EOF_
+_EOL_
 
 #-- nginx 設定
-cat <<'_EOF_'> /etc/nginx/conf.d/https.d/cockpit.conf
+cat <<'_EOL_'> /etc/nginx/conf.d/https.d/cockpit.conf
   location ^~ /cockpit {
     location /cockpit/ {
       # Required to proxy the connection to Cockpit
@@ -40,16 +40,16 @@ cat <<'_EOF_'> /etc/nginx/conf.d/https.d/cockpit.conf
       gzip off;
     }
   }
-_EOF_
+_EOL_
 
 #-- 389-ds の cockpit plugin 対応
 dnf -y module install 389-directory-server:stable/default
 
-cat <<_EOF_>>/usr/lib/systemd/system/cockpit.service
+cat <<_EOL_>>/usr/lib/systemd/system/cockpit.service
 
 [Install]
 WantedBy=multi-user.target
-_EOF_
+_EOL_
 
 systemctl daemon-reload
 systemctl enable cockpit
