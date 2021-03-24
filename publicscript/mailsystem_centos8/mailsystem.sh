@@ -5,7 +5,7 @@
 # @sacloud-desc-begin
 # @sacloud-tag @require-core>=1 @require-memory-gib>=2
 # このスクリプトはメールサーバをセットアップします
-# (このスクリプトは、CentOS Stream 8 でのみ動作します)
+# (このスクリプトは、CentOS8, CentOS Stream 8 でのみ動作します)
 #
 # 事前作業として以下の2つが必要となります
 # ・さくらのクラウドDNSのゾーンに作成するメールアドレスで使用するドメインを登録していること
@@ -51,14 +51,17 @@ set -ex
 _motd start
 trap '_motd fail' ERR
 
-#-- CentOS Stream 8 は 通信が可能になるまで少し時間がかかる模様
-sleep 20
+#-- CentOS Stream 8 は 通信が可能になるまで少し時間がかかる
+if [ $(grep -c "CentOS Stream release 8" /etc/redhat-release) -eq 1 ]
+then
+  sleep 30
+fi
 
 #-- tool のインストールと更新
 dnf config-manager --set-enabled powertools
 dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
 
-#-- update 確認
+#-- dnf update 確認
 UPDATE=@@@update@@@
 
 if [ ! -z ${UPDATE} ]

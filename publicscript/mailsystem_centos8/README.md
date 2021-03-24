@@ -1,6 +1,6 @@
 # 概要
 - メールシステム
-  - このスクリプトはCentOS Stream で単体のメールサーバをセットアップします。
+  - このスクリプトはCentOS8, CentOS Stream で単体のメールサーバをセットアップします。
   - セットアップにはサーバの作成から20分程度、お時間がかかります。
 # 提供機能
 - メール送信
@@ -43,7 +43,7 @@
 ```
 下記は example.com をドメインとした場合の例です
 ```
-- "アーカイブ選択" で CentOS Stream 8 を選択
+- "アーカイブ選択" で CentOS 8.x 又は CentOS Stream 8 を選択
 - "ホスト名" はドメインを省いたものを入力してください (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
 - "配置するスタートアップスクリプト"で MailSystem for CentOS Stream を選択
@@ -110,11 +110,11 @@ OK: php-fpm
 OK: nginx
 
 -- example.com DNS Check --
-OK: example.com A 27.133.152.XX
+OK: example.com A XX.XX.XX.XX
 OK: example.com MX 10 example.com.
-OK: example.com TXT "v=spf1 +ip4:27.133.152.XX -all"
-OK: mail.example.com A 27.133.152.XX
-OK: autoconfig.example.com A 27.133.152.XX
+OK: example.com TXT "v=spf1 +ip4:XX.XX.XX.XX -all"
+OK: mail.example.com A XX.XX.XX.XX
+OK: autoconfig.example.com A XX.XX.XX.XX
 OK: _dmarc.example.com TXT "v=DMARC1\; p=reject\; rua=mailto:admin@example.com"
 OK: _adsp._domainkey.example.com TXT "dkim=discardable"
 OK: default._domainkey.example.com TXT "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkviwuC8KvC6OP7HwUPQEZDA+ZnY1mRzZrCJcM4sMRhhVse7Cwy/VOldbIxGTAnsRSaLmmxcz96aiCftvctue7mzIvFscCDRm35PtAS5mvlWXRP1f2brHROLoc0rv7upliPdwNXmc7UhZ2b8/gJhSDw76nFiOiOG7/x5GkLCZLCQIDAQAB"
@@ -180,10 +180,10 @@ user03@example.com: ***********
 - cockpit
   - サーバ管理ツール
 - thunderbird の autoconfig設定
-    - Thunderbird へのアカウント登録簡略化
+  - Thunderbird へのアカウント登録簡略化
 ## phpldapadminのログイン
 - ログイン後、メールアドレスの追加/削除/無効化/パスワード変更などができる
-    - メールアドレスの追加は、既存のユーザのレコードをコピーし、固有なIDのみ変更すること
+  - メールアドレスの追加は、既存のユーザのレコードをコピーし、固有なIDのみ変更すること
 
 ![phpldapadmin](https://user-images.githubusercontent.com/7104966/30680400-580b6066-9eda-11e7-9c0d-d4c721fefb64.png)
 
@@ -205,18 +205,6 @@ user03@example.com: ***********
     - archive用のメールボックスのみ cron で 受信日時から1年経過したメールを自動で削除する
 - マルチドメイン設定方法
     - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
-- SMTP/POP/IMAP への辞書アタックを拒否する機能
-  - 1. POP/IMAP/SMTPの認証処理を一定時間(最大6分)以内に3回失敗したIPアドレスからの認証処理を10分間拒否する(接続元には認証エラーを返す)
-  - 2. 1の拒否を3回繰り返したIPアドレスからの認証処理を24時間拒否する
-  - IPをホワイトリストへ追加する方法
-    - /var/www/html/http_root/nginx_mail_proxy/ldap_authentication.php の $whitelist(配列) に IPを追加する
-  - 1,2 の処理で使用されている全てのカウンターをリセットする方法
-```
-# redis-cli
-127.0.0.1:6379> flushall
-OK
-127.0.0.1:6379> quit
-```
 - 各種OSSの設定、操作方法についてはOSSの公式のドキュメントをご参照ください
 
 ## コマンドでのメールアドレスの管理
