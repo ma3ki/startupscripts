@@ -140,7 +140,7 @@ else
 fi
 
 #-- セットアップ実行
-for x in ./setup_scripts/_*.sh
+for x in ./setup_scripts/_[0-9]*.sh
 do
   ${x} 2>&1
 done

@@ -92,7 +92,7 @@ $protomap = array(
   "465" => "smtps",
 );
 
-// ldap setting // attribute は全て小文字で記述すること
+// ldap setting , attribute は全て小文字で記述すること
 $ldap = array(
   "host" => "127.0.0.1",
   "port" => 389,
@@ -111,7 +111,6 @@ foreach (preg_split("/\./", $spmra[1]) as $value) {
   $ldap['dn'] = $ldap['dn'] . 'dc=' . $value . ',' ;
 }
 $tmpdn = preg_split('/,$/',$ldap['dn']);
-$ldap['basedn'] = $tmpdn[0];
 $ldap['dn'] = 'uid=' . $spmra[0] . ',ou=People,' . $tmpdn[0];
 
 // set search attribute
@@ -125,44 +124,6 @@ $log = sprintf('meth=%s, user=%s, client=%s, proto=%s', $env['meth'], $env['user
 // set password
 $ldap['passwd'] = urldecode($env['passwd']);
 
-// set ratelimit
-$max_failcnt = 3 ;
-$max_rejectcnt = 3 ;
-$expire_time = 120 ;
-$reject_time = 600 ;
-$max_reject_time = 86400 ;
-
-$whitelist = [
-  "127.0.0.1",
-  "#IPV4"
-];
-
-// check whitelist
-if ( ! preg_grep("/^$clientip$/", $whitelist) ) {
-  $redis = new Redis();
-  try {
-    $redis->connect('127.0.0.1', 6379);
-
-    $key = $protomap[$env['port']] . ":" . $env['client'] ;
-    $clientip = $env['client'] ;
-    $failcnt = $redis->Get($key);
-    $ttl = $redis->ttl($key);
-    $rejectcnt = $redis->hGet('blacklist', $key);
-
-    if ($failcnt >= $max_failcnt && $ttl > 0 ) {
-      // $log = sprintf('auth=reject, %s, failcnt=%s, rejectcnt=%s, ttl=%s',$log,$failcnt,$rejectcnt,$ttl);
-      $log = sprintf('auth=reject, %s, passwd=%s, failcnt=%s, rejectcnt=%s, ttl=%s',$log,$ldap['passwd'],$failcnt,$rejectcnt,$ttl);
-      header('Content-type: text/html');
-      header('Auth-Status: Invalid login');
-      _writelog($log);
-      exit;
-    }
-  }
-  catch(Exception $e) {
-  }
-  $redis->close();
-}
-
 // ldap authentication
 if (_ldapauth($ldap['host'], $ldap['port'], $ldap['dn'], $ldap['passwd'])) {
   // authentication successful
@@ -172,49 +133,8 @@ if (_ldapauth($ldap['host'], $ldap['port'], $ldap['dn'], $ldap['passwd'])) {
   $log = sprintf('%s, %s', $log, $result);
 } else {
   // authentication failure
-  // $log = sprintf('auth=failure, %s', $log);
   $log = sprintf('auth=failure, %s, passwd=%s', $log, $ldap['passwd']);
-
-  // check whitelist
-  if ( ! preg_grep("/^$clientip$/", $whitelist) ) {
-    // set failcnt to redis
-    $redis = new Redis();
-    try {
-      $redis->connect('127.0.0.1', 6379);
-
-      $key = $protomap[$env['port']] . ":" . $env['client'] ;
-      $ttl = $redis->ttl($key);
-      $failcnt = $redis->Get($key) + 1;
-      $rejectcnt = $redis->hGet('blacklist', $key);
-
-      if ( $failcnt > $max_failcnt ) {
-        $failcnt = 1 ;
-      }
-
-      if ( $failcnt < $max_failcnt ) {
-        $redis->Set($key,$failcnt,$expire_time + $ttl);
-        if ( empty($rejectcnt) ) {
-          $rejectcnt = 0;
-          $redis->hSet('blacklist', $key, $rejectcnt);
-        }
-      } else {
-        $rejectcnt += 1;
-        $redis->hSet('blacklist', $key, $rejectcnt);
-        if ( $rejectcnt >= $max_rejectcnt ) {
-          $reject_time = $max_reject_time ;
-          $redis->hSet('blacklist', $key, 0);
-        }
-        $redis->Set($key, $failcnt, $reject_time);
-      }
-
-      $ttl = $redis->ttl($key);
-      $log = sprintf('%s, failcnt=%s, rejectcnt=%s, ttl=%s',$log,$failcnt,$rejectcnt,$ttl);
-
-    }
-    catch(Exception $e) {
-    }
-    $redis->close();
-  }
+  // $log = sprintf('auth=failure, %s', $log);
   header('Content-type: text/html');
   header('Auth-Status: Invalid login');
 }
