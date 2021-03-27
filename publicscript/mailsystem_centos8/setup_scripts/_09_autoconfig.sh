@@ -3,47 +3,29 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-#-- thunderbird 用 autoconfig を作成
-mkdir -p ${HTTPS_DOCROOT}/.well-known/autoconfig/mail
-chown -R nginx. ${HTTPS_DOCROOT}/.well-known
+mkdir -p ${HTTPS_DOCROOT}/emailsetting
+chown -R nginx. ${HTTPS_DOCROOT}/emailsetting
 
-cat <<'_EOL_'>${HTTPS_DOCROOT}/.well-known/autoconfig/mail/config-v1.1.xml
-<?xml version="1.0"?>
-<clientConfig version="1.1">
-    <emailProvider id="sakuravps">
-      <domain>_DOMAIN_</domain>
-      <displayName>_DOMAIN_</displayName>
-      <displayShortName>_DOMAIN_</displayShortName>
-      <incomingServer type="imap">
-         <username>%EMAILADDRESS%</username>
-         <hostname>_DOMAIN_</hostname>
-         <port>993</port>
-         <socketType>SSL</socketType>
-         <authentication>password-cleartext</authentication>
-      </incomingServer>
-      <incomingServer type="pop3">
-         <username>%EMAILADDRESS%</username>
-         <hostname>_DOMAIN_</hostname>
-         <port>995</port>
-         <socketType>SSL</socketType>
-         <authentication>password-cleartext</authentication>
-         <pop3>
-            <leaveMessagesOnServer>true</leaveMessagesOnServer>
-            <downloadOnBiff>true</downloadOnBiff>
-            <daysToLeaveMessagesOnServer>14</daysToLeaveMessagesOnServer>
-         </pop3>
-      </incomingServer>
-      <outgoingServer type="smtp">
-         <username>%EMAILADDRESS%</username>
-         <hostname>_DOMAIN_</hostname>
-         <port>465</port>
-         <socketType>SSL</socketType>
-         <authentication>password-cleartext</authentication>
-      </outgoingServer>
-    </emailProvider>
-    <clientConfigUpdate url="https://_DOMAIN_/.well-known/autoconfig/mail/config-v1.1.xml" />
-</clientConfig>
+#-- thunderbird
+cp -p $(dirname $0)/../tools/autoconfig.php ${HTTPS_DOCROOT}/emailsetting
+#-- Microsoft Outlook
+cp -p $(dirname $0)/../tools/autodiscover.php ${HTTPS_DOCROOT}/emailsetting
+
+cat <<'_EOL_' > /etc/nginx/conf.d/https.d/emailsetting.conf
+  #-- Microsoft Outlook
+  location ~* ^/autodiscover/autodiscover.xml {
+    try_files /emailsetting/autodiscover.php =404;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+    include fastcgi_params;
+  }
+  #-- thunderbird
+  location ~* ^/.well-known/autoconfig/mail/config-v1.1.xml {
+    try_files /emailsetting/autoconfig.php =404;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+    include fastcgi_params;
+  }
 _EOL_
-
-sed -i "s/_DOMAIN_/${FIRST_DOMAIN}/g" ${HTTPS_DOCROOT}/.well-known/autoconfig/mail/config-v1.1.xml
-
