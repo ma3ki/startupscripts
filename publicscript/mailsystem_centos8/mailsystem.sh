@@ -58,7 +58,7 @@ then
 fi
 
 #-- tool のインストールと更新
-dnf config-manager --set-enabled powertools
+dnf config-manager --set-enabled PowerTools || dnf config-manager --set-enabled powertools
 dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
 
 #-- dnf update 確認
