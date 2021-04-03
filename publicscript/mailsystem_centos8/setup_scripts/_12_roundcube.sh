@@ -81,8 +81,6 @@ mv ${HTTPS_DOCROOT}/roundcube/installer ${HTTPS_DOCROOT}/roundcube/_installer
 
 #-- elastic テーマを使用するため、lessc コマンドをインストール
 dnf install -y npm
-#-- less 4.0.0 だと問題が発生する為、3.13.1 を指定してインストール
-#-- npm install -g less@3.13.1
 npm install less
 
 cd ${HTTPS_DOCROOT}/roundcube/skins/elastic

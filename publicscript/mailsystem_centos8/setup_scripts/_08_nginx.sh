@@ -3,7 +3,7 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-#-- リポジトリの設定と nginx, php7.3 のインストール
+#-- リポジトリの設定と nginx, php7.2 のインストール
 dnf install -y nginx php php-{fpm,ldap,devel,xml,pear,json}
 
 #-- php, php-fpm の設定
@@ -126,7 +126,7 @@ cat <<_EOL_> /etc/nginx/conf.d/http.conf
 server {
   listen ${IPADDR}:80;
   server_name _;
-  return 301 https://$host$request_uri;
+  return 301 https://\$host\$request_uri;
 }
 
 server {
@@ -223,7 +223,7 @@ systemctl enable nginx php-fpm
 systemctl start nginx php-fpm
 
 #-- OS再起動時にnginxの起動に失敗することがあるので、その対応
-sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 network-online.target\nWants=network-online.target/" /usr/lib/systemd/system/nginx.service
+sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 NetworkManager-wait-online.service/" /usr/lib/systemd/system/nginx.service
 systemctl daemon-reload
 
 #-- firewall の設定

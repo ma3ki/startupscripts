@@ -11,7 +11,6 @@ dnf -y install 389-ds-base openldap-clients
 
 #-- 389ds 設定
 dscreate create-template ${WORKDIR}/ldap/389ds
-#sed -ri "s/;(root_dn).*/\1=${ROOT_DN}/;s/;(root_password).*/\1=${ROOT_PASSWORD}/" ${WORKDIR}/ldap/389ds
 sed -ri "s/;(root_password).*/\1=${ROOT_PASSWORD}\nroot_dn=${ROOT_DN}/" ${WORKDIR}/ldap/389ds
 dscreate from-file ${WORKDIR}/ldap/389ds
 

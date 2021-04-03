@@ -41,6 +41,3 @@ _EOL_
 #-- clamd の起動設定
 systemctl enable clamd@scan clamav-freshclam
 systemctl start clamd@scan
-
-#-- clamd の起動に 90秒以上かかる為、systemd のタイムアウトを 5分に変更する
-#grep ^TimeoutSec /lib/systemd/system/clamd@.service >/dev/null || echo "TimeoutSec = 5min" >> /lib/systemd/system/clamd@.service
