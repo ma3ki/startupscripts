@@ -37,7 +37,7 @@ do
 done
 basedn="ou=People${basedn}"
 
-cat <<-_EOL_>>${WORKDIR}/ldap/${domain}_${account}.ldif
+cat <<-_EOL_>${WORKDIR}/ldap/${domain}_${account}.ldif
 dn: uid=${account},${basedn}
 objectClass: mailRecipient
 objectClass: top

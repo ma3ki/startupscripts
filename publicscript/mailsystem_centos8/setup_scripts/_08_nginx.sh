@@ -223,7 +223,7 @@ systemctl enable nginx php-fpm
 systemctl start nginx php-fpm
 
 #-- OS再起動時にnginxの起動に失敗することがあるので、その対応
-sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 NetworkManager-wait-online.service/" /usr/lib/systemd/system/nginx.service
+sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 NetworkManager-wait-online.service postfix.service/" /usr/lib/systemd/system/nginx.service
 systemctl daemon-reload
 
 #-- firewall の設定

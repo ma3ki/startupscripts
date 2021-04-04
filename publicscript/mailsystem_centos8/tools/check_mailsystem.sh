@@ -76,7 +76,7 @@ check_version() {
 check_proc() {
 	PROC=$1
 	USER=$2
-	if [ $(ps -eo user,cmd | grep "^${USER} " | grep ${PROC} | grep -vc grep ) -eq 0 ]
+	if [ $(ps -eo user,cmd | grep "^${USER} " | sed "s/${USER}//" | grep ${PROC} | grep -vc grep) -eq 0 ]
 	then
 		echo "ERROR: ${PROC}"
 	elif [ "${PROC}" = "master" ]
