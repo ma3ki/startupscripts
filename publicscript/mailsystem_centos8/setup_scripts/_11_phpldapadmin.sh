@@ -8,7 +8,8 @@ mkdir -p ${WORKDIR}/git
 git clone https://github.com/leenooks/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
 
 cd ${WORKDIR}/git/phpldapadmin
-version=$(git tag | sort --version-sort | tail -1)
+#version=$(git tag | sort --version-sort | tail -1)
+version=1.2.6.2
 git checkout ${version}
 
 cp -pr ${WORKDIR}/git/phpldapadmin ${HTTPS_DOCROOT}/phpldapadmin-${version}
@@ -28,7 +29,8 @@ do
   printf "${dc},"
 done | sed 's/,$//')
 
-sed -i -e "301i \$servers->setValue('server','base',array(${ARRAY_LIST}));" ${HTTPS_DOCROOT}/phpldapadmin/config/config.php
+sed -i -e "472i \$servers->setValue('login','anon_bind',false);" \ 
+  -e "305i \$servers->setValue('server','base',array(${ARRAY_LIST}));" ${HTTPS_DOCROOT}/phpldapadmin/config/config.php
 
 #-- 使用しないテンプレートを移動
 mkdir ${HTTPS_DOCROOT}/phpldapadmin/templates/creation_backup

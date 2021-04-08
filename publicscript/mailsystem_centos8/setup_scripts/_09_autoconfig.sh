@@ -13,7 +13,7 @@ cp -p $(dirname $0)/../tools/autodiscover.php ${HTTPS_DOCROOT}/emailsetting
 
 cat <<'_EOL_' > /etc/nginx/conf.d/https.d/emailsetting.conf
   #-- Microsoft Outlook
-  location ~* ^/autodiscover/autodiscover.xml {
+  location ^~ /autodiscover/autodiscover.xml {
     try_files /emailsetting/autodiscover.php =404;
     fastcgi_pass unix:/run/php-fpm/www.sock;
     fastcgi_index index.php;
@@ -21,7 +21,7 @@ cat <<'_EOL_' > /etc/nginx/conf.d/https.d/emailsetting.conf
     include fastcgi_params;
   }
   #-- thunderbird
-  location ~* ^/.well-known/autoconfig/mail/config-v1.1.xml {
+  location ^~ /mail/config-v1.1.xml {
     try_files /emailsetting/autoconfig.php =404;
     fastcgi_pass unix:/run/php-fpm/www.sock;
     fastcgi_index index.php;

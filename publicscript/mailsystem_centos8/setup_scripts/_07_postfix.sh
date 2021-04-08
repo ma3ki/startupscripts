@@ -38,6 +38,7 @@ postconf -c /etc/postfix -e non_smtpd_milters=inet:${RSPAMD_SERVER}:${RSPAMD_POR
 postconf -c /etc/postfix -e smtpd_authorized_xclient_hosts=${XAUTH_HOST}
 postconf -c /etc/postfix -e smtpd_sasl_auth_enable=yes
 postconf -c /etc/postfix -e smtpd_sender_restrictions=reject_sender_login_mismatch
+postconf -c /etc/postfix -e myhostname=${HOSTNAME}
 
 postconf -c /etc/postfix-inbound -X master_service_disable
 postconf -c /etc/postfix-inbound -e inet_interfaces=${IPADDR}
