@@ -5,7 +5,7 @@
 # @sacloud-desc-begin
 # @sacloud-tag @require-core>=1 @require-memory-gib>=2
 # このスクリプトはメールサーバをセットアップします
-# (このスクリプトは、CentOS8, CentOS Stream 8 でのみ動作します)
+# (このスクリプトは、CentOS8, CentOS Stream 8, AlmaLinux 8 で動作します)
 #
 # 事前作業として以下の2つが必要となります
 # ・さくらのクラウドDNSのゾーンに作成するメールアドレスで使用するドメインを登録していること
@@ -25,7 +25,6 @@
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
 # @sacloud-checkbox default= archive "メールアーカイブを有効にする"
 # @sacloud-checkbox default= cockpit "cockpitを有効にする"
-# @sacloud-checkbox default= update "dnf updateを実行する"
 
 _motd() {
 	LOG=$(ls /root/.sacloud-api/notes/*log)
@@ -60,13 +59,8 @@ fi
 #-- tool のインストールと更新
 dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
 
-#-- dnf update 確認
-UPDATE=@@@update@@@
-
-if [ ! -z ${UPDATE} ]
-then
-  dnf update -y
-fi
+#-- dnf update
+dnf update -y
 
 #-- enable PowerTools 
 dnf config-manager --set-enabled PowerTools || dnf config-manager --set-enabled powertools
@@ -158,7 +152,7 @@ then
   do
     #-- ldap にメールアドレスを登録
     mail_password=$(./tools/389ds_create_mailaddress.sh archive@${domain})
-    echo "${x}: ${mail_password}" >> ${pass_list}
+    echo "archive@${domain}: ${mail_password}" >> ${pass_list}
 
     # 送信アーカイブ設定
     echo "/^(.*)@${domain}\$/    archive+\$1-Sent@${domain}" >> /etc/postfix/sender_bcc_maps
