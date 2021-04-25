@@ -126,6 +126,7 @@ sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
 
 #-- cockpit 確認
 COCKPIT=@@@cockpit@@@
+echo "COCKPIT=${COCKPIT}" >> config.source
 
 if [ ! -z ${COCKPIT} ]
 then
