@@ -126,7 +126,8 @@ cat <<_EOL_> /etc/nginx/conf.d/http.conf
 server {
   listen ${IPADDR}:80;
   server_name _;
-  return 301 https://\$host\$request_uri;
+#  return 301 https://\$host\$request_uri;
+  return 301 https://${FIRST_DOMAIN}\$request_uri;
 }
 
 server {

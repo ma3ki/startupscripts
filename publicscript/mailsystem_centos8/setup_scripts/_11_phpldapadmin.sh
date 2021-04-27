@@ -29,7 +29,8 @@ do
   printf "${dc},"
 done | sed 's/,$//')
 
-sed -i -e "472i \$servers->setValue('login','anon_bind',false);" \
+sed -i -e "531i \$servers->setValue('unique','attrs',array('mail','uidNumber','mailRoutingaddress','mailAlternateAddress'));" \
+  -e "472i \$servers->setValue('login','anon_bind',false);" \
   -e "305i \$servers->setValue('server','base',array(${ARRAY_LIST}));" ${HTTPS_DOCROOT}/phpldapadmin/config/config.php
 
 #-- 使用しないテンプレートを移動
