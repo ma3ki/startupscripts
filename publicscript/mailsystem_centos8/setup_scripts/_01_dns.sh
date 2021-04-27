@@ -20,17 +20,14 @@ do
   fi
   usacloud dns record-add -y --name _dmarc --type TXT --value "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}" ${domain}
   usacloud dns record-add -y --name _adsp._domainkey --type TXT --value "dkim=discardable" ${domain}
-  usacloud dns record-add -y --name _autodiscover._tcp --type SRV --srv-priority 5 --srv-port 443 --srv-target "${FIRST_DOMAIN}." ${domain}
   if [ "${FIRST_DOMAIN}" = "${domain}" ]
   then
     usacloud dns record-add -y --name _mta-sts --type TXT --value "v=STSv1; id=$(date +%Y%m%d%H%M%S);" ${domain}
     usacloud dns record-add -y --name _smtp._tls --type TXT --value "v=TLSRPTv1; rua=mailto:sts-report@${domain}" ${domain}
     usacloud dns record-add -y --name autoconfig --type A --value ${IPADDR} ${domain}
-    usacloud dns record-add -y --name autodiscover --type A --value ${IPADDR} ${domain}
     usacloud dns record-add -y --name mta-sts --type A --value ${IPADDR} ${domain}
   else
     usacloud dns record-add -y --name autoconfig --type CNAME --value autoconfig.${FIRST_DOMAIN}. ${domain}
-    usacloud dns record-add -y --name autodiscover --type CNAME --value autodiscover.${FIRST_DOMAIN}. ${domain}
   fi
 done
 
