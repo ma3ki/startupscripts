@@ -111,7 +111,8 @@ foreach (preg_split("/\./", $spmra[1]) as $value) {
   $ldap['dn'] = $ldap['dn'] . 'dc=' . $value . ',' ;
 }
 $tmpdn = preg_split('/,$/',$ldap['dn']);
-$ldap['dn'] = 'uid=' . $spmra[0] . ',ou=People,' . $tmpdn[0];
+$ldap['basedn'] = $tmpdn[0];
+$ldap['dn'] = 'uid=' . $spmra[0] . ',ou=People,' . $ldap['basedn'];
 
 // set search attribute
 if ($env['proto'] === 'smtp' ) {
