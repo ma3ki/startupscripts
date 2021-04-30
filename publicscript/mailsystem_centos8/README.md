@@ -3,11 +3,11 @@
   - このスクリプトは単体のメールサーバをセットアップします。
   - セットアップにはサーバの作成から20分程度、お時間がかかります。
 # 提供機能
-- メール送信
+- メール送信(SMTPサーバ)
   - SMTP Submission(587/tcp)
-  - STARTTLS
   - SMTP over TLS(465/tcp)
   - SMTP-AUTH
+  - STARTTLS
   - Virus Check (パスワード付きZIPファイルは送信拒否)
   - 各種メール認証技術
     - SPF, DKIM, DMARC, ARC 署名
@@ -18,13 +18,15 @@
   - Spam Check
   - 各種メール認証技術
     - SPF, DKIM, DMARC, ARC 認証
-- メール参照
+- メール参照(POP/IMAPサーバ)
   - POP over TLS(995/tcp)
   - IMAP over TLS(993/tcp)
+- Spam Filter Systemp
+  - Rspamd 
 - Webmail
   - Roundcube
-    - フィルタリング/転送 (managesieve)
-    - パスワード変更 (password)
+    - フィルタリング/転送設定
+    - パスワード変更
 - アカウント管理
   - phpldapadmin
     - メールアドレス追加/削除/停止
@@ -32,9 +34,8 @@
 - 他
   - Thunderbird の autoconfig 対応
   - メールアーカイブ機能
-  - マルチドメイン対応
   - MTA-STS に対応
-  - SMTP/POP/IMAP への辞書アタックを拒否する機能
+  - マルチドメイン対応
 # セットアップ手順
 ## 1. APIキーの登録
 ## 2. メールアドレス用ドメインの追加
@@ -43,16 +44,15 @@
 ```
 下記は example.com をドメインとした場合の例です
 ```
-- "アーカイブ選択" で CentOS 8.x 又は CentOS Stream 8 を選択
+- "アーカイブ選択" で RHEL 8互換のアーカイブを選択 (CentOS 8.x 又は CentOS Stream 8 など)
 - "ホスト名" はドメインを省いたものを入力してください (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
-- "配置するスタートアップスクリプト"で MailSystem for CentOS Stream を選択
+- "配置するスタートアップスクリプト"で MailSystem を選択
 - "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを1行に1つ入力
 ![create02](https://user-images.githubusercontent.com/7104966/30677401-8a5291a2-9ec6-11e7-8219-dfec28f7bf90.png)
 - "APIキー" を選択 (DNSのレコード登録に使用します)
 - "メールアーカイブを有効にする" 場合は チェックしてください
-- "cockpitを有効にする" 場合は チェックしてください
-- "dnf updateを実行する" 場合は チェックしてください
+- "cockpitを有効にする" 場合は チェックしてください (389-dsのcockpit pluginもインストールします)
 - "セットアップ完了メールを送信する宛先" に、メールを受信できるアドレスを入力
 ![create03](https://user-images.githubusercontent.com/7104966/30677427-a4594988-9ec6-11e7-9f40-506e31c2e707.png)
 - 必要な項目を入力したら作成
@@ -173,14 +173,12 @@ user03@example.com: ***********
   - メールフィルタ設定
   - メール転送設定
 - phpldapadmin
-  - メールドメイン管理
   - メールアカウント管理
 - certbot
   - TLS対応(Lets Encrypt)
 - cockpit
-  - サーバ管理ツール
-- thunderbird の autoconfig設定
-  - Thunderbird へのアカウント登録簡略化
+  - サーバ管理
+- Thunderbird の autoconfig設定
 ## phpldapadminのログイン
 - ログイン後、メールアドレスの追加/削除/無効化/パスワード変更などができる
   - メールアドレスの追加は、既存のユーザのレコードをコピーし、固有なIDのみ変更すること
@@ -205,6 +203,7 @@ user03@example.com: ***********
     - archive用のメールボックスのみ cron で 受信日時から1年経過したメールを自動で削除する
 - マルチドメイン設定方法
     - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
+    - MTA-STSの対応は1つ目のドメインのみ
 - 各種OSSの設定、操作方法についてはOSSの公式のドキュメントをご参照ください
 
 ## コマンドでのメールアドレスの管理
