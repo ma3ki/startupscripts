@@ -138,13 +138,13 @@ $whitelist = [
 ];
 
 // check whitelist
+$clientip = $env['client'] ;
 if ( ! preg_grep("/^$clientip$/", $whitelist) ) {
   $redis = new Redis();
   try {
     $redis->connect('127.0.0.1', 6379);
 
     $key = $protomap[$env['port']] . ":" . $env['client'] ;
-    $clientip = $env['client'] ;
     $failcnt = $redis->Get($key);
     $ttl = $redis->ttl($key);
     $rejectcnt = $redis->hGet('blacklist', $key);
