@@ -28,6 +28,9 @@ cat <<_EOL_>> ${CRONFILE}
 * * * * * root chgrp nginx /var/lib/php/{opcache,session,wsdlcache} >/dev/null 2>&1
 _EOL_
 
+RESOLVER1=$(awk '/^nameserver/{print $2}' /etc/resolv.conf | head -1)
+RESOLVER2=$(awk '/^nameserver/{print $2}' /etc/resolv.conf | tail -1)
+
 #-- nginx mail proxy の設定
 cat <<_EOL_> /etc/nginx/mail.conf
 mail {
@@ -108,9 +111,6 @@ http {
 }
 include /etc/nginx/mail.conf;
 _EOL_
-
-RESOLVER1=$(awk '/^nameserver/{print $2}' /etc/resolv.conf | head -1)
-RESOLVER2=$(awk '/^nameserver/{print $2}' /etc/resolv.conf | tail -1)
 
 cat <<_EOL_> /etc/nginx/default.d/${FIRST_DOMAIN}_ssl.conf
 ssl_protocols TLSv1.2 TLSv1.3 ;

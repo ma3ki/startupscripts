@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @sacloud-name "MailSystem for CentOS Stream"
+# @sacloud-name "mailsystem"
 # @sacloud-once
 # @sacloud-tag @require-core>=1 @require-memory-gib>=2
 # @sacloud-desc-begin
