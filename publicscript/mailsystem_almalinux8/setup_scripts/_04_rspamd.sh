@@ -101,8 +101,8 @@ _EOL_
 mkdir -p ${WORKDIR}/keys
 for domain in ${DOMAIN_LIST}
 do
-  rspamadm dkim_keygen -d ${domain} -s default -b 1024 > ${WORKDIR}/keys/${domain}.keys
-  head -16 ${WORKDIR}/keys/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
+  rspamadm dkim_keygen -d ${domain} -s default -b 2048 > ${WORKDIR}/keys/${domain}.keys
+  head -28 ${WORKDIR}/keys/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
   chmod 600 /etc/rspamd/local.d/keys/default.${domain}.key
   chown _rspamd. /etc/rspamd/local.d/keys/default.${domain}.key
 done
@@ -228,7 +228,7 @@ _EOL_
 #-- dkim record 追加
 for domain in ${DOMAIN_LIST}
 do
-  record=$(cat ${WORKDIR}/keys/${domain}.keys | tr '\n' ' ' | sed -e 's/.*( "//' -e 's/".*"p=/p=/' -e 's/" ).*//')
+  record=$(cat ${WORKDIR}/keys/${domain}.keys | tr -d '[\n\t]' | sed -e 's/"//g' -e 's/.* TXT ( //' -e 's/) ; $//')
   usacloud dns record-add -y --name default._domainkey --type TXT --value "${record}" ${domain}
 done
 

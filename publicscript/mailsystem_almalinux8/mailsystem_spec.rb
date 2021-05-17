@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-services = %w(nginx mysqld postfix dovecot slapd rspamd php73-php-fpm redis)
-processes = %w(nginx mysqld master dovecot slapd rspamd clamd php-fpm redis-server)
+services = %w(nginx mysqld postfix dovecot rspamd php-fpm redis)
+processes = %w(nginx mysqld master dovecot ns-slapd rspamd clamd php-fpm redis-server)
 ports = %w(24 25 80 110 143 389 443 465 587 993 995 3306 4190 9000 11332 11334)
 logchk = 'ls /root/.sacloud-api/notes/[0-9]*.done'
 

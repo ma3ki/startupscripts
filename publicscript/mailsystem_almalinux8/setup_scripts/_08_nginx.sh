@@ -46,7 +46,7 @@ mail {
     protocol   smtp;
     starttls   on;
     xclient    on;
-    resolver   8.8.8.8 8.8.4.4;
+    resolver   ${RESOLVER1} ${RESOLVER2};
     auth_http_header PORT 587;
   }
   server {
@@ -54,7 +54,7 @@ mail {
     protocol   smtp;
     ssl        on;
     xclient    on;
-    resolver   8.8.8.8 8.8.4.4;
+    resolver   ${RESOLVER1} ${RESOLVER2};
     auth_http_header PORT 465;
   }
   server {
@@ -109,6 +109,9 @@ http {
 include /etc/nginx/mail.conf;
 _EOL_
 
+RESOLVER1=$(awk '/^nameserver/{print $2}' /etc/resolv.conf | head -1)
+RESOLVER2=$(awk '/^nameserver/{print $2}' /etc/resolv.conf | tail -1)
+
 cat <<_EOL_> /etc/nginx/default.d/${FIRST_DOMAIN}_ssl.conf
 ssl_protocols TLSv1.2 TLSv1.3 ;
 ssl_ciphers EECDH+AESGCM;
@@ -118,7 +121,7 @@ ssl_session_timeout  5m;
 ssl_certificate /etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem;
 ssl_certificate_key /etc/letsencrypt/live/${FIRST_DOMAIN}/privkey.pem;
 ssl_trusted_certificate /etc/letsencrypt/live/${FIRST_DOMAIN}/chain.pem;
-resolver 8.8.8.8 8.8.4.4 valid=300s;
+resolver ${RESOLVER1} ${RESOLVER2} valid=300s;
 resolver_timeout 10s;
 _EOL_
 
@@ -126,7 +129,6 @@ cat <<_EOL_> /etc/nginx/conf.d/http.conf
 server {
   listen ${IPADDR}:80;
   server_name _;
-#  return 301 https://\$host\$request_uri;
   return 301 https://${FIRST_DOMAIN}\$request_uri;
 }
 
@@ -197,15 +199,6 @@ server {
   }
 
 }
-_EOL_
-
-#-- mta-sts へ対応
-mkdir -p ${HTTPS_DOCROOT}/.well-known
-cat <<_EOL_> ${HTTPS_DOCROOT}/.well-known/mta-sts.txt
-version: STSv1
-mx: ${FIRST_DOMAIN}
-mode: enforce
-max_age: 10368000
 _EOL_
 
 #-- nginx-mail-proxy用の認証スクリプトを作成

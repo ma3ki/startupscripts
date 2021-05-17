@@ -4,11 +4,9 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 mkdir -p ${WORKDIR}/git
-#git clone https://github.com/breisig/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
 git clone https://github.com/leenooks/phpLDAPadmin.git ${WORKDIR}/git/phpldapadmin
 
 cd ${WORKDIR}/git/phpldapadmin
-#version=$(git tag | sort --version-sort | tail -1)
 version=1.2.6.2
 git checkout ${version}
 

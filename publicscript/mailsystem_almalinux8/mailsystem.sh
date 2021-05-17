@@ -2,24 +2,25 @@
 #
 # @sacloud-name "MailSystem for CentOS Stream"
 # @sacloud-once
-# @sacloud-desc-begin
 # @sacloud-tag @require-core>=1 @require-memory-gib>=2
-# このスクリプトはメールサーバをセットアップします
-# (このスクリプトは、CentOS8, CentOS Stream 8, AlmaLinux 8 で動作します)
+# @sacloud-desc-begin
+# さくらのクラウド上で メールサーバを 自動的にセットアップするスクリプトです。
+# このスクリプトは、AlmaLinux 8.X でのみ動作します
+# セットアップには20分程度時間がかかります。
 #
 # 事前作業として以下の2つが必要となります
-# ・さくらのクラウドDNSのゾーンに作成するメールアドレスで使用するドメインを登録していること
+# ・さくらのクラウドDNSのゾーンにメールサーバで使用するドメインを登録していること
 # ・さくらのクラウドAPIのアクセストークンを取得していること
 # 注意
-# ・ホスト名はドメインを含めないこと(例: mail)
-# ・使用するDNSゾーンはリソースレコードが未登録であること
-# ・ローカルパートが下記のメールアドレスはシステムで作成するため、入力しないこと
-#   [ admin root postmaster abuse nobody dmarc-report sts-report archive ]
+# ・ホスト名にはドメインを含めないこと(例: mail)
+# ・使用するDNSのゾーンはリソースレコードが未登録であること
+# ・ローカルパートが下記のメールアドレスはシステムで利用するため、入力しないこと
+#   [ admin root postmaster abuse nobody dmarc-report archive ]
 # ・セットアップ後、サーバを再起動します
 # ・usacloud と certbot の動作の為、ACCESS_TOKEN と ACCESS_TOKEN_SECRET をサーバに保存します
 # @sacloud-desc-end
 #
-# @sacloud-require-archive distro-centos distro-ver-8
+# @sacloud-require-archive distro-alma distro-ver-8.*
 # @sacloud-textarea required heredoc ADDR "作成するメールアドレスのリスト" ex="foo@example.com"
 # @sacloud-apikey required permission=create AK "APIキー"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
@@ -92,7 +93,7 @@ set -x
 #source config.source
 
 git clone https://github.com/ma3ki/startupscripts.git
-cd startupscripts/publicscript/mailsystem_centos8
+cd startupscripts/publicscript/mailsystem_almalinux8
 source config.source
 
 #-- 特殊タグの展開
@@ -179,7 +180,7 @@ _EOL_
 fi
 
 #-- ldap にメールアドレスを登録
-ignore_list="admin|root|postmaster|abuse|nobody|dmarc-report|sts-report|archive"
+ignore_list="admin|root|postmaster|abuse|nobody|dmarc-report|archive"
 for x in $(egrep -v "^$|^#" ${addr_list} | egrep -v "^(${ignore_list})@"| grep @ | sort | uniq)
 do
   mail_password=$(./tools/389ds_create_mailaddress.sh ${x})

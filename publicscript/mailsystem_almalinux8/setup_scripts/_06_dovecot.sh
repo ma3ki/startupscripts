@@ -14,9 +14,6 @@ deliver_log_format = from=%{from_envelope}, to=%{to_envelope}, size=%p, msgid=%m
 disable_plaintext_auth = no
 first_valid_uid = 97
 mail_location = maildir:/var/dovecot/%Ld/%Ln
-# mail_location = sdbox:/var/dovecot/%Ld/%Ln
-# mail_attachment_dir = /var/dovecot/attachments/%Ld/%Ln
-# mail_attachment_min_size = 1
 mail_plugins = \$mail_plugins zlib
 plugin {
   sieve = /var/dovecot/%Ld/%Ln/dovecot.sieve

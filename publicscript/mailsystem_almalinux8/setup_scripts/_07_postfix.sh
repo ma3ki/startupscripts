@@ -11,7 +11,7 @@ dnf remove -y postfix
 #-- 標準の postfix では ldap が使用できないため、ソースから build する
 mkdir -p ${WORKDIR}/src
 cd ${WORKDIR}/src
-VERSION=3.5.9
+VERSION=3.6.0
 curl -O http://mirror.postfix.jp/postfix-release/official/postfix-${VERSION}.tar.gz
 tar xvzf postfix-${VERSION}.tar.gz && cd postfix-${VERSION}
 
@@ -171,7 +171,6 @@ postmulti -i postfix-inbound -e enable
 postmulti -i postfix-inbound -p start
 
 #-- OS再起動時にpostfixの起動に失敗することがあるので、その対応
-#sed -i -e "s/^\(After=syslog.target network.target\)/\1 network-online.target\nWants=network-online.target/" /usr/lib/systemd/system/postfix.service
 sed -i -e "s/^After=syslog.target.*/After=syslog.target network.target NetworkManager-wait-online.service/" /usr/lib/systemd/system/postfix.service
 systemctl daemon-reload
 

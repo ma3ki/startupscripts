@@ -34,7 +34,6 @@
 - 他
   - Thunderbird の autoconfig 対応
   - メールアーカイブ機能
-  - MTA-STS に対応
   - マルチドメイン対応
 # セットアップ手順
 ## 1. APIキーの登録
@@ -44,7 +43,7 @@
 ```
 下記は example.com をドメインとした場合の例です
 ```
-- "アーカイブ選択" で RHEL 8互換のアーカイブを選択 (CentOS 8.x 又は CentOS Stream 8 など)
+- "アーカイブ選択" で AlmaLinux 8.X のアーカイブを選択
 - "ホスト名" はドメインを省いたものを入力してください (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
 - "配置するスタートアップスクリプト"で MailSystem を選択
@@ -118,8 +117,6 @@ OK: autoconfig.example.com A XX.XX.XX.XX
 OK: _dmarc.example.com TXT "v=DMARC1\; p=reject\; rua=mailto:admin@example.com"
 OK: _adsp._domainkey.example.com TXT "dkim=discardable"
 OK: default._domainkey.example.com TXT "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkviwuC8KvC6OP7HwUPQEZDA+ZnY1mRzZrCJcM4sMRhhVse7Cwy/VOldbIxGTAnsRSaLmmxcz96aiCftvctue7mzIvFscCDRm35PtAS5mvlWXRP1f2brHROLoc0rv7upliPdwNXmc7UhZ2b8/gJhSDw76nFiOiOG7/x5GkLCZLCQIDAQAB"
-OK: _mta-sts.example.com TXT "v=STSv1; id=20210225090207;"
-OK: _smtp._tls.example.com TXT "v=TLSRPTv1; rua=mailto:sts-report@example.com"
 
 -- example.com TLS Check --
 Validity:
@@ -139,7 +136,7 @@ user03@example.com: ***********
   - さくらのクラウドDNSへのレコード登録
     - A レコード (メールドメイン用、ホスト名用)
     - MX レコード
-    - TXT レコード (SPF, DKIM, DKIM-ADSP, DMARC, MTA-STS)
+    - TXT レコード (SPF, DKIM, DKIM-ADSP, DMARC)
     - CNAME レコード (Thunderbird の autoconfig用)
     - PTR レコード
 - 389 directory server
@@ -191,10 +188,10 @@ user03@example.com: ***********
 ![thunderbird](https://user-images.githubusercontent.com/7104966/30680317-d9df3d70-9ed9-11e7-8168-fffb5fa4aa9d.png)
 
 ## 補足
-- 1通のメールサイズは20MBまで、MBOXのサイズ、保存通数に制限は設定していない
+- 1通のメールサイズは最大20MBで、MBOXのサイズと保存通数に制限は設定していない
 - 転送設定の最大転送先アドレスは32アドレス
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
-    - admin, root, postmaster, abuse, nobody, dmarc-report, sts-report
+    - admin, root, postmaster, abuse, nobody, dmarc-report
 - virus メールについて
     - clamavで Virus と判定したメールは、送受信を拒否する(reject)
 - rspamd が正常に動作していない場合、postfixは tempfail を応答する
@@ -203,7 +200,7 @@ user03@example.com: ***********
     - archive用のメールボックスのみ cron で 受信日時から1年経過したメールを自動で削除する
 - マルチドメイン設定方法
     - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
-    - MTA-STSの対応は1つ目のドメインのみ
+- cockpit を有効にすることにより、389-ds のデータベースのバックアップ/リストアがWebUIから実施できます
 - 各種OSSの設定、操作方法についてはOSSの公式のドキュメントをご参照ください
 
 ## コマンドでのメールアドレスの管理
@@ -223,7 +220,6 @@ mailAlternateAddress: postmaster@example.com
 mailAlternateAddress: abuse@example.com
 mailAlternateAddress: nobody@example.com
 mailAlternateAddress: dmarc-report@example.com
-mailAlternateAddress: sts-report@example.com
 uid: admin
 
 ※)mailAlternateAddress 宛のメールが mailRoutingAddress のMBOXに配送される
@@ -244,5 +240,4 @@ newsuperior: ou=Termed,dc=example,dc=com
 
 ・メールアドレス追加 (作成したメールアドレスのパスワードが出力されます)
 # /root/.sacloud-api/notes/cloud-startupscripts/publicscript/mailsystem/tools/389ds_create_mailaddress.sh adduser@example.com
-
 ```
