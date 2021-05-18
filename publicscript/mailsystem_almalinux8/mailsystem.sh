@@ -17,6 +17,7 @@
 # ・ローカルパートが下記のメールアドレスはシステムで利用するため、入力しないこと
 #   [ admin root postmaster abuse nobody dmarc-report archive ]
 # ・セットアップ後、サーバを再起動します
+# ・cockpit を有効にする場合、管理ユーザのパスワード を必ず設定してください。(設定しないとパスワードなしで rootログインできてしまいます)
 # ・usacloud と certbot の動作の為、ACCESS_TOKEN と ACCESS_TOKEN_SECRET をサーバに保存します
 # @sacloud-desc-end
 #
@@ -212,6 +213,7 @@ PASSWORD  : ${rpassword}
 LOGIN URL : https://${first_domain}/roundcube
 
 $(cat cockpit.txt)
+
 $(./tools/check_mailsystem.sh 2>&1)
 
 -- Mail Address and Password --
