@@ -37,32 +37,28 @@
   - マルチドメイン対応
 # セットアップ手順
 ## 1. APIキーの登録
+- アクセスレベルが 作成・削除 のAPIキーを用意
 ## 2. メールアドレス用ドメインの追加
-- グローバル DNS に ゾーンを追加
+- グローバルリソースの DNS に ゾーンを追加
 ## 3. サーバの作成
 ```
 下記は example.com をドメインとした場合の例です
 ```
-- "アーカイブ選択" で AlmaLinux 8.X のアーカイブを選択
+- "アーカイブ選択" で 対応OS のアーカイブを選択
 - "ホスト名" はドメインを省いたものを入力してください (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
 - "配置するスタートアップスクリプト"で MailSystem を選択
 - "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを1行に1つ入力
-![create02](https://user-images.githubusercontent.com/7104966/30677401-8a5291a2-9ec6-11e7-8219-dfec28f7bf90.png)
 - "APIキー" を選択 (DNSのレコード登録に使用します)
 - "メールアーカイブを有効にする" 場合は チェックしてください
 - "cockpitを有効にする" 場合は チェックしてください (389-dsのcockpit pluginもインストールします)
 - "セットアップ完了メールを送信する宛先" に、メールを受信できるアドレスを入力
-![create03](https://user-images.githubusercontent.com/7104966/30677427-a4594988-9ec6-11e7-9f40-506e31c2e707.png)
 - 必要な項目を入力したら作成
 ## 4. セットアップ完了メール の確認
 - セットアップ完了後に、セットアップ情報を記述したメールが届きます
 - メールが届かない場合は、サーバにログインしインストールログを確認してください
 
 ```
-SETUP START : Tue Sep 12 01:34:13 JST 2017
-SETUP END   : Tue Sep 12 01:50:08 JST 2017
-
 -- Mail Server Domain --
 smtp server : example.com
 pop  server : example.com
@@ -84,18 +80,18 @@ LOGIN URL : https://example.com/roundcube
 LOGIN URL : https://example.com/cockpit
 
 -- Application Version --
-os: CentOS Stream release 8
-389ds: 1.4.3.17
+os: AlmaLinux release 8.3 (Purple Manul)
+389ds: 1.4.3.22
 dovecot: 2.3.8
-clamd: 0.103.0
+clamd: 0.103.2
 rspamd: 2.7
 redis: 5.0.3
-postfix: 3.5.9
+postfix: 3.6.0
 mysql: 8.0.21
 php-fpm: 7.2.24
 nginx: 1.14.1
 roundcube: 1.4.11
-phpldapadmin: 1.2.3
+phpldapadmin: 1.2.6.2
 
 -- Process Check --
 OK: ns-slapd
@@ -120,8 +116,8 @@ OK: default._domainkey.example.com TXT "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEB
 
 -- example.com TLS Check --
 Validity:
- Not Before: Feb 24 23:04:05 2021 GMT
- Not After : May 25 23:04:05 2021 GMT
+ Not Before: May 17 22:28:59 2021 GMT
+ Not After : Aug 15 22:28:59 2021 GMT
 Subject Alternative Name:
  DNS:*.example.com, DNS:example.com
 
@@ -170,74 +166,39 @@ user03@example.com: ***********
   - メールフィルタ設定
   - メール転送設定
 - phpldapadmin
-  - メールアカウント管理
+  - ldapの管理
 - certbot
   - TLS対応(Lets Encrypt)
 - cockpit
   - サーバ管理
 - Thunderbird の autoconfig設定
-## phpldapadminのログイン
-- ログイン後、メールアドレスの追加/削除/無効化/パスワード変更などができる
-  - メールアドレスの追加は、既存のユーザのレコードをコピーし、固有なIDのみ変更すること
-
-![phpldapadmin](https://user-images.githubusercontent.com/7104966/30680400-580b6066-9eda-11e7-9c0d-d4c721fefb64.png)
-
-## ThunderBirdへのアカウント追加
-- autoconfigによりメールアドレスとパスワードの入力だけで設定が完了する
-
-![thunderbird](https://user-images.githubusercontent.com/7104966/30680317-d9df3d70-9ed9-11e7-8168-fffb5fa4aa9d.png)
-
 ## 補足
 - 1通のメールサイズは最大20MBで、MBOXのサイズと保存通数に制限は設定していない
 - 転送設定の最大転送先アドレスは32アドレス
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
-    - admin, root, postmaster, abuse, nobody, dmarc-report
+  - admin, root, postmaster, abuse, nobody, dmarc-report
 - virus メールについて
-    - clamavで Virus と判定したメールは、送受信を拒否する(reject)
+  - clamavで Virus と判定したメールは、送受信を拒否する(reject)
 - rspamd が正常に動作していない場合、postfixは tempfail を応答する
 - メールアーカイブ機能
-    - メールアーカイブを有効にすると、全てのユーザの送信/受信メールがarchive用のアドレスに複製配送(bcc)される
-    - archive用のメールボックスのみ cron で 受信日時から1年経過したメールを自動で削除する
+  - メールアーカイブを有効にすると、全てのユーザの送信/受信メールがarchive用のアドレスに複製配送(bcc)される
+  - archive用のメールボックスのみ cron で 受信日時から1年経過したメールを自動で削除する
 - マルチドメイン設定方法
-    - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
-- cockpit を有効にすることにより、389-ds のデータベースのバックアップ/リストアがWebUIから実施できます
+  - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
+- メールアドレスの無効化
+  - ldap の ou 属性を People から Termed に変更することで メールアドレスを無効にできる 
+- ldap のバックアップ/リストア
+  - cockpit を有効にすることにより、389-ds のデータベースのバックアップ/リストアがWebUIから実施できる
 - 各種OSSの設定、操作方法についてはOSSの公式のドキュメントをご参照ください
 
-## コマンドでのメールアドレスの管理
-
+## コマンドでの操作
 ```
-・メールアドレスの確認
-# ldapsearch -x mailroutingaddress=admin@example.com
-objectClass: mailRecipient
-objectClass: top
-mailMessageStore: 127.0.0.1
-mailHost: 127.0.0.1
-mailAccessDomain: example.com
-mailRoutingAddress: admin@example.com
-mailAlternateAddress: admin@example.com
-mailAlternateAddress: root@example.com
-mailAlternateAddress: postmaster@example.com
-mailAlternateAddress: abuse@example.com
-mailAlternateAddress: nobody@example.com
-mailAlternateAddress: dmarc-report@example.com
-uid: admin
-
-※)mailAlternateAddress 宛のメールが mailRoutingAddress のMBOXに配送される
-※)nginx は mailHost に SMTP を Proxy する
-※)nginx は mailMessageStore に POP/IMAP を Proxy する
-※)postfix-inbound は mailMessageStore に LMTP で配送をする
-
-・パスワード変更: archive@example.com のパスワードを xxxxxx に変更する(******は ROOT_DNのパスワード)
-# ldappasswd -x -D "cn=manager" -w ****** -s xxxxxx "uid=archive,ou=People,dc=example,dc=com"
-
-・メールアドレス無効化: foobar@example.com の ou を People から Termed に変更する
-ldapmodify -D cn=manager -W
-dn: uid=foobar,ou=People,dc=example,dc=com
-changetype: modrdn
-newrdn: uid=foobar
-deleteoldrdn: 0
-newsuperior: ou=Termed,dc=example,dc=com
-
 ・メールアドレス追加 (作成したメールアドレスのパスワードが出力されます)
 # /root/.sacloud-api/notes/cloud-startupscripts/publicscript/mailsystem/tools/389ds_create_mailaddress.sh adduser@example.com
+
+・外部向けメールキューの確認
+# mailq
+
+・内部向けメールキューの確認
+# postqueue -p -c /etc/postfix-inbound/
 ```
