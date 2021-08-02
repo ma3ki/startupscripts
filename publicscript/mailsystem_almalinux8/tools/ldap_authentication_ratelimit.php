@@ -26,7 +26,7 @@ function _ldapauth($server,$port,$dn,$passwd) {
   }
 }
 
-function _mail_proxy($server,$port,$base,$filter,$attribute,$proxyport) {
+function _mail_proxy($server,$port,$base,$filter,$attribute,$proxyport,$user) {
   $message = "" ;
   $proxyhost = _ldapsearch($server, $port, $base, $filter, $attribute);
 
@@ -44,6 +44,7 @@ function _mail_proxy($server,$port,$base,$filter,$attribute,$proxyport) {
     header('Auth-Status: OK');
     header("Auth-Server: $proxyip");
     header("Auth-Port: $proxyport");
+    header("Auth-User: $user");
   }
   return $message ;
 }
@@ -97,7 +98,7 @@ $ldap = array(
   "host" => "127.0.0.1",
   "port" => 389,
   "basedn" => "",
-  "filter" => "(mailRoutingAddress=" . $env['user'] . ")",
+  "filter" => "(mailAlternateAddress=" . $env['user'] . ")",
   "attribute" => "mailmessagestore",
   "dn" => "",
   "passwd" => "",
@@ -112,7 +113,12 @@ foreach (preg_split("/\./", $spmra[1]) as $value) {
 }
 $tmpdn = preg_split('/,$/',$ldap['dn']);
 $ldap['basedn'] = $tmpdn[0];
-$ldap['dn'] = 'uid=' . $spmra[0] . ',ou=People,' . $ldap['basedn'];
+
+// mailAlternateAddress で認証する場合のコード
+$spmra[0] = _ldapsearch($ldap['host'], $ldap['port'], $ldap['basedn'], $ldap['filter'], "uid");
+$authuser = $spmra[0] . '@' . $spmra[1];
+
+$ldap['dn'] = 'uid=' . $spmra[0] . ',ou=People,' . $tmpdn[0];
 
 // set search attribute
 if ($env['proto'] === 'smtp' ) {
@@ -120,7 +126,11 @@ if ($env['proto'] === 'smtp' ) {
 }
 
 // set log
-$log = sprintf('meth=%s, user=%s, client=%s, proto=%s', $env['meth'], $env['user'], $env['client'], $protomap[$env['port']]);
+if ($env['user'] === $authuser ) {
+  $log = sprintf('meth=%s, user=%s, client=%s, proto=%s', $env['meth'], $env['user'], $env['client'], $protomap[$env['port']]);
+} else {
+  $log = sprintf('meth=%s, user=%s, alias=%s, client=%s, proto=%s', $env['meth'], $authuser, $env['user'], $env['client'], $protomap[$env['port']]);
+}
 
 // set password
 $ldap['passwd'] = urldecode($env['passwd']);
@@ -168,13 +178,12 @@ if (_ldapauth($ldap['host'], $ldap['port'], $ldap['dn'], $ldap['passwd'])) {
   // authentication successful
   $log = sprintf('auth=successful, %s', $log);
   $proxyport = $portmap[$env['proto']];
-  $result = _mail_proxy($ldap['host'], $ldap['port'], $ldap['basedn'], $ldap['filter'], $ldap['attribute'], $proxyport);
+  $result = _mail_proxy($ldap['host'], $ldap['port'], $ldap['basedn'], $ldap['filter'], $ldap['attribute'], $proxyport, $authuser);
   $log = sprintf('%s, %s', $log, $result);
 } else {
   // authentication failure
   // $log = sprintf('auth=failure, %s', $log);
   $log = sprintf('auth=failure, %s, passwd=%s', $log, $ldap['passwd']);
-
   // check whitelist
   if ( ! preg_grep("/^$clientip$/", $whitelist) ) {
     // set failcnt to redis
