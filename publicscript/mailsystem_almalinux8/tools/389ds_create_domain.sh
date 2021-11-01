@@ -24,7 +24,7 @@ then
 	replace: nsslapd-sizelimit
 	nsslapd-sizelimit: -1
 	_EOL_
-	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/config.ldif
+	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/config.ldif
 
 	cat <<-_EOL_>> ${WORKDIR}/ldap/limit.ldif
 	dn: cn=config,cn=ldbm database,cn=plugins,cn=config
@@ -32,7 +32,7 @@ then
 	replace: nsslapd-lookthroughlimit
 	nsslapd-lookthroughlimit: -1
 	_EOL_
-	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/limit.ldif
+	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/limit.ldif
 fi
 
 for domain in ${DOMAIN_LIST}
@@ -112,7 +112,7 @@ do
 	aci: (targetattr="UserPassword")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "2"; allow(compare) userdn="ldap:///anyone";)
 	aci: (targetattr!="UserPassword")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "3"; allow(search,read) userdn="ldap:///anyone";)
 	_EOL_
-	ldapmodify -D ${ROOT_DN} -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_acl.ldif
+	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_acl.ldif
 
 done
 
