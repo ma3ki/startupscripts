@@ -10,6 +10,10 @@ cd ${WORKDIR}/git/phpldapadmin
 version=1.2.6.2
 git checkout ${version}
 
+#-- ssha512 対応
+git fetch origin pull/139/head:add_support_password
+git checkout add_support_password
+
 cp -pr ${WORKDIR}/git/phpldapadmin ${HTTPS_DOCROOT}/phpldapadmin-${version}
 ln -s ${HTTPS_DOCROOT}/phpldapadmin-${version} ${HTTPS_DOCROOT}/phpldapadmin
 cp -p ${HTTPS_DOCROOT}/phpldapadmin/config/config.php{.example,}

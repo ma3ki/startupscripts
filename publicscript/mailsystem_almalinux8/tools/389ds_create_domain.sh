@@ -23,6 +23,10 @@ then
 	changetype: modify
 	replace: nsslapd-sizelimit
 	nsslapd-sizelimit: -1
+
+	changetype: modify
+	replace: passwordStorageScheme
+	passwordStorageScheme: SSHA512
 	_EOL_
 	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/config.ldif
 
@@ -59,6 +63,26 @@ do
 		if [ $(dsconf localhost backend suffix list | fgrep -ci "(userroot${count})") -eq 0 ]
 		then
 			dsconf localhost backend create --suffix ${base} --be-name userRoot${count}
+
+			cat <<-_EOL_>> ${WORKDIR}/ldap/create_index.ldif
+			dn: cn=mailRoutingAddress,cn=index,cn=userRoot${count},cn=ldbm database,cn=plugins,cn=config
+			changetype: add
+			objectClass:top
+			objectClass:nsIndex
+			cn:mailRoutingAddress
+			nsSystemIndex:false
+			nsIndexType:eq
+
+			dn: cn=mailRoutingAddress,cn=index,cn=tasks,cn=config
+			changetype: add
+			objectclass: top
+			objectclass: extensibleObject
+			cn: mailRoutingAddress
+			nsInstance: userRoot${count}
+			nsIndexAttribute: mailRoutingAddress:eq
+			_EOL_
+        		ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/add_index.ldif
+
 			break
 		else
 			count=$(expr ${count} + 1)
@@ -66,7 +90,8 @@ do
 	done
 
 	people="ou=People,${base}"
-	termed=$(echo ${people} | sed 's/ou=People/ou=Termed/')
+#	termed=$(echo ${people} | sed 's/ou=People/ou=Termed/')
+	termed="ou=Termed,${base}"
 
 	cat <<-_EOL_>>${WORKDIR}/ldap/${domain}.ldif
 	dn: ${people}
