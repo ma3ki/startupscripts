@@ -117,6 +117,9 @@ $ldap['basedn'] = $tmpdn[0];
 // mailAlternateAddress で認証する場合のコード
 $spmra[0] = _ldapsearch($ldap['host'], $ldap['port'], $ldap['basedn'], $ldap['filter'], "uid");
 $authuser = $spmra[0] . '@' . $spmra[1];
+if ($spmra[0] === '') {
+  $authuser = 'NotFound' ;
+}
 
 $ldap['dn'] = 'uid=' . $spmra[0] . ',ou=People,' . $tmpdn[0];
 
@@ -127,9 +130,9 @@ if ($env['proto'] === 'smtp' ) {
 
 // set log
 if ($env['user'] === $authuser ) {
-  $log = sprintf('meth=%s, user=%s, client=%s, proto=%s', $env['meth'], $env['user'], $env['client'], $protomap[$env['port']]);
+  $log = sprintf('meth=%s, userid=%s, client=%s, proto=%s', $env['meth'], $env['user'], $env['client'], $protomap[$env['port']]);
 } else {
-  $log = sprintf('meth=%s, user=%s, alias=%s, client=%s, proto=%s', $env['meth'], $authuser, $env['user'], $env['client'], $protomap[$env['port']]);
+  $log = sprintf('meth=%s, authid=%s, userid=%s, client=%s, proto=%s', $env['meth'], $env['user'], $authuser, $env['client'], $protomap[$env['port']]);
 }
 
 // set password
@@ -138,7 +141,7 @@ $ldap['passwd'] = urldecode($env['passwd']);
 // set ratelimit
 $max_failcnt = 3 ;
 $max_rejectcnt = 3 ;
-$expire_time = 120 ;
+$expire_time = 320 ;
 $reject_time = 600 ;
 $max_reject_time = 86400 ;
 

@@ -99,8 +99,9 @@ done
 
 tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldaptransport${x}.cf "; done)
 postconf -c /etc/postfix-inbound -e transport_maps="${tmpcf}"
-tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldapvirtualalias${x}.cf "; done)
-postconf -c /etc/postfix-inbound -e virtual_alias_maps="${tmpcf}"
+tmpcf1=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldapvirtualalias${x}.cf "; done)
+tmpcf2=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldapvirtualgroup${x}.cf "; done)
+postconf -c /etc/postfix-inbound -e virtual_alias_maps="${tmpcf1} ${tmpcf2}"
 tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldaprcptcheck${x}.cf "; done)
 postconf -c /etc/postfix-inbound -e smtpd_recipient_restrictions="check_recipient_access ${tmpcf} reject"
 tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix/ldapsendercheck${x}.cf "; done)
@@ -139,8 +140,29 @@ do
 	${sb}
 	_EOL_
 
-	cp /etc/postfix-inbound/ldaprcptcheck${x}.cf /etc/postfix-inbound/ldapvirtualalias${x}.cf
-	sed -i 's/result_format = OK/result_format = %s/' /etc/postfix-inbound/ldapvirtualalias${x}.cf
+	cat <<-_EOL_>/etc/postfix-inbound/ldapvirtualalias${x}.cf
+	server_host = ${LDAP_SERVER}
+	bind = no
+	version = 3
+	scope = sub
+	timeout = 15
+	query_filter = (&(objectClass=mailRecipient)(mailAlternateAddress=%s)(!(mailForwardingAddress=*)))
+	result_attribute = mailRoutingAddress
+	result_format = %s
+	${sb}
+	_EOL_
+
+	cat <<-_EOL_>/etc/postfix-inbound/ldapvirtualgroup${x}.cf
+	server_host = ${LDAP_SERVER}
+	bind = no
+	version = 3
+	scope = sub
+	timeout = 15
+	query_filter = (&(objectClass=mailRecipient)(mailRoutingAddress=%s)(mailForwardingAddress=*))
+	result_attribute = mailRoutingAddress, mailForwardingAddress
+	result_format = %s
+	${sb}
+	_EOL_
 
 	cat <<-_EOL_>/etc/postfix/ldapsendercheck${x}.cf
 	server_host = ${LDAP_SERVER}
