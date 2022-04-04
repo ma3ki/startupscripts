@@ -14,7 +14,7 @@ deliver_log_format = from=%{from_envelope}, to=%{to_envelope}, size=%p, msgid=%m
 disable_plaintext_auth = no
 first_valid_uid = 97
 mail_location = maildir:/var/dovecot/%Ld/%Ln
-mail_plugins = \$mail_plugins zlib
+mail_plugins = \$mail_plugins zlib quota
 plugin {
   sieve = /var/dovecot/%Ld/%Ln/dovecot.sieve
   sieve_extensions = +notify +imapflags +editheader +vacation-seconds
@@ -26,6 +26,13 @@ plugin {
   sieve_vacation_max_period = 60d
   zlib_save = bz2
   zlib_save_level = 5
+  quota = count:User quota
+  quota_rule = *:storage=3G
+  quota_vsizes = yes
+  quota_grace = 5%%
+  quota_status_success = DUNNO
+  quota_status_nouser = DUNNO
+  quota_status_overquota = "552 5.2.2 Mailbox is full"
 }
 protocols = imap pop3 lmtp sieve
 service imap-login {
@@ -49,25 +56,38 @@ service managesieve-login {
     address = ${DOVECOT_SERVER}
   }
 }
+service quota-status {
+  executable = quota-status -p postfix
+  inet_listener {
+    port = 12340
+  }
+  client_limit = 1
+}
 protocol lmtp {
   mail_plugins = \$mail_plugins sieve
 }
 protocol imap {
+  mail_plugins = \$mail_plugins imap_quota
   mail_max_userip_connections = 20
+}
+protocol \!indexer-worker {
+  mail_vsize_bg_after_count = 100
 }
 ssl = no
 ssl_cert =
 ssl_key =
 lmtp_save_to_detail_mailbox = yes
 lda_mailbox_autocreate = yes
+lda_mailbox_autosubscribe = yes
+mailbox_list_index = yes
 passdb {
   driver = static
   args = nopassword=y
 }
-userdb {
-  args = uid=dovecot gid=dovecot home=/var/dovecot/%Ld/%Ln allow_all_users=yes
-  driver = static
-}
+# userdb {
+#   args = uid=dovecot gid=dovecot home=/var/dovecot/%Ld/%Ln allow_all_users=yes
+#   driver = static
+# }
 _EOL_
 
 cnt=1
@@ -98,7 +118,8 @@ user_attrs = \
   =uid=dovecot, \
   =gid=dovecot, \
   =mail=maildir:/var/dovecot/%Ld/%Ln, \
-  =home=/var/dovecot/%Ld/%Ln
+  =home=/var/dovecot/%Ld/%Ln, \
+  mailQuota=quota_rule=*:bytes=%\$
 user_filter = (mailRoutingAddress=%u)
 iterate_attrs = mailRoutingAddress=user
 iterate_filter = (mailRoutingAddress=*)

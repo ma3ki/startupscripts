@@ -47,6 +47,7 @@ mailMessageStore: ${STORE_SERVER}
 mailHost: ${OUTBOUND_MTA_SERVER}
 mailRoutingAddress: ${account}@${domain}
 mailAlternateAddress: ${account}@${domain}
+mailQuota: ${QUOTA}
 
 _EOL_
 ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_${account}.ldif >/dev/null

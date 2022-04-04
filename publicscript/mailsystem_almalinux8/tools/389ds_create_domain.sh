@@ -111,6 +111,7 @@ do
 	mailAccessDomain: ${domain}
 	mailRoutingAddress: ${account}@${domain}
 	mailAlternateAddress: ${account}@${domain}
+        mailQuota: ${QUOTA}
 	_EOL_
 
 	for alt in ${ADMINS}

@@ -11,7 +11,7 @@ dnf remove -y postfix
 #-- 標準の postfix では ldap が使用できないため、ソースから build する
 mkdir -p ${WORKDIR}/src
 cd ${WORKDIR}/src
-VERSION=3.6.0
+VERSION=3.7.0
 curl -O http://mirror.postfix.jp/postfix-release/official/postfix-${VERSION}.tar.gz
 tar xvzf postfix-${VERSION}.tar.gz && cd postfix-${VERSION}
 
@@ -103,7 +103,7 @@ tmpcf1=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "lda
 tmpcf2=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldapvirtualgroup${x}.cf "; done)
 postconf -c /etc/postfix-inbound -e virtual_alias_maps="${tmpcf1} ${tmpcf2}"
 tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix-inbound/ldaprcptcheck${x}.cf "; done)
-postconf -c /etc/postfix-inbound -e smtpd_recipient_restrictions="check_recipient_access ${tmpcf} reject"
+postconf -c /etc/postfix-inbound -e smtpd_recipient_restrictions="check_policy_service inet:${STORE_SERVER}:12340 check_recipient_access ${tmpcf} reject"
 tmpcf=$(for x in $(seq ${MIN_DOMAIN_LEVEL} ${MAX_DOMAIN_LEVEL}); do printf "ldap:/etc/postfix/ldapsendercheck${x}.cf "; done)
 postconf -c /etc/postfix -e smtpd_sender_login_maps="${tmpcf}"
 

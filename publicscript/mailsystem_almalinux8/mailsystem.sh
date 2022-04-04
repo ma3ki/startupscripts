@@ -5,7 +5,7 @@
 # @sacloud-tag @require-core>=1 @require-memory-gib>=2
 # @sacloud-desc-begin
 # さくらのクラウド上で メールサーバを 自動的にセットアップするスクリプトです。
-# このスクリプトは、AlmaLinux 8.X でのみ動作します
+# このスクリプトは、RockyLinux 8.X でのみ動作します
 # セットアップには20分程度時間がかかります。
 #
 # 事前作業として以下の2つが必要となります
@@ -21,7 +21,7 @@
 # ・usacloud と certbot の動作の為、ACCESS_TOKEN と ACCESS_TOKEN_SECRET をサーバに保存します
 # @sacloud-desc-end
 #
-# @sacloud-require-archive distro-alma distro-ver-8.*
+# @sacloud-require-archive distro-rocky distro-ver-8.*
 # @sacloud-textarea required heredoc ADDR "作成するメールアドレスのリスト" ex="foo@example.com"
 # @sacloud-apikey required permission=create AK "APIキー"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
