@@ -64,7 +64,7 @@ do
 		then
 			dsconf localhost backend create --suffix ${base} --be-name userRoot${count}
 
-			cat <<-_EOL_>> ${WORKDIR}/ldap/create_index.ldif
+			cat <<-_EOL_> ${WORKDIR}/ldap/create_index${count}.ldif
 			dn: cn=mailRoutingAddress,cn=index,cn=userRoot${count},cn=ldbm database,cn=plugins,cn=config
 			changetype: add
 			objectClass:top
@@ -81,7 +81,7 @@ do
 			nsInstance: userRoot${count}
 			nsIndexAttribute: mailRoutingAddress:eq
 			_EOL_
-        		ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/create_index.ldif
+        		ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/create_index${count}.ldif
 
 			break
 		else
