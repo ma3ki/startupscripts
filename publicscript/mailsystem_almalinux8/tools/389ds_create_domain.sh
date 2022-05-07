@@ -81,7 +81,7 @@ do
 			nsInstance: userRoot${count}
 			nsIndexAttribute: mailRoutingAddress:eq
 			_EOL_
-        		ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/add_index.ldif
+        		ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/create_index.ldif
 
 			break
 		else
