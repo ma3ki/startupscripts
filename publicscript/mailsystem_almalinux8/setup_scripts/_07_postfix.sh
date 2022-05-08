@@ -11,7 +11,7 @@ dnf remove -y postfix
 #-- 標準の postfix では ldap が使用できないため、ソースから build する
 mkdir -p ${WORKDIR}/src
 cd ${WORKDIR}/src
-VERSION=3.7.0
+VERSION=3.7.2
 curl -O http://mirror.postfix.jp/postfix-release/official/postfix-${VERSION}.tar.gz
 tar xvzf postfix-${VERSION}.tar.gz && cd postfix-${VERSION}
 
