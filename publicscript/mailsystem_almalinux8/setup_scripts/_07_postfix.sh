@@ -4,7 +4,7 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 #-- 必要なパッケージのインストール
-dnf install -y postfix {cyrus-sasl,openldap,pcre,libdb,libnsl2,mysql,openssl}-devel cyrus-sasl-plain
+dnf install -y postfix {cyrus-sasl,openldap,pcre,libdb,libnsl2,mysql,openssl}-devel cyrus-sasl-plain make
 grep -v ExecStartPre= /usr/lib/systemd/system/postfix.service > /var/tmp/postfix.service
 dnf remove -y postfix
 
