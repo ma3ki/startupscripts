@@ -13,6 +13,7 @@ dnf config-manager --set-enabled powertools
 
 #-- selinux 無効化
 sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+setenforce 0
 
 #-- certbot で使用する token と secret
 cat <<_EOL_> ~/.sakura
