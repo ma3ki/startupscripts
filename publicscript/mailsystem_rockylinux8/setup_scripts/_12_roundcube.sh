@@ -5,7 +5,7 @@ echo "---- $0 ----"
 
 git clone https://github.com/roundcube/roundcubemail.git ${WORKDIR}/git/roundcubemail
 cd ${WORKDIR}/git/roundcubemail
-base_version=1.4
+base_version=1.5
 version=$(git tag | grep "^${base_version}" | sort --version-sort | tail -1)
 
 git checkout ${version}
