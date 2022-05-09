@@ -230,6 +230,6 @@ for domain in ${DOMAIN_LIST}
 do
   record=$(cat ${WORKDIR}/keys/${domain}.keys | tr -d '[\n\t]' | sed -e 's/"//g' -e 's/.* TXT ( //' -e 's/) ; $//')
   echo "DKIM RECORD を追加してください"
-  echo "default._domainkey.${domain} TXT "${record}"
+  echo "default._domainkey.${domain} TXT ${record}"
 done
 
