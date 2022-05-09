@@ -1,0 +1,36 @@
+HOST=dummy
+MXHOST=dummy
+IPADDR=dummy
+IPV6ADDR=dummy
+SACLOUD_APIKEY_ACCESS_TOKEN=dummy
+SACLOUD_APIKEY_ACCESS_TOKEN_SECRET=dummy
+### domain
+DOMAIN_LIST=example.com
+FIRST_DOMAIN=example.com
+FIRST_ADDRESS=test@example.com
+MIN_DOMAIN_LEVEL=2
+MAX_DOMAIN_LEVEL=4
+### ldap
+ROOT_DN="cn=manager"
+ROOT_PASSWORD=dummy
+LDAP_MASTER=127.0.0.1
+LDAP_SERVER=127.0.0.1
+### mail
+ADMINS=" admin root postmaster abuse nobody dmarc-report "
+DOVECOT_SERVER=127.0.0.1
+LMTP_PORT=24
+XAUTH_HOST=127.0.0.1
+OUTBOUND_MTA_SERVER=127.0.0.1
+STORE_SERVER=127.0.0.1
+REDIS_SERVER=127.0.0.1
+QUOTA=4294967296
+### milter
+RSPAMD_SERVER=127.0.0.1
+RSPAMD_PORT=11332
+### web
+HTTP_DOCROOT=/var/www/html/http_root
+HTTPS_DOCROOT=/var/www/html/https_root
+### working directory
+WORKDIR=/root/work
+### cron file
+CRONFILE=/etc/cron.d/ma3ki.cron
