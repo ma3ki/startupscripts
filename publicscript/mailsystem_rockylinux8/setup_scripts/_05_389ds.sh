@@ -19,6 +19,6 @@ dscreate from-file ${WORKDIR}/ldap/389ds || rm -rf /var/lib/dirsrv/slapd-localho
 systemctl enable dirsrv@localhost.service
 systemctl start dirsrv@localhost
 
-#-- ドメインの登録
-sleep 5
+#-- ドメインの登録(起動から登録まで早すぎると登録に失敗する)
+sleep 15
 sh -x $(dirname $0)/../tools/389ds_create_domain.sh
