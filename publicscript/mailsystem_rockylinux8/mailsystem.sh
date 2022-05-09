@@ -94,7 +94,7 @@ set -x
 #source config.source
 
 git clone https://github.com/ma3ki/startupscripts.git
-cd startupscripts/publicscript/mailsystem_almalinux8
+cd startupscripts/publicscript/mailsystem_rockylinux8
 source config.source
 
 #-- 特殊タグの展開
