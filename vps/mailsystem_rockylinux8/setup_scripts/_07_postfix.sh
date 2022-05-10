@@ -66,7 +66,7 @@ postconf -c /etc/postfix-inbound -e lmtp_destination_concurrency_limit=40
 for cf in /etc/postfix /etc/postfix-inbound
 do
   postconf -c ${cf} -e alias_maps=hash:/etc/aliases
-  postconf -c ${cf} -e inet_protocols=ipv4
+  postconf -c ${cf} -e inet_protocols=all
   postconf -c ${cf} -e milter_default_action=tempfail
   postconf -c ${cf} -e milter_protocol=6
   postconf -c ${cf} -e milter_command_timeout=15s
