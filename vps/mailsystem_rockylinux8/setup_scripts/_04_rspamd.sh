@@ -58,9 +58,6 @@ clamav {
 }
 _EOL_
 
-usermod -aG clamscan _rspamd
-usermod -aG virusgroup _rspamd
-
 cat <<'_EOL_'> /etc/rspamd/local.d/url_reputation.conf
 enabled = true;
 
