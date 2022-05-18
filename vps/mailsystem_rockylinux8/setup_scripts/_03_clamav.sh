@@ -23,7 +23,9 @@ LogSyslog yes
 PidFile /var/run/clamd.scan/clamd.pid
 TemporaryDirectory /var/tmp
 DatabaseDirectory /var/lib/clamav
-LocalSocket /var/run/clamd.scan/clamd.sock
+# LocalSocket /var/run/clamd.scan/clamd.sock
+TCPSocket 3310
+TCPAddr ${PRIVATEIP}
 FixStaleSocket yes
 MaxConnectionQueueLength 30
 MaxThreads 50

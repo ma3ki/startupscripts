@@ -39,6 +39,25 @@ then
 	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/limit.ldif
 fi
 
+domain=postfix.domains
+sysbase=$(echo ${domain} | sed -e 's/\(^\|\.\)/,dc=/g' -e 's/^,//')
+if [ ! -f "${WORKDIR}/ldap/system.ldif" ]
+then
+	dc=$(echo ${domain} | awk -F\. '{print $1}')
+	if [ $(ldapsearch -h ${LDAP_MASTER} -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${sysbase}" | grep -c ^dn:) -eq 0 ]
+	then
+		cat <<-_EOL_>>${WORKDIR}/ldap/${domain}.ldif
+		dn: ${sysbase}
+		objectClass: dcObject
+		objectClass: organization
+		dc: ${dc}
+		o: ${domain}
+		
+		_EOL_
+	fi
+	ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/system.ldif.ldif
+fi
+
 for domain in ${DOMAIN_LIST}
 do
 	account=$(echo ${ADMINS} | awk '{print $1}')
@@ -140,5 +159,12 @@ do
 	_EOL_
 	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_acl.ldif
 
+	cat <<-_EOL_>> ${WORKDIR}/ldap/${domain}_add.ldif
+	dn: ${sysbase}
+	changeType: modify
+	add: registeredAddress
+	registeredAddress: ${domain}
+	_EOL_
+	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_add.ldif
 done
 

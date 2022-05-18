@@ -48,7 +48,8 @@ cat <<_EOL_> /etc/rspamd/local.d/antivirus.conf
 clamav {
   action  = "reject";
   type    = "clamav";
-  servers = "/var/run/clamd.scan/clamd.sock";
+  # servers = "/var/run/clamd.scan/clamd.sock";
+  servers = "${PRIVATEIP}:3310";
   symbol = "CLAM_VIRUS";
   patterns {
     #symbol_name = "pattern";
@@ -105,7 +106,9 @@ do
   head -28 ${WORKDIR}/keys/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
   chmod 600 /etc/rspamd/local.d/keys/default.${domain}.key
   chown _rspamd. /etc/rspamd/local.d/keys/default.${domain}.key
+  echo "${domain} /etc/rspamd/local.d/keys/default.${domain}.key" >> /etc/rspamd/local.d/dkim_paths.map
 done
+# rspamadm dkim_keygen -d ${domain} -s default --algorithm eddsa -b 2048
 
 cat <<'_EOL_'> /etc/rspamd/local.d/dkim_signing.conf
 # メーリングリストや転送の対応
@@ -115,21 +118,9 @@ sign_local = true;
 use_esld = false;
 try_fallback = true;
 
-_EOL_
+selector = "default" ;
+path_map = "/etc/rspamd/local.d/dkim_paths.map";
 
-for domain in ${DOMAIN_LIST} 
-do
-	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
-	domain {
-	  ${domain} {
-	    path = "/etc/rspamd/local.d/keys/\$selector.\$domain.key";
-	    selector = "default";
-	  }
-	}
-	_EOL_
-done
-
-cat <<_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
 #-- メーリングリストを使用しない場合
 sign_headers = '(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post';
 _EOL_
@@ -143,21 +134,9 @@ use_domain = "envelope";
 use_esld = false;
 try_fallback = true;
 
-_EOL_
+selector = "default" ;
+path_map = "/etc/rspamd/local.d/dkim_paths.map";
 
-for domain in ${DOMAIN_LIST}
-do
-	cat <<-_EOL_>> /etc/rspamd/local.d/arc.conf
-	domain {
-	  ${domain} {
-	    path = "/etc/rspamd/local.d/keys/\$selector.\$domain.key";
-	    selector = "default";
-	  }
-	}
-	_EOL_
-done
-
-cat <<_EOL_>> /etc/rspamd/local.d/arc.conf
 #-- メーリングリストを使用しない場合
 sign_headers = "(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post:dkim-signature";
 _EOL_

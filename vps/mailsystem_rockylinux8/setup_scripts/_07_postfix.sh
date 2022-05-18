@@ -31,8 +31,9 @@ mv /var/tmp/postfix.service /usr/lib/systemd/system/
 #-- postfix の設定
 postmulti -e init
 postmulti -I postfix-inbound -e create
+postmulti -I postfix-outbound -e create
 
-postconf -c /etc/postfix -e inet_interfaces=${OUTBOUND_MTA_SERVER}
+postconf -c /etc/postfix -e inet_interfaces=${LOCAL_MTA_SERVER}
 postconf -c /etc/postfix -e smtpd_milters=inet:${RSPAMD_SERVER}:${RSPAMD_PORT}
 postconf -c /etc/postfix -e non_smtpd_milters=inet:${RSPAMD_SERVER}:${RSPAMD_PORT}
 postconf -c /etc/postfix -e smtpd_authorized_xclient_hosts=${XAUTH_HOST}

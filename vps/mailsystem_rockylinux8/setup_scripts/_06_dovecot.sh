@@ -84,15 +84,14 @@ passdb {
   driver = static
   args = nopassword=y
 }
-# userdb {
-#   args = uid=dovecot gid=dovecot home=/var/dovecot/%Ld/%Ln allow_all_users=yes
-#   driver = static
-# }
+!include_try domain.d/*.conf
 _EOL_
 
-cnt=1
+mkdir /etc/dovecot/domain.d
+
 for base in $(for domain in ${DOMAIN_LIST}
   do
+    echo "${domain}" > /tmp/dovecot_install.tmp
     tmpdc=""
     for dc in $(echo ${domain} | sed 's/\./ /g')
     do
@@ -101,14 +100,15 @@ for base in $(for domain in ${DOMAIN_LIST}
     echo ${tmpdc}
   done | sed 's/,$//')
 do
-cat <<_EOL_>>/etc/dovecot/local.conf
+tmpdoman=$(cat /tmp/dovecot_install.tmp)
+cat <<_EOL_>>/etc/dovecot/domain.d/dovecot-userdb_${tmpdomain}.conf
 userdb {
-  args = /etc/dovecot/dovecot-ldap${cnt}.conf.ext
+  args = /etc/dovecot/domain.d/dovecot-ldap_${tmpdomain}.conf.ext
   driver = ldap
 }
 _EOL_
 
-cat <<_EOL_>/etc/dovecot/dovecot-ldap${cnt}.conf.ext
+cat <<_EOL_>/etc/dovecot/dovecot-ldap_${tmpdomain}.conf.ext
 hosts = ${LDAP_SERVER}
 auth_bind = yes
 base = ${base}
@@ -134,6 +134,6 @@ mkdir /var/dovecot
 chown dovecot. /var/dovecot
 
 #-- dovecot の起動
-systemctl enable dovecot
-systemctl start dovecot
+# systemctl enable dovecot
+# systemctl start dovecot
 
