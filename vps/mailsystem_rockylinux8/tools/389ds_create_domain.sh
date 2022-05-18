@@ -44,7 +44,7 @@ sysbase=$(echo ${domain} | sed -e 's/\(^\|\.\)/,dc=/g' -e 's/^,//')
 if [ ! -f "${WORKDIR}/ldap/system.ldif" ]
 then
 	dc=$(echo ${domain} | awk -F\. '{print $1}')
-	if [ $(ldapsearch -h ${LDAP_MASTER} -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${sysbase}" | grep -c ^dn:) -eq 0 ]
+	if [ $(ldapsearch -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${sysbase}" | grep -c ^dn:) -eq 0 ]
 	then
 		cat <<-_EOL_>>${WORKDIR}/ldap/${domain}.ldif
 		dn: ${sysbase}
@@ -55,7 +55,7 @@ then
 		
 		_EOL_
 	fi
-	ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/system.ldif.ldif
+	ldapadd -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/system.ldif.ldif
 fi
 
 for domain in ${DOMAIN_LIST}
@@ -63,7 +63,7 @@ do
 	account=$(echo ${ADMINS} | awk '{print $1}')
 	base=$(echo ${domain} | sed -e 's/\(^\|\.\)/,dc=/g' -e 's/^,//')
 	dc=$(echo ${domain} | awk -F\. '{print $1}')
-	if [ $(ldapsearch -h ${LDAP_MASTER} -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${base}" | grep -c ^dn:) -eq 0 ]
+	if [ $(ldapsearch -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${base}" | grep -c ^dn:) -eq 0 ]
 	then
 		cat <<-_EOL_>>${WORKDIR}/ldap/${domain}.ldif
 		dn: ${base}
@@ -143,7 +143,7 @@ do
 	done
 
 	echo >> ${WORKDIR}/ldap/${domain}.ldif
-	ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}.ldif
+	ldapadd -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}.ldif
 	mv -f ${WORKDIR}/ldap/${domain}.ldif ${WORKDIR}/ldap/${domain}_admin.ldif
 	echo "${account}@${domain}: ${ROOT_PASSWORD}" >> ${WORKDIR}/password.list
 

@@ -6,7 +6,7 @@
 address=$1
 source $(dirname $0)/../config.source
 
-ldapsearch -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} > /dev/null 2>&1
+ldapsearch -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} > /dev/null 2>&1
 
 if [ $? -ne 0 ]
 then
@@ -50,6 +50,6 @@ mailAlternateAddress: ${account}@${domain}
 mailQuota: ${QUOTA}
 
 _EOL_
-ldapadd -x -h ${LDAP_MASTER} -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_${account}.ldif >/dev/null
+ldapadd -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_${account}.ldif >/dev/null
 
 echo ${password}

@@ -33,7 +33,8 @@ done | sed 's/,$//')
 
 sed -i -e "531i \$servers->setValue('unique','attrs',array('mail','uidNumber','mailRoutingaddress','mailAlternateAddress'));" \
   -e "472i \$servers->setValue('login','anon_bind',false);" \
-  -e "305i \$servers->setValue('server','base',array(${ARRAY_LIST}));" ${HTTPS_DOCROOT}/phpldapadmin/config/config.php
+  -e "305i \$servers->setValue('server','base',array(${ARRAY_LIST}));" \
+  -e "295i \$servers->setValue('server','host','${LDAP_MASTER}');" ${HTTPS_DOCROOT}/phpldapadmin/config/config.php
 
 #-- 使用しないテンプレートを移動
 mkdir ${HTTPS_DOCROOT}/phpldapadmin/templates/creation_backup
