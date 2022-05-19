@@ -43,6 +43,7 @@ domain=postfix.domains
 sysbase=$(echo ${domain} | sed -e 's/\(^\|\.\)/,dc=/g' -e 's/^,//')
 if [ ! -f "${WORKDIR}/ldap/system.ldif" ]
 then
+	dsconf localhost backend create --suffix ${sysbase} --be-name userRoot0
 	dc=$(echo ${domain} | awk -F\. '{print $1}')
 	if [ $(ldapsearch -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${sysbase}" | grep -c ^dn:) -eq 0 ]
 	then
