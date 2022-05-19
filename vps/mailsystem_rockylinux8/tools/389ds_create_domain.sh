@@ -63,7 +63,7 @@ then
 	cat <<-'_EOL_'>> ${WORKDIR}/ldap/${domain}_acl.ldif
 	changeType: modify
 	replace: aci
-	aci: (targetattr="registeredAddress")(target!="ldap:///uid=*,ou=Termed,dc=*")(version 3.0; acl "3"; allow(search,read) userdn="ldap:///anyone";)
+	aci: (targetattr="*")(version 3.0; acl "3"; allow(search,read) userdn="ldap:///anyone";)
 	_EOL_
 	ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/${domain}_acl.ldif
 fi
