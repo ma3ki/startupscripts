@@ -100,7 +100,7 @@ for base in $(for domain in ${DOMAIN_LIST}
     echo ${tmpdc}
   done | sed 's/,$//')
 do
-tmpdoman=$(cat /tmp/dovecot_install.tmp)
+tmpdomain=$(cat /tmp/dovecot_install.tmp)
 cat <<_EOL_>>/etc/dovecot/domain.d/dovecot-userdb_${tmpdomain}.conf
 userdb {
   args = /etc/dovecot/domain.d/dovecot-ldap_${tmpdomain}.conf.ext
