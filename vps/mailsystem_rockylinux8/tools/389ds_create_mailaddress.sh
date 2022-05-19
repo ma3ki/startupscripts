@@ -44,7 +44,7 @@ objectClass: top
 uid: ${account}
 userPassword: ${password}
 mailMessageStore: ${STORE_SERVER}
-mailHost: ${OUTBOUND_MTA_SERVER}
+mailHost: ${LOCAL_MTA_SERVER}
 mailRoutingAddress: ${account}@${domain}
 mailAlternateAddress: ${account}@${domain}
 mailQuota: ${QUOTA}

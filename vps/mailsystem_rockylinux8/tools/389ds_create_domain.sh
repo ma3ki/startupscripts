@@ -136,7 +136,7 @@ do
 	objectClass: top
 	userPassword: ${ROOT_PASSWORD}
 	mailMessageStore: ${STORE_SERVER}
-	mailHost: ${OUTBOUND_MTA_SERVER}
+	mailHost: ${LOCAL_MTA_SERVER}
 	mailAccessDomain: ${domain}
 	mailRoutingAddress: ${account}@${domain}
 	mailAlternateAddress: ${account}@${domain}
