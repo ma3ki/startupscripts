@@ -46,7 +46,7 @@ then
 	dc=$(echo ${domain} | awk -F\. '{print $1}')
 	if [ $(ldapsearch -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -b "${sysbase}" | grep -c ^dn:) -eq 0 ]
 	then
-		cat <<-_EOL_>>${WORKDIR}/ldap/${domain}.ldif
+		cat <<-_EOL_>>${WORKDIR}/ldap/system.ldif
 		dn: ${sysbase}
 		objectClass: dcObject
 		objectClass: organization
@@ -55,7 +55,7 @@ then
 		
 		_EOL_
 	fi
-	ldapadd -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/system.ldif.ldif
+	ldapadd -x -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/system.ldif
 fi
 
 for domain in ${DOMAIN_LIST}
