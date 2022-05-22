@@ -49,7 +49,7 @@ clamav {
   action  = "reject";
   type    = "clamav";
   # servers = "/var/run/clamd.scan/clamd.sock";
-  servers = "${PRIVATEIP}:3310";
+  servers = "${VCSERVER}:3310";
   symbol = "CLAM_VIRUS";
   patterns {
     #symbol_name = "pattern";
