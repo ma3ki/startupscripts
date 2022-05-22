@@ -8,7 +8,7 @@ usage() {
 	exit 1
 }
 
-if [ "$#" -ne 2 ]
+if [ "$#" -ne 1 ]
 then
 	usage
 fi
@@ -18,7 +18,7 @@ then
 	systemctl stop rsyncd
 	systemctl start lsyncd
 	systemctl start dovecot
-elsif [ "$1" = "backup" ]
+elif [ "$1" = "backup" ]
 then
 	systemctl stop dovecot
 	systemctl stop lsyncd

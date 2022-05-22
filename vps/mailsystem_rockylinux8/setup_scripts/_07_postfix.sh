@@ -40,15 +40,22 @@ postconf -c /etc/postfix -e smtpd_authorized_xclient_hosts=${XAUTH_HOST}
 postconf -c /etc/postfix -e smtpd_sasl_auth_enable=yes
 postconf -c /etc/postfix -e smtpd_sender_restrictions=reject_sender_login_mismatch
 postconf -c /etc/postfix -e myhostname=${HOSTNAME}
+postconf -c /etc/postfix -e relayhost=${OUTMX}
+
+postconf -c /etc/postfix-outbound -e inet_interfaces=${PRIVATE_MTA_SERVER}
+postconf -c /etc/postfix-outbound -e myhostname=${OUTHOST}
+postconf -c /etc/postfix-outbound -e smtp_helo_name=${HOSTNAME}
+postconf -c /etc/postfix-outbound -X master_service_disable
 
 postconf -c /etc/postfix-inbound -X master_service_disable
 postconf -c /etc/postfix-inbound -e inet_interfaces=${IPADDR},${IPV6ADDR}
-postconf -c /etc/postfix-inbound -e myhostname=${MXHOST}
+postconf -c /etc/postfix-inbound -e myhostname=${INHOST}
 postconf -c /etc/postfix-inbound -e recipient_delimiter=+
 postconf -c /etc/postfix-inbound -e smtpd_milters=inet:${RSPAMD_SERVER}:${RSPAMD_PORT}
 postconf -c /etc/postfix-inbound -e smtpd_helo_restrictions="reject_invalid_hostname reject_non_fqdn_hostname reject_unknown_hostname"
 postconf -c /etc/postfix-inbound -e smtpd_sender_restrictions="reject_non_fqdn_sender reject_unknown_sender_domain"
-postconf -c /etc/postfix-inbound -e relay_domains=/etc/postfix-inbound/relay_domains
+# postconf -c /etc/postfix-inbound -e relay_domains=/etc/postfix-inbound/relay_domains
+postconf -c /etc/postfix-inbound -e relay_domains=ldap:/etc/postfix-inbound/relay_domains.cf
 postconf -c /etc/postfix-inbound -e authorized_submit_users=static:anyone
 postconf -c /etc/postfix-inbound -e smtpd_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
 postconf -c /etc/postfix-inbound -e smtpd_tls_ask_ccert=yes
@@ -67,7 +74,6 @@ postconf -c /etc/postfix-inbound -e lmtp_destination_concurrency_limit=40
 for cf in /etc/postfix /etc/postfix-inbound
 do
   postconf -c ${cf} -e alias_maps=hash:/etc/aliases
-  postconf -c ${cf} -e inet_protocols=all
   postconf -c ${cf} -e milter_default_action=tempfail
   postconf -c ${cf} -e milter_protocol=6
   postconf -c ${cf} -e milter_command_timeout=15s
@@ -82,6 +88,11 @@ do
   # postconf -c ${cf} -e smtpd_client_message_rate_limit=100
   # postconf -c ${cf} -e smtpd_client_recipient_rate_limit=200
   # postconf -c ${cf} -e smtpd_client_connection_rate_limit=100
+done
+
+for cf in /etc/postfix /etc/postfix-inbound /etc/postfix-outbound
+do
+  postconf -c ${cf} -e inet_protocols=all
   postconf -c ${cf} -e disable_vrfy_command=yes
   postconf -c ${cf} -e smtpd_discard_ehlo_keywords=dsn,enhancedstatuscodes,etrn
   postconf -c ${cf} -e lmtp_host_lookup=native
@@ -180,18 +191,32 @@ do
 done
 
 #-- ドメインの追加
-for domain in ${DOMAIN_LIST}
-do
-cat <<_EOL_>>/etc/postfix-inbound/relay_domains
-${domain}
+# for domain in ${DOMAIN_LIST}
+# do
+# cat <<_EOL_>>/etc/postfix-inbound/relay_domains
+# ${domain}
+# _EOL_
+# done
+cat <<_EOL_>/etc/postfix-inbound/relay_domains.cf
+server_host = ${LDAP_SERVER}
+bind = no
+version = 3
+scope = sub
+timeout = 15
+search_base = dc=postfix,dc=domains
+query_filter = (registeredAddress=%s)
+result_attribute = registeredAddress
+result_format = %s
 _EOL_
-done
 
 #-- postfix の再起動と postfix-inbound インスタンスの有効化
 systemctl enable postfix
 systemctl start postfix
 postmulti -i postfix-inbound -e enable
 postmulti -i postfix-inbound -p start
+
+postmulti -i postfix-outbound -e enable
+postmulti -i postfix-outbound -p start
 
 #-- OS再起動時にpostfixの起動に失敗することがあるので、その対応
 sed -i -e "s/^After=syslog.target.*/After=syslog.target network.target NetworkManager-wait-online.service/" /usr/lib/systemd/system/postfix.service

@@ -1,5 +1,7 @@
 HOST=dummy
-MXHOST=dummy
+INHOST=dummy
+OUTHOST=dummy
+OUTMX=dummy
 IPADDR=dummy
 IPV6ADDR=dummy
 PRIVATEIP=dummy

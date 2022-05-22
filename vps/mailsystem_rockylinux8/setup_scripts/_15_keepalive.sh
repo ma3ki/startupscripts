@@ -7,7 +7,7 @@ echo "---- $0 ----"
 
 yum install -y keepalived
 VRID=$(echo ${PRIVATEVIP} | awk -F\. '{print $4}')
-PRI=$(echo ${IPADDR} | awk -F\. '{print $4}')
+PRI=$(echo ${PRIVATEIP} | awk -F\. '{print $4}')
 
 cat << _EOL_ > /etc/keepalived/keepalived.conf
 vrrp_sync_group VG1 {
@@ -24,13 +24,14 @@ vrrp_instance ETH1 {
   advert_int 5
   authentication {
     auth_type PASS
-    auth_pass sakura-portal
+    auth_pass sakura-p
   }
   virtual_ipaddress {
     ${PRIVATEVIP}
   }
-  notfiy_master "/usr/local/bin/keepalived_notify.sh master"
-  notfiy_backlup "/usr/local/bin/keepalived_notify.sh backup"
+  notify_master "/usr/local/bin/keepalived_notify.sh master"
+  notify_backup "/usr/local/bin/keepalived_notify.sh backup"
+  notify_stop "/usr/local/bin/keepalived_notify.sh backup"
 }
 _EOL_
 
