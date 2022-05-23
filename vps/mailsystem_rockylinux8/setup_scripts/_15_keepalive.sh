@@ -7,7 +7,7 @@ echo "---- $0 ----"
 
 yum install -y keepalived
 VRID=$(echo ${PRIVATEVIP} | awk -F\. '{print $4}')
-PRI=$(echo ${PRIVATEIP} | awk -F\. '{print $4}')
+PRI=$(echo ${PRIVATEPAIR} | awk -F\. '{print $4}')
 
 cat << _EOL_ > /etc/keepalived/keepalived.conf
 vrrp_sync_group VG1 {
@@ -38,10 +38,10 @@ _EOL_
 
 systemctl start keepalived
 #-- VRRPパケットの受信を許可する。
-firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 1 -i em1 -d 224.0.0.18 -p vrrp -j ACCEPT
+firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 1 -i eth1 -d 224.0.0.18 -p vrrp -j ACCEPT
 
 #-- VRRPパケットの送信を許可する。
-firewall-cmd --permanent --direct --add-rule ipv4 filter OUTPUT 1 -o em1 -d 224.0.0.18 -p vrrp -j ACCEPT
+firewall-cmd --permanent --direct --add-rule ipv4 filter OUTPUT 1 -o eth1 -d 224.0.0.18 -p vrrp -j ACCEPT
 firewall-cmd --reload
 
 cp -p $(dirname $0)/../tools/keepalived_notify.sh /usr/local/bin
