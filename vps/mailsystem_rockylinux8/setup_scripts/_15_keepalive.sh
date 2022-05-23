@@ -38,7 +38,7 @@ _EOL_
 
 
 systemctl start keepalived
-#-- VRRPパケットの許可
+#-- VRRPパケットの許可 (firewall-cmd --permanent --zone=trusted --add-interface=eth1 だけでいいかも)
 firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent
 firewall-cmd --reload
 

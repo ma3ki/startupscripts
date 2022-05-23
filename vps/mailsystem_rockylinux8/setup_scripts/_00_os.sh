@@ -24,3 +24,7 @@ chmod 600 ~/.sakura
 
 #-- rsyslog の ratelimit を無効化
 sed -i '/^module(load="imjournal"/a \       ratelimit.interval="0"' /etc/rsyslog.conf
+
+#-- eth1 を trusted
+firewall-cmd --permanent --zone=trusted --add-interface=eth1
+firewall-cmd --reload
