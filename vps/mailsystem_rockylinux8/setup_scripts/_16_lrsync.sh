@@ -3,7 +3,7 @@
 source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
-dnf install -y rsync lsyncd
+dnf install -y rsync rsync-daemon lsyncd
 
 sed -i 's/^sync/-- sync/' /etc/lsyncd.conf
 
@@ -23,7 +23,7 @@ _EOF_
 echo "fs.inotify.max_user_watches = 1048576" > /etc/sysctl.d/98-lsyncd.conf
 sysctl -p /etc/sysctl.d/98-lsyncd.conf
 
-cat << '_EOF_' >> /etc/rsyncd.conf
+cat << _EOF_ >> /etc/rsyncd.conf
 hosts allow = ${PRIVATEPAIR}
 hosts deny = *
 list = true
