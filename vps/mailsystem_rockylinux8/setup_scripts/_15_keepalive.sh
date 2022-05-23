@@ -12,7 +12,7 @@ PRI=$(echo ${PRIVATEPAIR} | awk -F\. '{print $4}')
 cat << _EOL_ > /etc/keepalived/keepalived.conf
 vrrp_sync_group VG1 {
   group {
-       EM1
+       ETH1
   }
 }
 
@@ -22,6 +22,7 @@ vrrp_instance ETH1 {
   state BACKUP
   priority ${PRI}
   advert_int 5
+  nopreempt
   authentication {
     auth_type PASS
     auth_pass sakura-p
@@ -37,11 +38,8 @@ _EOL_
 
 
 systemctl start keepalived
-#-- VRRPパケットの受信を許可する。
-firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 1 -i eth1 -d 224.0.0.18 -p vrrp -j ACCEPT
-
-#-- VRRPパケットの送信を許可する。
-firewall-cmd --permanent --direct --add-rule ipv4 filter OUTPUT 1 -o eth1 -d 224.0.0.18 -p vrrp -j ACCEPT
+#-- VRRPパケットの許可
+firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent
 firewall-cmd --reload
 
 cp -p $(dirname $0)/../tools/keepalived_notify.sh /usr/local/bin
