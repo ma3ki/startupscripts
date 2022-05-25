@@ -11,11 +11,22 @@ cat << _EOF_ >> /etc/lsyncd.conf
 settings{
   statusFile = "/tmp/lsyncd.stat",
   statusInterval = 1,
+    insist = 1,
 }
 sync{
   default.rsync,
   source="/var/dovecot/",
   target="${PRIVATEPAIR}::maildata",
+  delete = running,
+  init = failse,
+  rsync = {
+    owner = true,
+    group = true,
+    links = true,
+    perms = true,
+    update = true,
+    hard_links = true,
+  }
 }
 
 _EOF_
