@@ -41,8 +41,9 @@ vrrp_instance ETH1 {
     chk_myscript
   }
   notify_master "/usr/local/bin/keepalived_notify.sh master"
+  notify_fault  "/usr/local/bin/keepalived_notify.sh backup"
   notify_backup "/usr/local/bin/keepalived_notify.sh backup"
-  notify_stop "/usr/local/bin/keepalived_notify.sh backup"
+  notify_stop   "/usr/local/bin/keepalived_notify.sh backup"
 }
 _EOL_
 
