@@ -48,8 +48,10 @@ _EOL_
 
 
 systemctl start keepalived
+systemctl enable keepalived
 #-- VRRPパケットの許可 (firewall-cmd --permanent --zone=trusted --add-interface=eth1 だけでいいかも)
 firewall-cmd --add-rich-rule='rule protocol value="vrrp" accept' --permanent
 firewall-cmd --reload
 
 cp -p $(dirname $0)/../tools/keepalived_notify.sh /usr/local/bin
+cp -p $(dirname $0)/../tools/keepalived_track.sh /usr/local/bin
