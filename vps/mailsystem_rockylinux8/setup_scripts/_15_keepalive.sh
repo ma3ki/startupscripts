@@ -16,6 +16,13 @@ vrrp_sync_group VG1 {
   }
 }
 
+vrrp_script chk_myscript {
+  script "/usr/local/bin/keepalived_track.sh"
+  interval 5
+  fail 2
+  rise 2
+}
+
 vrrp_instance ETH1 {
   interface eth1
   virtual_router_id ${VRID}
@@ -29,6 +36,9 @@ vrrp_instance ETH1 {
   }
   virtual_ipaddress {
     ${PRIVATEVIP}
+  }
+  track_script {
+    chk_myscript
   }
   notify_master "/usr/local/bin/keepalived_notify.sh master"
   notify_backup "/usr/local/bin/keepalived_notify.sh backup"

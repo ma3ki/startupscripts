@@ -50,7 +50,6 @@ $config['support_url'] = '';
 $config['product_name'] = 'Roundcube Webmail';
 $config['des_key'] = 'rcmail-!24ByteDESkey*Str';
 $config['plugins'] = array('managesieve', 'password', 'archive', 'zipdownload');
-$config['managesieve_host'] = 'localhost';
 $config['spellcheck_engine'] = 'pspell';
 $config['skin'] = 'elastic';
 _EOL_
@@ -63,9 +62,10 @@ sed -i -e "s/managesieve_vacation'] = 0/managesieve_vacation'] = 1/" ${HTTPS_DOC
 cp -p ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php{.dist,}
 
 sed -i -e "s/'sql'/'ldap'/" \
-  -e "s/'ou=people,dc=example,dc=com'/''/" \
+  -e "s/'%u';/'%l';/" \
+  -e "s/'ou=people,dc=example,dc=com'/'ou=People,%dc'/" \
   -e "s/'dc=exemple,dc=com'/''/" \
-  -e "s/'uid=%login,ou=people,dc=exemple,dc=com'/'uid=%name,ou=People,%dc'/" \
+  -e "s/'uid=%login,ou=people,dc=example,dc=com'/'uid=%name,ou=People,%dc'/" \
   -e "s/'(uid=%login)'/'(uid=%name,ou=People,%dc)'/" ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
 
 chown -R nginx. ${HTTPS_DOCROOT}/roundcubemail-${version}
