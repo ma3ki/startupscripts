@@ -129,7 +129,7 @@ if ($env['proto'] === 'smtp' ) {
 }
 
 // set log
-if ($env['user'] === $authuser ) {
+if ($env['user'] === $authuser or $spmra[0] === '' ) {
   $log = sprintf('meth=%s, userid=%s, client=%s, proto=%s', $env['meth'], $env['user'], $env['client'], $protomap[$env['port']]);
 } else {
   $log = sprintf('meth=%s, authid=%s, userid=%s, client=%s, proto=%s', $env['meth'], $env['user'], $authuser, $env['client'], $protomap[$env['port']]);
