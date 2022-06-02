@@ -102,13 +102,13 @@ do
 			nsSystemIndex:false
 			nsIndexType:eq
 
-			dn: cn=mailRoutingAddress,cn=index,cn=tasks,cn=config
-			changetype: add
-			objectclass: top
-			objectclass: extensibleObject
-			cn: mailRoutingAddress
-			nsInstance: userRoot${count}
-			nsIndexAttribute: mailRoutingAddress:eq
+#			dn: cn=mailRoutingAddress,cn=index,cn=tasks,cn=config
+#			changetype: add
+#			objectclass: top
+#			objectclass: extensibleObject
+#			cn: mailRoutingAddress
+#			nsInstance: userRoot${count}
+#			nsIndexAttribute: mailRoutingAddress:eq
 			_EOL_
         		ldapmodify -D "${ROOT_DN}" -w ${ROOT_PASSWORD} -f ${WORKDIR}/ldap/create_index${count}.ldif
 
