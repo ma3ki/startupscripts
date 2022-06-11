@@ -19,6 +19,23 @@ sync{
   target="${PRIVATEPAIR}::maildata",
   delete = running,
   init = failse,
+  delay = 2,
+  rsync = {
+    owner = true,
+    group = true,
+    links = true,
+    perms = true,
+    update = true,
+    hard_links = true,
+  }
+}
+sync{
+  default.rsync,
+  source="/ma3ki/",
+  target="${PRIVATEPAIR}::mailconf",
+  delete = running,
+  init = failse,
+  delay = 2,
   rsync = {
     owner = true,
     group = true,
@@ -31,8 +48,11 @@ sync{
 
 _EOF_
 
+mkdir /ma3ki
+
 echo "fs.inotify.max_user_watches = 1048576" > /etc/sysctl.d/98-lsyncd.conf
 sysctl -p /etc/sysctl.d/98-lsyncd.conf
+
 
 cat << _EOF_ >> /etc/rsyncd.conf
 hosts allow = ${PRIVATEPAIR}
