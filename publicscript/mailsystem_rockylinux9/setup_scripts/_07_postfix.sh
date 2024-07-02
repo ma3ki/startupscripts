@@ -4,29 +4,31 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 #-- 必要なパッケージのインストール
-dnf install -y postfix {cyrus-sasl,openldap,pcre,libdb,libnsl2,mysql,openssl}-devel cyrus-sasl-plain make gcc m4
-grep -v ExecStartPre= /usr/lib/systemd/system/postfix.service > /var/tmp/postfix.service
-dnf remove -y postfix
+# dnf install -y postfix {cyrus-sasl,openldap,pcre,libdb,libnsl2,mysql,openssl}-devel cyrus-sasl-plain make gcc m4
+# grep -v ExecStartPre= /usr/lib/systemd/system/postfix.service > /var/tmp/postfix.service
+# dnf remove -y postfix
+
+dnf install -y postfix postfix-ldap
 
 #-- 標準の postfix では ldap が使用できないため、ソースから build する
-mkdir -p ${WORKDIR}/src
-cd ${WORKDIR}/src
-VERSION=3.9.0
-curl -O http://mirror.postfix.jp/postfix-release/official/postfix-${VERSION}.tar.gz
-tar xvzf postfix-${VERSION}.tar.gz && cd postfix-${VERSION}
+# mkdir -p ${WORKDIR}/src
+# cd ${WORKDIR}/src
+# VERSION=3.9.0
+# curl -O http://mirror.postfix.jp/postfix-release/official/postfix-${VERSION}.tar.gz
+# tar xvzf postfix-${VERSION}.tar.gz && cd postfix-${VERSION}
 
-CCARGS="-Wmissing-prototypes -Wformat -Wno-comment -fPIC \
--DHAS_LDAP -DLDAP_DEPRECATED=1 -DHAS_PCRE -I/usr/include/pcre \
--DHAS_MYSQL -I/usr/include/mysql -DUSE_SASL_AUTH -DUSE_CYRUS_SASL \
--I/usr/include/sasl -DUSE_TLS -DDEF_CONFIG_DIR=\\\"/etc/postfix\\\""
+# CCARGS="-Wmissing-prototypes -Wformat -Wno-comment -fPIC \
+# -DHAS_LDAP -DLDAP_DEPRECATED=1 -DHAS_PCRE -I/usr/include/pcre \
+# -DHAS_MYSQL -I/usr/include/mysql -DUSE_SASL_AUTH -DUSE_CYRUS_SASL \
+# -I/usr/include/sasl -DUSE_TLS -DDEF_CONFIG_DIR=\\\"/etc/postfix\\\""
 
-AUXLIBS="-lldap -llber -lpcre -ldb -lnsl -lresolv -L/usr/lib64/mysql -lmysqlclient \
--lm -L/usr/lib64/sasl2 -lsasl2 -lssl -lcrypto  -pie -Wl,-z,relro,-z,now"
+# AUXLIBS="-lldap -llber -lpcre -ldb -lnsl -lresolv -L/usr/lib64/mysql -lmysqlclient \
+# -lm -L/usr/lib64/sasl2 -lsasl2 -lssl -lcrypto  -pie -Wl,-z,relro,-z,now"
 
-make -f Makefile.init makefiles CCARGS="${CCARGS}" AUXLIBS="${AUXLIBS}"
-make
-make upgrade
-mv /var/tmp/postfix.service /usr/lib/systemd/system/
+# make -f Makefile.init makefiles CCARGS="${CCARGS}" AUXLIBS="${AUXLIBS}"
+# make
+# make upgrade
+# mv /var/tmp/postfix.service /usr/lib/systemd/system/
 
 #-- postfix の設定
 postmulti -e init
