@@ -66,13 +66,13 @@ dnf install -y bind-utils telnet jq expect bash-completion sysstat mkpasswd
 dnf update -y
 
 #-- enable PowerTools 
-
 # dnf config-manager --set-enabled PowerTools || dnf config-manager --set-enabled powertools
 
 set +x
 
 #-- usacloud のインストール
 dnf clean all
+export HOME=/root
 curl -fsSL https://github.com/sacloud/usacloud/releases/latest/download/install.sh | bash
 zone=$(dmidecode -t system | awk '/Family/{print $NF}')
 

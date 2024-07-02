@@ -11,20 +11,30 @@ hostnamectl set-hostname ${name}.${FIRST_DOMAIN}
 #-- DNSレコードの登録
 for domain in ${DOMAIN_LIST}
 do
-  usacloud dns record-add -y --name @ --type A   --ttl 600 --value ${IPADDR} ${domain}
-  usacloud dns record-add -y --name @ --type MX  --ttl 600 --value ${FIRST_DOMAIN}. ${domain}
-  usacloud dns record-add -y --name @ --type TXT --ttl 600 --value "v=spf1 +ip4:${IPADDR} -all" ${domain}
+
   if [ "${domain}" = "${FIRST_DOMAIN}" ]
   then
-    usacloud dns record-add -y --name ${name} --type A --value ${IPADDR} ${domain}
-  fi
-  usacloud dns record-add -y --name _dmarc --type TXT --value "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}" ${domain}
-  usacloud dns record-add -y --name _adsp._domainkey --type TXT --value "dkim=discardable" ${domain}
-  if [ "${FIRST_DOMAIN}" = "${domain}" ]
-  then
-    usacloud dns record-add -y --name autoconfig --type A --value ${IPADDR} ${domain}
+cat <<_EOF_> ${domain}.json
+{"Records": [
+    { "Name": "@", "Type": "A", "RData": "${IPADDR}", "TTL": 600 },
+    { "Name": "@", "Type": "MX", "RData": "10 ${FIRST_DOMAIN}.", "TTL": 600 },
+    { "Name": "@", "Type": "TXT", "RData": "v=spf1 +ip4:${IPADDR} -all", "TTL": 600 },
+    { "Name": "_dmarc", "Type": "TXT", "RData": "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}", "TTL": 600 },
+    { "Name": "${name}", "Type": "A", "RData": "${IPADDR}", "TTL": 600 },
+    { "Name": "autoconfig", "Type": "A", "RData": "${IPADDR}", "TTL": 600 }
+]}
+_EOF_
   else
-    usacloud dns record-add -y --name autoconfig --type CNAME --value autoconfig.${FIRST_DOMAIN}. ${domain}
+cat <<_EOF_> ${domain}.json
+{"Records": [
+    { "Name": "@", "Type": "A", "RData": "${IPADDR}", "TTL": 600 },
+    { "Name": "@", "Type": "MX", "RData": "10 ${FIRST_DOMAIN}.", "TTL": 600 },
+    { "Name": "@", "Type": "TXT", "RData": "v=spf1 +ip4:${IPADDR} -all", "TTL": 600 },
+    { "Name": "_dmarc", "Type": "TXT", "RData": "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}", "TTL": 600 },
+    { "Name": "autoconfig", "Type": "CNAME", "RData": "autoconfig.${FIRST_DOMAIN}.", "TTL": 600 }
+]}
+_EOF_
   fi
+  usacloud dns update ${domain} -y --parameters ${domain}.json
 done
 

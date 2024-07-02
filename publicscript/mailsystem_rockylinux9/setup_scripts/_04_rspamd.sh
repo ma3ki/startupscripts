@@ -227,6 +227,7 @@ _EOL_
 for domain in ${DOMAIN_LIST}
 do
   record=$(cat ${WORKDIR}/keys/${domain}.keys | tr -d '[\n\t]' | sed -e 's/"//g' -e 's/.* TXT ( //' -e 's/) ; $//')
-  usacloud dns record-add -y --name default._domainkey --type TXT --value "${record}" ${domain}
+  sed -i -e "2i    { \"Name\": \"default._domainkey\", \"Type\": \"TXT\", \"RData\": \"${record}\", \"TTL\": 600 }," ${domain}.json
+  usacloud dns update ${domain} -y --parameters ${domain}.json
 done
 
