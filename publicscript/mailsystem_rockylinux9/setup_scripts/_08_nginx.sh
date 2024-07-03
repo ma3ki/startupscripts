@@ -4,7 +4,7 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 #-- リポジトリの設定と nginx, php8.0 のインストール
-dnf install -y nginx php php-{fpm,ldap,devel,xml,pear,json}
+dnf install -y nginx nginx-mod-mail php php-{fpm,ldap,devel,xml,pear,json}
 
 #-- php, php-fpm の設定
 cp -p /etc/php.ini{,.org}
@@ -53,23 +53,20 @@ mail {
     auth_http_header PORT 587;
   }
   server {
-    listen     ${IPADDR}:465;
+    listen     ${IPADDR}:465 ssl;
     protocol   smtp;
-    ssl        on;
     xclient    on;
     resolver   ${RESOLVER1} ${RESOLVER2};
     auth_http_header PORT 465;
   }
   server {
-    listen     ${IPADDR}:995;
+    listen     ${IPADDR}:995 ssl;
     protocol   pop3;
-    ssl        on;
     auth_http_header PORT 995;
   }
   server {
-    listen     ${IPADDR}:993;
+    listen     ${IPADDR}:993 ssl;
     protocol   imap;
-    ssl        on;
     auth_http_header PORT 993;
   }
 }
@@ -217,8 +214,8 @@ systemctl enable nginx php-fpm
 systemctl start nginx php-fpm
 
 #-- OS再起動時にnginxの起動に失敗することがあるので、その対応
-sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 NetworkManager-wait-online.service postfix.service/" /usr/lib/systemd/system/nginx.service
-systemctl daemon-reload
+# sed -i -e "s/^\(After=network.target remote-fs.target nss-lookup.target\)/\1 NetworkManager-wait-online.service postfix.service/" /usr/lib/systemd/system/nginx.service
+# systemctl daemon-reload
 
 #-- firewall の設定
 firewall-cmd --permanent --add-port={25,587,465,993,995,80,443}/tcp
