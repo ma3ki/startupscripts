@@ -91,10 +91,6 @@ chmod 600 ~/.sakura
 set -x
 
 #-- セットアップスクリプトをダウンロード
-#git clone https://github.com/sakura-internet/cloud-startupscripts.git
-#cd cloud-startupscripts/publicscript/mailsystem
-#source config.source
-
 git clone https://github.com/ma3ki/startupscripts.git
 cd startupscripts/publicscript/mailsystem_rockylinux9
 source config.source
