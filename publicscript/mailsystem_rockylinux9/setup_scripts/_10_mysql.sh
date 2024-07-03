@@ -4,7 +4,7 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 #-- mysql のインストール
-dnf -y install mysql-{server,devel}
+dnf -y install mysql-server
 
 #-- mysqld の起動
 systemctl enable mysqld
