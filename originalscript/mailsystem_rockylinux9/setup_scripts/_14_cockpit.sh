@@ -43,7 +43,8 @@ cat <<'_EOL_'> /etc/nginx/conf.d/https.d/cockpit.conf
 _EOL_
 
 #-- 389-ds の cockpit plugin 対応
-dnf -y module install 389-directory-server:stable/default
+dnf -y copr enable @389ds/389-directory-server
+dnf install -y cockpit-389-ds
 
 cat <<_EOL_>>/usr/lib/systemd/system/cockpit.service
 
