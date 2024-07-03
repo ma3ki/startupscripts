@@ -82,18 +82,18 @@ LOGIN URL : https://example.com/roundcube
 LOGIN URL : https://example.com/cockpit
 
 -- Application Version --
-os: AlmaLinux release 8.3 (Purple Manul)
-389ds: 1.4.3.22
-dovecot: 2.3.8
-clamd: 0.103.2
-rspamd: 2.7
-redis: 5.0.3
-postfix: 3.6.0
-mysql: 8.0.21
-php-fpm: 7.2.24
-nginx: 1.14.1
-roundcube: 1.4.11
-phpldapadmin: 1.2.6.2
+os: Rocky Linux release 9.4 (Blue Onyx)
+389ds: 2.4.5
+dovecot: 2.3.16
+clamd: 1.0.6
+rspamd: 3.8.4
+redis: 6.2.7
+postfix: 3.5.9
+mysql: 8.0.36
+php-fpm: 8.0.30
+nginx: 1.20.1
+roundcube: 1.6.7
+phpldapadmin: 1.2.6.6
 
 -- Process Check --
 OK: ns-slapd
@@ -113,7 +113,6 @@ OK: example.com TXT "v=spf1 +ip4:XX.XX.XX.XX -all"
 OK: mail.example.com A XX.XX.XX.XX
 OK: autoconfig.example.com A XX.XX.XX.XX
 OK: _dmarc.example.com TXT "v=DMARC1\; p=reject\; rua=mailto:admin@example.com"
-OK: _adsp._domainkey.example.com TXT "dkim=discardable"
 OK: default._domainkey.example.com TXT "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkviwuC8KvC6OP7HwUPQEZDA+ZnY1mRzZrCJcM4sMRhhVse7Cwy/VOldbIxGTAnsRSaLmmxcz96aiCftvctue7mzIvFscCDRm35PtAS5mvlWXRP1f2brHROLoc0rv7upliPdwNXmc7UhZ2b8/gJhSDw76nFiOiOG7/x5GkLCZLCQIDAQAB"
 
 -- example.com TLS Check --

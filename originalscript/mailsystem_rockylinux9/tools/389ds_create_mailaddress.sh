@@ -29,7 +29,7 @@ then
 	continue
 fi
 domain=$(echo ${address} | awk -F@ '{print $2}')
-password=$(mkpasswd -l 12 -d 3 -c 3 -C 3 -s 0)
+password=$(mkpasswd-expect -l 12 -d 3 -c 3 -C 3 -s 0)
 basedn=""
 for x in $(echo "${domain}" | sed 's/\./ /g')
 do
