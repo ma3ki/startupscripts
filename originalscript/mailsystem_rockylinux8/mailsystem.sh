@@ -5,7 +5,7 @@
 # @sacloud-tag @require-core>=1 @require-memory-gib>=2
 # @sacloud-desc-begin
 # さくらのクラウド上で メールサーバを 自動的にセットアップするスクリプトです。
-# このスクリプトは、RockyLinux 9.X でのみ動作します
+# このスクリプトは、RockyLinux 8.X でのみ動作します
 # セットアップには20分程度時間がかかります。
 #
 # 事前作業として以下の2つが必要となります
@@ -21,7 +21,7 @@
 # ・usacloud と certbot の動作の為、ACCESS_TOKEN と ACCESS_TOKEN_SECRET をサーバに保存します
 # @sacloud-desc-end
 #
-# @sacloud-require-archive distro-rocky distro-ver-9.*
+# @sacloud-require-archive distro-rocky distro-ver-8.*
 # @sacloud-textarea required heredoc ADDR "作成するメールアドレスのリスト" ex="foo@example.com"
 # @sacloud-apikey required permission=create AK "APIキー"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
@@ -52,28 +52,26 @@ set -ex
 _motd start
 trap '_motd fail' ERR
 
-#-- swap 作成
-fallocate -l 4G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo '/swapfile none swap sw 0 0' >> /etc/fstab
+#-- CentOS Stream 8 は 通信が可能になるまで少し時間がかかる
+if [ $(grep -c "CentOS Stream release 8" /etc/redhat-release) -eq 1 ]
+then
+  sleep 30
+fi
 
 #-- tool のインストールと更新
-dnf install -y bind-utils telnet jq expect bash-completion sysstat mkpasswd
+dnf install -y bind-utils telnet jq expect bash-completion sysstat mailx git tar chrony
 
 #-- dnf update
 dnf update -y
 
 #-- enable PowerTools 
-# dnf config-manager --set-enabled PowerTools || dnf config-manager --set-enabled powertools
+dnf config-manager --set-enabled PowerTools || dnf config-manager --set-enabled powertools
 
 set +x
 
 #-- usacloud のインストール
 dnf clean all
-export HOME=/root
-curl -fsSL https://github.com/sacloud/usacloud/releases/latest/download/install.sh | bash
+(curl -fsSL https://releases.usacloud.jp/usacloud/repos/install.sh | bash || true)
 zone=$(dmidecode -t system | awk '/Family/{print $NF}')
 
 #-- usacloud の設定
@@ -91,8 +89,12 @@ chmod 600 ~/.sakura
 set -x
 
 #-- セットアップスクリプトをダウンロード
+#git clone https://github.com/sakura-internet/cloud-startupscripts.git
+#cd cloud-startupscripts/publicscript/mailsystem
+#source config.source
+
 git clone https://github.com/ma3ki/startupscripts.git
-cd startupscripts/publicscript/mailsystem_rockylinux9
+cd startupscripts/originalscript/mailsystem_rockylinux8
 source config.source
 
 #-- 特殊タグの展開
@@ -115,7 +117,7 @@ max_domain_level=$(($(echo "${domain_level}" | sort -nr | head -1) + 1))
 source /etc/sysconfig/network-scripts/ifcfg-eth0
 
 #-- セットアップ設定ファイルの修正
-rpassword=$(mkpasswd-expect -l 12 -d 3 -c 3 -C 3 -s 0)
+rpassword=$(mkpasswd -l 12 -d 3 -c 3 -C 3 -s 0)
 sed -i -e "s/^DOMAIN_LIST=.*/DOMAIN_LIST=\"${domain_list}\"/" \
   -e "s/^FIRST_DOMAIN=.*/FIRST_DOMAIN=\"${first_domain}\"/" \
   -e "s/^FIRST_ADDRESS=.*/FIRST_ADDRESS=\"${first_address}\"/" \

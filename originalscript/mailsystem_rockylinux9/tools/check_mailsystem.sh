@@ -46,7 +46,7 @@ check_version() {
 			VERSION=$(/usr/sbin/nginx -v 2>&1 | awk -F\/ '{print $NF}')
 			;;
 		roundcube)
-			VERSION=$(awk '/Version/{print $3}' ${HTTPS_DOCROOT}/roundcube/index.php)
+                        VERSION=$(ls -d ${HTTPS_DOCROOT}/roundcubemail* | awk -F- '{print $2}')
 			;;
 		phpldapadmin)
 			VERSION=$(awk -F- '{print $NF}' ${HTTPS_DOCROOT}/phpldapadmin/VERSION)
@@ -55,7 +55,7 @@ check_version() {
 			VERSION=$(ls -dtr ${HTTPS_DOCROOT}/rainloop/rainloop/v/* | awk -F\/ '{print $NF}' | tail -1)
 			;;
 		rspamd)
-			VERSION=$(rspamd --version | awk '{print $NF}')
+			VERSION=$(rspamd --version  | head -1 | awk '{print $NF}')
 			;;
 		redis)
 			VERSION=$(redis-server -v | awk '{print $3}' | awk -F= '{print $2}')
@@ -146,7 +146,6 @@ do
 		check_dns autoconfig.${x} CNAME
 	fi
 	check_dns _dmarc.${x} TXT
-	check_dns _adsp._domainkey.${x} TXT
 	check_dns default._domainkey.${x} TXT
 	echo
 done

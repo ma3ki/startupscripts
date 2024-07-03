@@ -196,7 +196,7 @@ user03@example.com: ***********
 ## コマンドでの操作
 ```
 ・メールアドレス追加 (作成したメールアドレスのパスワードが出力されます)
-# /root/.sacloud-api/notes/cloud-startupscripts/publicscript/mailsystem/tools/389ds_create_mailaddress.sh adduser@example.com
+# /root/.sacloud-api/notes/cloud-startupscripts/originalscript/mailsystem/tools/389ds_create_mailaddress.sh adduser@example.com
 
 ・外部向けメールキューの確認
 # mailq
