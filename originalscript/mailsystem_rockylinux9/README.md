@@ -21,8 +21,6 @@
 - メール参照(POP/IMAPサーバ)
   - POP over TLS(995/tcp)
   - IMAP over TLS(993/tcp)
-- Spam Filter System
-  - Rspamd 
 - Webmail
   - Roundcube
     - フィルタリング/転送設定
@@ -143,13 +141,13 @@ user03@example.com: ***********
   - メール参照 (POP/IMAP)
   - メールフィルタリング (Sieve)
   - メール転送 (Sieve)
-- rspamd
+- rspamd + redis
   - 送信メールの DKIM, ARC 署名
   - 受信メールの SPF, DKIM, DMARC, ARC 検証
   - 受信メールの Spam Check
   - 送受信メールの Virus Scan (clamav と連携)
 - clamav
-  - 送受信メールの ウィルススキャンサーバ
+  - ウィルススキャンサーバ
 - postfix, postfix-inbound (multi-instance)
   - メール送信サーバ(postfix)
   - メール受信サーバ(postfix-inbound)
