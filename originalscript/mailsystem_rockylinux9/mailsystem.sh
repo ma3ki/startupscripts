@@ -17,7 +17,6 @@
 # ・ローカルパートが下記のメールアドレスはシステムで利用するため、入力しないこと
 #   [ admin root postmaster abuse nobody dmarc-report archive ]
 # ・セットアップ後、サーバを再起動します
-# ・cockpit を有効にする場合、管理ユーザのパスワード を必ず設定してください。(設定しないとパスワードなしで rootログインできてしまいます)
 # ・usacloud と certbot の動作の為、ACCESS_TOKEN と ACCESS_TOKEN_SECRET をサーバに保存します
 # @sacloud-desc-end
 #
@@ -26,7 +25,7 @@
 # @sacloud-apikey required permission=create AK "APIキー"
 # @sacloud-text required MAILADDR "セットアップ完了メールを送信する宛先" ex="foobar@example.com"
 # @sacloud-checkbox default= archive "メールアーカイブを有効にする"
-# @sacloud-checkbox default= cockpit "cockpitを有効にする"
+#-- @sacloud-checkbox default= cockpit "cockpitを有効にする"
 
 _motd() {
 	LOG=$(ls /root/.sacloud-api/notes/*log)

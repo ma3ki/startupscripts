@@ -53,7 +53,6 @@
 - "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを1行に1つ入力
 - "APIキー" を選択 (DNSのレコード登録に使用します)
 - "メールアーカイブを有効にする" 場合は チェックしてください
-- "cockpitを有効にする" 場合は チェックしてください (389-dsのcockpit pluginもインストールします)
 - "セットアップ完了メールを送信する宛先" に、メールを受信できるアドレスを入力
 - 必要な項目を入力したら作成
 ## 4. セットアップ完了メール の確認
@@ -77,9 +76,6 @@ PASSWORD  : ***********
 
 -- Roundcube Webmail --
 LOGIN URL : https://example.com/roundcube
-
--- Cockpit --
-LOGIN URL : https://example.com/cockpit
 
 -- Application Version --
 os: Rocky Linux release 9.4 (Blue Onyx)
@@ -170,16 +166,14 @@ user03@example.com: ***********
   - ldapの管理
 - certbot
   - TLS対応(Lets Encrypt)
-- cockpit
-  - サーバ管理
 - Thunderbird の autoconfig設定
 ## 補足
 - 1通のメールサイズは最大20MBで、MBOXのサイズと保存通数に制限は設定していない
 - 転送設定の最大転送先アドレスは32アドレス
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
   - admin, root, postmaster, abuse, nobody, dmarc-report
-- virus メールについて
-  - clamavで Virus と判定したメールは、送受信を拒否する(reject)
+- ウィルス検知時の挙動
+  - clamavで ウィルス を検知したメールは、送受信を拒否する(reject)
 - rspamd が正常に動作していない場合、postfixは tempfail を応答する
 - メールアーカイブ機能
   - メールアーカイブを有効にすると、全てのユーザの送信/受信メールがarchive用のアドレスに複製配送(bcc)される
@@ -188,8 +182,6 @@ user03@example.com: ***********
   - さくらのクラウドDNSに複数ゾーンを追加し、サーバ作成時に複数のドメインのメールアドレスを入力する
 - メールアドレスの無効化
   - ldap の ou 属性を People から Termed に変更することで メールアドレスを無効にできる
-- ldap のバックアップ/リストア
-  - cockpit を有効にすることにより、389-ds のデータベースのバックアップ/リストアがWebUIから実施できる
 - 各種OSSの設定、操作方法についてはOSSの公式のドキュメントをご参照ください
 
 ## コマンドでの操作
