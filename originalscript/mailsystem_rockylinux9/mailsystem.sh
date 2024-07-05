@@ -58,9 +58,6 @@ mkswap /swapfile
 swapon /swapfile
 echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
-#-- openssh 脆弱性対応
-sed -e 's/#LoginGraceTime .*/LoginGraceTime 0/' /etc/ssh/sshd_config
-
 #-- dnf update
 dnf update -y
 
