@@ -168,7 +168,7 @@ user03@example.com: ***********
   - TLS対応(Lets Encrypt)
 - Thunderbird の autoconfig設定
 ## 補足
-- 1通のメールサイズは最大20MBで、MBOXのサイズと保存通数に制限は設定していない
+- 1通のメールサイズは最大20MBで、MBOXのサイズは大きい値でquotaをかけている
 - 転送設定の最大転送先アドレスは32アドレス
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
   - admin, root, postmaster, abuse, nobody, dmarc-report
