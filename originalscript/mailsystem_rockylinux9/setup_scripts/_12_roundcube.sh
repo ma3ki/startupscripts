@@ -24,9 +24,8 @@ mysql roundcubemail < ${HTTPS_DOCROOT}/roundcube/SQL/mysql.initial.sql
 dnf install -y php-{pdo,xml,mbstring,intl,gd,mysqlnd,pear-Auth-SASL,zip} unzip php-pear-Net-SMTP
 pear channel-update pear.php.net
 pear install -a Mail_mime
-#pear install Net_LDAP
 pear install Net_LDAP2
-pear install Net_Sieve-1.4.6
+pear install Net_Sieve
 
 dnf install -y ImageMagick ImageMagick-devel
 pecl channel-update pecl.php.net
@@ -65,9 +64,10 @@ cp -p ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php{.dist,}
 sed -i -e "s/'sql'/'ldap'/" \
   -e "s/'%u';/'%l';/" \
   -e "s/'ou=people,dc=example,dc=com'/'ou=People,%dc'/" \
-  -e "s/'dc=exemple,dc=com'/''/" \
+  -e "s/'dc=example,dc=com'/''/" \
   -e "s/'uid=%login,ou=people,dc=example,dc=com'/'uid=%name,ou=People,%dc'/" \
-  -e "s/'(uid=%login)'/'(uid=%name,ou=People,%dc)'/" ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
+  -e "s/'(uid=%login)'/'(uid=%name,ou=People,%dc)'/" \
+  -e "s/'crypt';/'ssha';/" ${HTTPS_DOCROOT}/roundcube/plugins/password/config.inc.php
 
 chown -R nginx. ${HTTPS_DOCROOT}/roundcubemail-${version}
 cd ${HTTPS_DOCROOT}/roundcube
