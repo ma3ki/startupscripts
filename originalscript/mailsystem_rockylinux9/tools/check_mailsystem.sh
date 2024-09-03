@@ -146,7 +146,7 @@ do
 		check_dns autoconfig.${x} CNAME
 	fi
 	check_dns _dmarc.${x} TXT
-	check_dns default._domainkey.${x} TXT
+	check_dns ${SELECTOR}._domainkey.${x} TXT
 	echo
 done
 

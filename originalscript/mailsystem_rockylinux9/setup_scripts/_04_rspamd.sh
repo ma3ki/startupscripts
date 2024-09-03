@@ -96,38 +96,25 @@ relevance = true;
 _EOL_
 
 #-- DKIM
+
 mkdir -p ${WORKDIR}/keys
 for domain in ${DOMAIN_LIST}
 do
-  rspamadm dkim_keygen -d ${domain} -s default -b 2048 > ${WORKDIR}/keys/${domain}.keys
-  head -28 ${WORKDIR}/keys/${domain}.keys > /etc/rspamd/local.d/keys/default.${domain}.key
-  chmod 600 /etc/rspamd/local.d/keys/default.${domain}.key
-  chown _rspamd. /etc/rspamd/local.d/keys/default.${domain}.key
+  rspamadm dkim_keygen -d ${domain} -s ${SELECTOR} -b 2048 > ${WORKDIR}/keys/${domain}.keys
+  head -28 ${WORKDIR}/keys/${domain}.keys > /etc/rspamd/local.d/keys/${SELECTOR}.${domain}.key
+  chmod 600 /etc/rspamd/local.d/keys/${SELECTOR}.${domain}.key
+  chown _rspamd. /etc/rspamd/local.d/keys/${SELECTOR}.${domain}.key
 done
 
 cat <<'_EOL_'> /etc/rspamd/local.d/dkim_signing.conf
 # メーリングリストや転送の対応
 allow_hdrfrom_mismatch = true;
 sign_local = true;
-
 use_esld = false;
 try_fallback = true;
+selector_map = "/etc/rspamd/local.d/dkim_selectors.map";
+path_map = "/etc/rspamd/local.d/dkim_paths.map";
 
-_EOL_
-
-for domain in ${DOMAIN_LIST} 
-do
-	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
-	domain {
-	  ${domain} {
-	    path = "/etc/rspamd/local.d/keys/\$selector.\$domain.key";
-	    selector = "default";
-	  }
-	}
-	_EOL_
-done
-
-cat <<_EOL_>> /etc/rspamd/local.d/dkim_signing.conf
 #-- メーリングリストを使用しない場合
 sign_headers = '(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post';
 _EOL_
@@ -137,28 +124,26 @@ cat <<'_EOL_'> /etc/rspamd/local.d/arc.conf
 allow_hdrfrom_mismatch = true;
 sign_local = true;
 use_domain = "envelope";
-
 use_esld = false;
 try_fallback = true;
+selector_map = "/etc/rspamd/local.d/dkim_selectors.map";
+path_map = "/etc/rspamd/local.d/dkim_paths.map";
 
-_EOL_
-
-for domain in ${DOMAIN_LIST}
-do
-	cat <<-_EOL_>> /etc/rspamd/local.d/arc.conf
-	domain {
-	  ${domain} {
-	    path = "/etc/rspamd/local.d/keys/\$selector.\$domain.key";
-	    selector = "default";
-	  }
-	}
-	_EOL_
-done
-
-cat <<_EOL_>> /etc/rspamd/local.d/arc.conf
 #-- メーリングリストを使用しない場合
 sign_headers = "(o)from:(o)sender:(o)reply-to:(o)subject:(o)date:(o)message-id:(o)to:(o)cc:(o)mime-version:(o)content-type:(o)content-transfer-encoding:resent-to:resent-cc:resent-from:resent-sender:resent-message-id:(o)in-reply-to:(o)references:list-id:list-owner:list-unsubscribe:list-subscribe:list-post:dkim-signature";
 _EOL_
+
+for domain in ${DOMAIN_LIST} 
+do
+	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_selectors.map
+	${domain} ${SELECTOR}
+	_EOL_
+
+	cat <<-_EOL_>> /etc/rspamd/local.d/dkim_paths.map
+	${domain} /etc/rspamd/local.d/keys/\$selector.\$domain.key
+	_EOL_
+
+done
 
 cat <<_EOL_> /etc/rspamd/local.d/history_redis.conf
 servers         = ${REDIS_SERVER}:6379;
@@ -227,7 +212,7 @@ _EOL_
 for domain in ${DOMAIN_LIST}
 do
   record=$(cat ${WORKDIR}/keys/${domain}.keys | tr -d '[\n\t]' | sed -e 's/"//g' -e 's/.* TXT ( //' -e 's/) ; $//')
-  sed -i -e "2i    { \"Name\": \"default._domainkey\", \"Type\": \"TXT\", \"RData\": \"${record}\", \"TTL\": 600 }," ${domain}.json
+  sed -i -e "2i    { \"Name\": \"${SELECTOR}._domainkey\", \"Type\": \"TXT\", \"RData\": \"${record}\", \"TTL\": 600 }," ${domain}.json
   usacloud dns update ${domain} -y --parameters ${domain}.json
 done
 
