@@ -1,5 +1,9 @@
 #!/bin/bash -e
 #
+# 389ds_create_domain.sh でldapにドメインを登録してから
+# 各種アプリに設定を追加するために使用する 
+# アーカイブ設定はしない
+#
 # ./add_domain_config.sh <domain>
 
 source $(dirname $0)/../config.source
@@ -53,12 +57,7 @@ auth_bind = yes
 base = ${base}
 pass_attrs=mailRoutingAddress=User,userPassword=password
 pass_filter = (mailRoutingAddress=%u)
-user_attrs = \
-  =uid=dovecot, \
-  =gid=dovecot, \
-  =mail=maildir:/var/dovecot/%Ld/%Ln, \
-  =home=/var/dovecot/%Ld/%Ln, \
-  mailQuota=quota_rule=*:bytes=%\$
+user_attrs = =uid=dovecot, =gid=dovecot, =mail=maildir:/var/dovecot/%Ld/%Ln, =home=/var/dovecot/%Ld/%Ln, mailQuota=quota_rule=*:bytes=%\$
 user_filter = (mailRoutingAddress=%u)
 iterate_attrs = mailRoutingAddress=user
 iterate_filter = (mailRoutingAddress=*)
