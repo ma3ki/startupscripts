@@ -100,7 +100,7 @@ do
 
 	base=$(printf ${domain} | xargs -d "." -i printf "dc={}," | sed 's/,$//')
 
-	cat <<-_EOL_>/etc/dovecot/dovecot-ldap${cnt}.conf.ext
+	cat <<-_EOL_>/etc/dovecot/dovecot-ldap_${domain}.conf.ext
 	hosts = ${LDAP_SERVER}
 	auth_bind = yes
 	base = ${base}
