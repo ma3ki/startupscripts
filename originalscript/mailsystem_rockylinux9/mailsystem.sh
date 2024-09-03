@@ -151,11 +151,11 @@ then
     mail_password=$(./tools/389ds_create_mailaddress.sh archive@${domain})
     echo "archive@${domain}: ${mail_password}" >> ${pass_list}
 
-    # 送信アーカイブ設定
+    #-- 送信アーカイブ設定
     echo "/^(.*)@${domain}\$/    archive+\$1-Sent@${domain}" >> /etc/postfix/sender_bcc_maps
     postconf -c /etc/postfix -e sender_bcc_maps=regexp:/etc/postfix/sender_bcc_maps
 
-    # 受信アーカイブ設定
+    #-- 受信アーカイブ設定
     if [ ! -f /etc/postfix-inbound/recipient_bcc_maps ]
     then
 cat <<_EOL_>/etc/postfix-inbound/recipient_bcc_maps
@@ -168,7 +168,7 @@ _EOL_
     fi
     postconf -c /etc/postfix-inbound -e recipient_bcc_maps=regexp:/etc/postfix-inbound/recipient_bcc_maps
 
-    # 1年経過したアーカイブメールを削除
+    #-- 1年経過したアーカイブメールを削除
     echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u archive@${domain} mailbox \*-Sent before 365d" >> ${CRONFILE}
     echo "0 $((${RANDOM}%6+1)) * * * root doveadm expunge -u archive@${domain} mailbox \*-Recv before 365d" >> ${CRONFILE}
   done
@@ -182,10 +182,10 @@ do
   echo "${x}: ${mail_password}" >> ${pass_list}
 done
 
-# usacloud の設定削除
-usacloud config delete -y --name default
+#-- usacloud の設定削除
+# usacloud config delete -y --name default
 
-# セットアップ完了のメールを送信
+#-- セットアップ完了のメールを送信
 if [ $(echo ${mail_addr} | egrep -c "@") -eq 1 ]
 then
 	echo -e "Subject: Setup Mail Server - ${first_domain}

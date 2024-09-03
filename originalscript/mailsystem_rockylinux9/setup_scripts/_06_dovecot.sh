@@ -90,42 +90,32 @@ passdb {
 # }
 _EOL_
 
-cnt=1
-for base in $(for domain in ${DOMAIN_LIST}
-  do
-    tmpdc=""
-    for dc in $(echo ${domain} | sed 's/\./ /g')
-    do
-      tmpdc="${tmpdc}dc=${dc},"
-    done
-    echo ${tmpdc}
-  done | sed 's/,$//')
+for domain in ${DOMAIN_LIST}
 do
-cat <<_EOL_>>/etc/dovecot/local.conf
-userdb {
-  args = /etc/dovecot/dovecot-ldap${cnt}.conf.ext
-  driver = ldap
-}
-_EOL_
+	cat <<-_EOL_>>/etc/dovecot/local.conf
+	userdb {
+	  args = /etc/dovecot/dovecot-ldap_${domain}.conf.ext
+	  driver = ldap
+	}
 
-cat <<_EOL_>/etc/dovecot/dovecot-ldap${cnt}.conf.ext
-hosts = ${LDAP_SERVER}
-auth_bind = yes
-base = ${base}
-pass_attrs=mailRoutingAddress=User,userPassword=password
-pass_filter = (mailRoutingAddress=%u)
-user_attrs = \
-  =uid=dovecot, \
-  =gid=dovecot, \
-  =mail=maildir:/var/dovecot/%Ld/%Ln, \
-  =home=/var/dovecot/%Ld/%Ln, \
-  mailQuota=quota_rule=*:bytes=%\$
-user_filter = (mailRoutingAddress=%u)
-iterate_attrs = mailRoutingAddress=user
-iterate_filter = (mailRoutingAddress=*)
-_EOL_
+	base=$(printf ${domain} | xargs -d "." -i printf "dc={}," | sed 's/,$//')
 
-  cnt=$(($cnt + 1))
+	cat <<-_EOL_>/etc/dovecot/dovecot-ldap${cnt}.conf.ext
+	hosts = ${LDAP_SERVER}
+	auth_bind = yes
+	base = ${base}
+	pass_attrs=mailRoutingAddress=User,userPassword=password
+	pass_filter = (mailRoutingAddress=%u)
+	user_attrs = \
+	  =uid=dovecot, \
+	  =gid=dovecot, \
+	  =mail=maildir:/var/dovecot/%Ld/%Ln, \
+	  =home=/var/dovecot/%Ld/%Ln, \
+	  mailQuota=quota_rule=*:bytes=%\$
+	user_filter = (mailRoutingAddress=%u)
+	iterate_attrs = mailRoutingAddress=user
+	iterate_filter = (mailRoutingAddress=*)
+	_EOL_
 done
 
 sed -i 's/^\!include auth-system.conf.ext/#\|include auth-system.conf.ext/' /etc/dovecot/conf.d/10-auth.conf
