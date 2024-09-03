@@ -97,6 +97,7 @@ do
 	  args = /etc/dovecot/dovecot-ldap_${domain}.conf.ext
 	  driver = ldap
 	}
+	_EOL_
 
 	base=$(printf ${domain} | xargs -d "." -i printf "dc={}," | sed 's/,$//')
 
