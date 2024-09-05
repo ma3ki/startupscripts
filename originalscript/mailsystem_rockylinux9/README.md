@@ -39,7 +39,7 @@
 ## 1. APIキーの登録
 - アクセスレベルが 作成・削除 のAPIキーを用意
 ## 2. メールアドレス用ドメインの追加
-- グローバルリソースの DNS に ゾーンを追加
+- グローバルリソースの DNS に ゾーンを追加し利用できるようにする
 ## 3. スタートアップスクリプトの登録
 - mailsystem.sh の内容をスタートアップスクリプトに登録
 ## 4. サーバの作成
@@ -47,13 +47,14 @@
 下記は example.com をドメインとした場合の例です
 ```
 - "アーカイブ選択" で 対応OS のアーカイブを選択
-- "ホスト名" はドメインを省いたものを入力してください (例: mail と入力した場合、 mail.example.com というホスト名になります)
+- "ホスト名" はドメインを省いたものを入力する (例: mail と入力した場合、 mail.example.com というホスト名になります)
 - "スタートアップアクリプト" で shell を選択
 - "配置するスタートアップスクリプト"で 3で作成したスタートアップスクリプト を選択
 - "作成するメールアドレスのリスト" に初期セットアップ時に作成するメールアドレスを1行に1つ入力
 - "APIキー" を選択 (DNSのレコード登録に使用します)
 - "メールアーカイブを有効にする" 場合は チェックしてください
 - "セットアップ完了メールを送信する宛先" に、メールを受信できるアドレスを入力
+- "usacloudをインストールする" のチェックをはずす
 - 必要な項目を入力したら作成
 ## 5. セットアップ完了メール の確認
 - セットアップ完了後に、セットアップ情報を記述したメールが届きます
@@ -82,13 +83,13 @@ os: Rocky Linux release 9.4 (Blue Onyx)
 389ds: 2.4.5
 dovecot: 2.3.16
 clamd: 1.0.6
-rspamd: 3.8.4
+rspamd: 3.9.1
 redis: 6.2.7
 postfix: 3.5.9
 mysql: 8.0.36
 php-fpm: 8.0.30
 nginx: 1.20.1
-roundcube: 1.6.7
+roundcube: 1.6.9
 phpldapadmin: 1.2.6.6
 
 -- Process Check --
@@ -109,12 +110,12 @@ OK: example.com TXT "v=spf1 +ip4:XX.XX.XX.XX -all"
 OK: mail.example.com A XX.XX.XX.XX
 OK: autoconfig.example.com A XX.XX.XX.XX
 OK: _dmarc.example.com TXT "v=DMARC1\; p=reject\; rua=mailto:admin@example.com"
-OK: default._domainkey.example.com TXT "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkviwuC8KvC6OP7HwUPQEZDA+ZnY1mRzZrCJcM4sMRhhVse7Cwy/VOldbIxGTAnsRSaLmmxcz96aiCftvctue7mzIvFscCDRm35PtAS5mvlWXRP1f2brHROLoc0rv7upliPdwNXmc7UhZ2b8/gJhSDw76nFiOiOG7/x5GkLCZLCQIDAQAB"
+OK: sacloud._domainkey.example.com TXT "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkviwuC8KvC6OP7HwUPQEZDA+ZnY1mRzZrCJcM4sMRhhVse7Cwy/VOldbIxGTAnsRSaLmmxcz96aiCftvctue7mzIvFscCDRm35PtAS5mvlWXRP1f2brHROLoc0rv7upliPdwNXmc7UhZ2b8/gJhSDw76nFiOiOG7/x5GkLCZLCQIDAQAB"
 
 -- example.com TLS Check --
 Validity:
- Not Before: May 17 22:28:59 2021 GMT
- Not After : Aug 15 22:28:59 2021 GMT
+ Not Before: Sep  3 15:41:34 2024 GMT
+ Not After : Dec  2 15:41:33 2024 GMT
 Subject Alternative Name:
  DNS:*.example.com, DNS:example.com
 
@@ -168,7 +169,7 @@ user03@example.com: ***********
   - TLS対応(Lets Encrypt)
 - Thunderbird の autoconfig設定
 ## 補足
-- 1通のメールサイズは最大20MBで、MBOXのサイズは大きい値でquotaをかけている
+- 1通のメールサイズは最大20MBで、MBOXのサイズは4GBでquotaをかけている
 - 転送設定の最大転送先アドレスは32アドレス
 - adminアドレスはエイリアス設定をしている (下記のアドレス宛のメールは admin 宛に配送される)
   - admin, root, postmaster, abuse, nobody, dmarc-report
