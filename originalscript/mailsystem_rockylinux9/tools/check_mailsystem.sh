@@ -153,6 +153,9 @@ done
 
 echo "-- ${FIRST_DOMAIN} TLS Check --"
 check_cert ${FIRST_DOMAIN}
+echo
 
+echo "-- Firewall List --"
+firewall-cmd --list-all
 echo
 
