@@ -163,6 +163,7 @@ server {
     fastcgi_pass unix:/run/php-fpm/www.sock;
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+    fastcgi_param HTTP_HOST \$host;
     include fastcgi_params;
     deny all;
   }
@@ -177,8 +178,8 @@ server {
 _EOL_
 
 mkdir -p ${HTTP_DOCROOT} ${HTTPS_DOCROOT} /var/log/nginx /var/cache/nginx/client_temp /etc/nginx/conf.d/https.d
-cp -p /usr/share/nginx/html/[45]*.html /usr/share/nginx/html/{nginx-logo,poweredby}.png ${HTTP_DOCROOT}
-cp -p /usr/share/nginx/html/[45]*.html /usr/share/nginx/html/{nginx-logo,poweredby}.png ${HTTPS_DOCROOT}
+cp -p /usr/share/nginx/html/5*.html ${HTTP_DOCROOT}
+cp -p /usr/share/nginx/html/5*.html ${HTTPS_DOCROOT}
 chown -R nginx. /var/www/html/ /var/log/nginx /var/cache/nginx/client_temp
 
 cat <<_EOL_> /etc/nginx/conf.d/https.conf
@@ -212,9 +213,6 @@ server {
     include fastcgi_params;
   }
 
-  error_page 404 /404.html;
-    location = /404.html {
-  }
   error_page 500 502 503 504 /50x.html;
     location = /50x.html {
   }
