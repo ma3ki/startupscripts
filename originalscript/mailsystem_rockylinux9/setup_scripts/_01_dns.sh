@@ -21,6 +21,7 @@ cat <<_EOF_> ${domain}.json
     { "Name": "@", "Type": "TXT", "RData": "v=spf1 +ip4:${IPADDR} -all", "TTL": 600 },
     { "Name": "_dmarc", "Type": "TXT", "RData": "v=DMARC1; p=reject; rua=mailto:dmarc-report@${domain}", "TTL": 600 },
     { "Name": "${name}", "Type": "A", "RData": "${IPADDR}", "TTL": 600 },
+    { "Name": "@", "Type": "HTTPS", "RData": "10 . alpn=h3,h2", "TTL": 600 },
     { "Name": "autoconfig", "Type": "A", "RData": "${IPADDR}", "TTL": 600 }
 ]}
 _EOF_

@@ -4,7 +4,25 @@ source $(dirname $0)/../config.source
 echo "---- $0 ----"
 
 #-- リポジトリの設定と nginx, php8.0 のインストール
-dnf install -y nginx nginx-mod-mail php php-{fpm,ldap,devel,xml,pear,json}
+cat <<'_EOL_'> /etc/yum.repos.d/nginx.repo
+[nginx-stable]
+name=nginx stable repo
+baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+gpgcheck=1
+enabled=1
+gpgkey=https://nginx.org/keys/nginx_signing.key
+module_hotfixes=true
+
+[nginx-mainline]
+name=nginx mainline repo
+baseurl=http://nginx.org/packages/mainline/centos/$releasever/$basearch/
+gpgcheck=1
+enabled=0
+gpgkey=https://nginx.org/keys/nginx_signing.key
+module_hotfixes=true
+_EOL_
+
+dnf install -y nginx php php-{fpm,ldap,devel,xml,pear,json}
 
 #-- php, php-fpm の設定
 cp -p /etc/php.ini{,.org}
@@ -89,20 +107,21 @@ events {
 }
 
 http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
 
     access_log  /var/log/nginx/access.log  main;
 
-    sendfile            on;
-    tcp_nopush          on;
-    tcp_nodelay         on;
-    keepalive_timeout   65;
-    types_hash_max_size 2048;
+    sendfile        on;
+    #tcp_nopush     on;
 
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
+    keepalive_timeout  65;
+
+    #gzip  on;
 
     include /etc/nginx/conf.d/*.conf;
 }
@@ -164,7 +183,8 @@ chown -R nginx. /var/www/html/ /var/log/nginx /var/cache/nginx/client_temp
 
 cat <<_EOL_> /etc/nginx/conf.d/https.conf
 server {
-  listen 443 ssl http2 default_server;
+  listen 443 ssl default_server;
+  listen 443 quic reuseport default_server;
   server_name ${FIRST_DOMAIN};
   include /etc/nginx/default.d/${FIRST_DOMAIN}_ssl.conf;
   index index.html, index.php;
@@ -173,6 +193,10 @@ server {
   root ${HTTPS_DOCROOT};
   server_tokens off;
   charset     utf-8;
+
+  http2 on;
+  http3 on;
+  add_header  Alt-Svc 'h3=":443"; ma=86400';
 
   ssl_session_cache shared:WEB:10m;
   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
@@ -218,5 +242,5 @@ systemctl start nginx php-fpm
 # systemctl daemon-reload
 
 #-- firewall の設定
-firewall-cmd --permanent --add-port={25,587,465,993,995,80,443}/tcp
+firewall-cmd --permanent --add-port={25,587,465,993,995,80,443}/tcp --add-port=443/udp
 firewall-cmd --reload
