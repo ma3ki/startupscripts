@@ -142,6 +142,7 @@ do
 	then
 		check_dns ${HOST} A
 		check_dns autoconfig.${x} A
+		check_dns ${x} HTTPS
 	else
 		check_dns autoconfig.${x} CNAME
 	fi

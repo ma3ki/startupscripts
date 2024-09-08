@@ -153,7 +153,7 @@ user03@example.com: ***********
   - メール送信サーバ(postfix)
   - メール受信サーバ(postfix-inbound)
 - nginx, php-fpm
-  - Webサーバ(HTTPS)
+  - Webサーバ(HTTPS, HTTP/3)
   - メールプロキシサーバ(SMTP Submission,SMTPS,POPS,IMAPS)
   - メールプロキシ用認証サーバ(HTTP)
 - mysql
