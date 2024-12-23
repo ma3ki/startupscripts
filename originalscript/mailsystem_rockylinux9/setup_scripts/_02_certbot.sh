@@ -18,5 +18,7 @@ expect \"Congratulations\"
 #-- 証明書が作成されたことを確認
 ls -l /etc/letsencrypt/live/${FIRST_DOMAIN}/fullchain.pem
 
+sed -i "s/^POST_HOOK.*/POST_HOOK=\"--post-hook 'systemctl reload nginx postfix'\"/" /etc/sysconfig/certbot
+
 #-- cron に証明書の更新処理を設定
-echo "$((${RANDOM}%60)) $((${RANDOM}%24)) * * $((${RANDOM}%7)) root certbot renew --post-hook 'systemctl reload nginx postfix'" >> ${CRONFILE}
+# echo "$((${RANDOM}%60)) $((${RANDOM}%24)) * * $((${RANDOM}%7)) root certbot renew --post-hook 'systemctl reload nginx postfix'" >> ${CRONFILE}
